@@ -1,0 +1,45 @@
+
+Query Tokens:  586
+
+llama_print_timings:        load time =   366.01 ms
+llama_print_timings:      sample time =    25.21 ms /    35 runs   (    0.72 ms per token)
+llama_print_timings: prompt eval time = 24417.11 ms /   763 tokens (   32.00 ms per token)
+llama_print_timings:        eval time =  3600.48 ms /    34 runs   (  105.90 ms per token)
+llama_print_timings:       total time = 28395.85 ms
+
+
+Query Tokens:  560
+
+llama_print_timings:        load time =   366.01 ms
+llama_print_timings:      sample time =    14.70 ms /    20 runs   (    0.73 ms per token)
+llama_print_timings: prompt eval time = 21911.80 ms /   684 tokens (   32.03 ms per token)
+llama_print_timings:        eval time =  1946.36 ms /    19 runs   (  102.44 ms per token)
+llama_print_timings:       total time = 24226.13 ms
+
+
+Query Tokens:  596
+
+llama_print_timings:        load time =   366.01 ms
+llama_print_timings:      sample time =    11.46 ms /    16 runs   (    0.72 ms per token)
+llama_print_timings: prompt eval time = 22517.17 ms /   702 tokens (   32.08 ms per token)
+llama_print_timings:        eval time =  1635.80 ms /    15 runs   (  109.05 ms per token)
+llama_print_timings:       total time = 24512.63 ms
+
+
+
+Query Tokens:  626
+
+llama_print_timings:        load time =   366.01 ms
+llama_print_timings:      sample time =    11.58 ms /    16 runs   (    0.72 ms per token)
+llama_print_timings: prompt eval time = 38826.08 ms /   743 tokens (   52.26 ms per token)
+llama_print_timings:        eval time =  1535.88 ms /    15 runs   (  102.39 ms per token)
+llama_print_timings:       total time = 40744.86 ms
+
+
+Consolidation Tokens:  188
+
+llama_print_timings:        load time =   366.01 ms
+llama_print_timings:      sample time =    15.87 ms /    22 runs   (    0.72 ms per token)
+llama_print_timings: prompt eval time =  6882.06 ms /   229 tokens (   30.05 ms per token)
+llama_print_timings:        eval time =  1783.19 ms /    21 runs   (   84.91 ms per token)
+llama_print_timings:       total time =  8786.18 ms

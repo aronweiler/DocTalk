@@ -1,0 +1,111 @@
+<mxfile host="app.diagrams.net" modified="2023-06-14T05:51:22.108Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="ry-9n4hpHb1pT0_C_lhi" version="21.3.8" type="device">
+  <diagram id="F4hewUD3S2MZrJXhegjf" name="DocTalk Process Flow">
+    <mxGraphModel dx="2284" dy="788" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-34" value="&lt;font style=&quot;font-size: 19px;&quot;&gt;&lt;span&gt;The Plan&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="-60" y="70" width="880" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-15" value="Contextual Document Loader" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="130" y="420" width="650" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-1" value="Summarize Documents" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="130" y="130" width="650" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="TebW8Ba8xhdXek9SgM_W-2" target="TebW8Ba8xhdXek9SgM_W-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-5" value="Document&lt;br&gt;Text" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="TebW8Ba8xhdXek9SgM_W-2" target="TebW8Ba8xhdXek9SgM_W-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-9" value="Document &lt;br&gt;Embeddings&lt;br&gt;w/Metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-2" target="TebW8Ba8xhdXek9SgM_W-8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-2" value="Ingest Documents" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="180" y="180" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-7" value="Summary" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-3" target="TebW8Ba8xhdXek9SgM_W-10" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-3" value="LLM:&lt;br&gt;Summarize Document" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="395" y="180" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-8" value="Vector&lt;br&gt;DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
+          <mxGeometry x="425" y="290" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-13" value="Summary&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Embeddings&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;w/Metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-10" target="TebW8Ba8xhdXek9SgM_W-8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-10" value="Ingest Summary" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="630" y="180" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-1" target="TebW8Ba8xhdXek9SgM_W-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-17" target="TebW8Ba8xhdXek9SgM_W-22" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-17" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry y="490" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-21" value="Comma delimited &lt;br&gt;search terms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-22" target="TebW8Ba8xhdXek9SgM_W-20" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-30" value="Relevant&lt;br&gt;Documents&lt;br&gt;Metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-19" target="TebW8Ba8xhdXek9SgM_W-28" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-19" value="LLM:&lt;br&gt;Query Document Summaries" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="180" y="470" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-20" target="TebW8Ba8xhdXek9SgM_W-8" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="410" />
+              <mxPoint x="420" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-29" value="Relevant&lt;br&gt;Documents&lt;br&gt;List" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="TebW8Ba8xhdXek9SgM_W-20" target="TebW8Ba8xhdXek9SgM_W-28" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-20" value="Search &lt;br&gt;Vector DB" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="630" y="470" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-22" value="LLM:&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Pre-Process Query" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="180" y="590" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-18" value="Query" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-17" target="TebW8Ba8xhdXek9SgM_W-19" edge="1">
+          <mxGeometry x="-0.3846" y="-20" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-27" value="Document Summaries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=-15;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-8" target="TebW8Ba8xhdXek9SgM_W-19" edge="1">
+          <mxGeometry x="0.4717" y="20" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.3333333333333333;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="TebW8Ba8xhdXek9SgM_W-28" target="TebW8Ba8xhdXek9SgM_W-17" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-10" y="510" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="455" y="770" />
+              <mxPoint x="-20" y="770" />
+              <mxPoint x="-20" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-32" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;Final Answer&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="TebW8Ba8xhdXek9SgM_W-31" vertex="1" connectable="0">
+          <mxGeometry x="-0.1838" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TebW8Ba8xhdXek9SgM_W-28" value="LLM:&lt;br&gt;Combine and Answer Original Query" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="395" y="470" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,7 +1,7 @@
 #env
 _old/
 src/ChromaDB/
-docktalk_venv/
+doctalk_venv/
 .vscode/
 
 # Byte-compiled / optimized / DLL files

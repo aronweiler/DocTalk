@@ -1,0 +1,11 @@
+
+langchain
+llama-cpp-python
+chromadb
+tiktoken
+pypdf
+openai
+sentence_transformers
+InstructorEmbedding
+docx2txt
+openai

@@ -1,0 +1,110 @@
+import os
+import multiprocessing
+from typing import List
+
+from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
+
+from langchain.docstore.document import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from langchain.vectorstores import (Chroma)
+
+from shared import (DOCUMENT_DIRECTORY, DOCUMENT_TYPES, CHROMA_SETTINGS, CHROMA_DIRECTORY, get_embedding)
+
+def load_single_document(file_path: str) -> List[Document]:
+    # Loads a single document from a file path
+    file_extension = os.path.splitext(file_path)[1]
+    loader_class = DOCUMENT_TYPES.get(file_extension)
+    
+    if loader_class:
+        loader = loader_class(file_path)
+    else:
+        raise ValueError("Document type is undefined")
+
+    # Should return a list[Document] from within the current file.  For PDFs this looks like a document per page.
+    return loader.load()
+    # I think privateGPT was doing the loader.load()[0], but that wasn't working for me. 
+    # if file_extension == ".pdf":
+    #     return loader.load_and_split()
+    # else:
+    #     return loader.load()[0]
+    
+
+def load_document_batch(filepaths):
+    print("Loading document batch")
+    # create a thread pool
+    with ThreadPoolExecutor(len(filepaths)) as exe:
+        # load files
+        futures = [exe.submit(load_single_document, name) for name in filepaths]
+        # collect data
+        data_list = [future.result() for future in futures]
+        # return data and file paths
+        return (data_list, filepaths)
+
+def load_documents(source_dir: str) -> List[Document]:
+    # Loads all documents from the source documents directory
+    all_files = os.listdir(source_dir)
+    paths = []
+    for file_path in all_files:
+        file_extension = os.path.splitext(file_path)[1]
+        source_file_path = os.path.join(source_dir, file_path)
+        if file_extension in DOCUMENT_TYPES.keys():
+            paths.append(source_file_path)
+
+    num_processors = multiprocessing.cpu_count()
+    n_workers = min(num_processors, len(paths))
+    chunksize = round(len(paths) / n_workers)
+    docs = []
+    with ProcessPoolExecutor(n_workers) as executor:
+        futures = []
+        # split the load operations into chunks
+        for i in range(0, len(paths), chunksize):
+            # select a chunk of filenames
+            filepaths = paths[i:(i + chunksize)]
+            # submit the task
+            future = executor.submit(load_document_batch, filepaths)
+            futures.append(future)
+        # process all results
+        for future in as_completed(futures):
+            # open the file and load the data
+            contents, _ = future.result()
+            
+            if type(contents) == list:
+                for doc in contents[0]:
+                    docs.append(doc)
+            else:
+                docs.extend(contents)
+
+    return docs
+
+def main(document_directory:str, split_documents = True):
+    """ document_directory: Directory to load documents from
+    split_documents: Should documents be split into chunks?  """
+    documents = load_documents(document_directory)
+
+    if split_documents:
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        texts = text_splitter.split_documents(documents)
+    else:
+        texts = documents
+
+    print(f"Loaded {len(documents)} pages of documents from {DOCUMENT_DIRECTORY}")
+    print(f"Split into {len(texts)} chunks of text, because 'split_documents' is '{split_documents}'")
+
+    embeddings = get_embedding()
+
+    db = Chroma.from_documents(
+        texts,
+        embedding=embeddings,
+        persist_directory=CHROMA_DIRECTORY,
+        client_settings=CHROMA_SETTINGS,
+    )
+
+    print("Persisting DB")
+    db.persist()
+    db = None
+
+if __name__ == "__main__":
+    main(document_directory=DOCUMENT_DIRECTORY, split_documents=False)

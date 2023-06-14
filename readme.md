@@ -3,7 +3,15 @@ DocTalk is a project I'm working on to try to build my own LLM document chat.
 
 I'm not 100% sure what I'm doing, but it's been great so far.  
 
-Here's the plan:
+## Usage
+1. Install the requirements: `pip install -r requirements.txt`
+2. Load your documents using [document_loader.py](/src/document_loader.py)
+3. Once you've loaded your documents, run the LLM using [run_llm.py](/src/run_llm.py)
+
+Feel free to play around and please for the love of science, give me some feedback.
+
+## **Here's the plan:**
+I have some longer term plans, which I put in this diagram:
 ![The_Plan](images/docktalk_procecss_flow.png)
 
 I legit have no idea if this is going to be useful or anything, but it's certainly teaching me python, and renewing my interest in [snake_case](https://en.wikipedia.org/wiki/Snake_case) variables.

@@ -9,9 +9,12 @@ from langchain.document_loaders import (
     Docx2txtLoader    
 )
 
-from langchain.embeddings import (OpenAIEmbeddings, HuggingFaceInstructEmbeddings)
+MAX_LOCAL_CONTEXT_SIZE = 2048
 
-RUN_LOCAL = True
+## Should we split documents?  By how much?
+SPLIT_DOCUMENTS = True
+SPLIT_DOCUMENT_CHUNK_SIZE = 1300
+SPLIT_DOCUMENT_CHUNK_OVERLAP = 200
 
 APP_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DOCUMENT_DIRECTORY = "/repos/sample_docs/P&R"
@@ -35,11 +38,7 @@ CHROMA_SETTINGS = Settings(
         anonymized_telemetry=False
     )
 
-def get_embedding(force_local = False):
-    if RUN_LOCAL or force_local:
-        return HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
-    else:
-        return OpenAIEmbeddings()
+
 
 
 

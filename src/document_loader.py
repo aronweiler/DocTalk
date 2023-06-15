@@ -11,12 +11,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from langchain.vectorstores import (Chroma)
 
-from shared import (DOCUMENT_DIRECTORY, DOCUMENT_TYPES, CHROMA_SETTINGS, CHROMA_DIRECTORY, get_embedding)
+import shared
 
 def load_single_document(file_path: str) -> List[Document]:
     # Loads a single document from a file path
     file_extension = os.path.splitext(file_path)[1]
-    loader_class = DOCUMENT_TYPES.get(file_extension)
+    loader_class = shared.DOCUMENT_TYPES.get(file_extension)
     
     if loader_class:
         loader = loader_class(file_path)
@@ -50,7 +50,7 @@ def load_documents(source_dir: str) -> List[Document]:
     for file_path in all_files:
         file_extension = os.path.splitext(file_path)[1]
         source_file_path = os.path.join(source_dir, file_path)
-        if file_extension in DOCUMENT_TYPES.keys():
+        if file_extension in shared.DOCUMENT_TYPES.keys():
             paths.append(source_file_path)
 
     num_processors = multiprocessing.cpu_count()
@@ -85,21 +85,23 @@ def main(document_directory:str, split_documents = True):
     documents = load_documents(document_directory)
 
     if split_documents:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=shared.SPLIT_DOCUMENT_CHUNK_SIZE, chunk_overlap=shared.SPLIT_DOCUMENT_CHUNK_OVERLAP)
         texts = text_splitter.split_documents(documents)
     else:
         texts = documents
 
-    print(f"Loaded {len(documents)} pages of documents from {DOCUMENT_DIRECTORY}")
-    print(f"Split into {len(texts)} chunks of text, because 'split_documents' is '{split_documents}'")
+    print(f"Loaded {len(documents)} pages of documents from {shared.DOCUMENT_DIRECTORY}")
+    
+    if split_documents:
+        print(f"Split into {len(texts)} chunks of text (chunk_size: {shared.SPLIT_DOCUMENT_CHUNK_SIZE}, chunk_overlap: {shared.SPLIT_DOCUMENT_CHUNK_OVERLAP})")
 
-    embeddings = get_embedding()
+    embeddings = shared.get_embedding()
 
     db = Chroma.from_documents(
         texts,
         embedding=embeddings,
-        persist_directory=CHROMA_DIRECTORY,
-        client_settings=CHROMA_SETTINGS,
+        persist_directory=shared.CHROMA_DIRECTORY,
+        client_settings=shared.CHROMA_SETTINGS,
     )
 
     print("Persisting DB")
@@ -107,4 +109,4 @@ def main(document_directory:str, split_documents = True):
     db = None
 
 if __name__ == "__main__":
-    main(document_directory=DOCUMENT_DIRECTORY, split_documents=False)
+    main(document_directory=shared.DOCUMENT_DIRECTORY, split_documents=shared.SPLIT_DOCUMENTS)

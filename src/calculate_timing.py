@@ -26,14 +26,6 @@ def calculate_average_timings(file_path):
 
     return average_time_per_token
 
-def calculate_total_processing_time(docs):
-    """calculate the time it will take to process the given text, using averages from the llama timings"""
-    total_time = 0
-    for doc in docs:
-        total_time += _calculate_total_processing_time(doc.page_content)
-
-    return total_time
-
 def convert_milliseconds_to_english(milliseconds):
     seconds = int((milliseconds / 1000) % 60)
     minutes = int((milliseconds / (1000 * 60)) % 60)
@@ -52,16 +44,24 @@ def convert_milliseconds_to_english(milliseconds):
 
     return result.strip()
 
+def calculate_total_processing_time_from_docs(docs) -> float:
+    """calculate the time it will take to process the given text, using averages from the llama timings"""
+    total_time = 0
+    for doc in docs:
+        total_time += calculate_total_processing_time_from_text(doc.page_content)
 
-def _calculate_total_processing_time(text):
+    return total_time
+
+def calculate_total_processing_time_from_tokens(num_tokens:int) -> float:
     average_time_per_token = calculate_average_timings(LLAMA_TIMINGS_FILE)
+    # print(f"Reading {LLAMA_TIMINGS_FILE} looks like the average time per token on this system is: {average_time_per_token}")
+    total_processing_time = num_tokens * average_time_per_token
+    return total_processing_time
 
-    print(f"Reading {LLAMA_TIMINGS_FILE} looks like the average time per token on this system is: {average_time_per_token}")
-
+def calculate_total_processing_time_from_text(text:str) -> float:
     expected_tokens = num_tokens_from_string(text)
 
-    total_processing_time = expected_tokens * average_time_per_token
+    total_processing_time = calculate_total_processing_time_from_tokens(expected_tokens)
 
     return total_processing_time
 
-_calculate_total_processing_time("Here is a sample text block to calculate some timings with")

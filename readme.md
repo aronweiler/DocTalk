@@ -3,10 +3,12 @@ DocTalk is a project I'm working on to try to build my own LLM document chat.
 
 I'm not 100% sure what I'm doing, but it's been great so far.  
 
+*See [Update Notes](#update-notes) for changes I am making after the initial commit to this project.*
+
 ## Usage
 1. Install the requirements: `pip install -r requirements.txt`
 2. Load your documents using [document_loader.py](/src/document_loader.py)
-3. Once you've loaded your documents, run the LLM using [run_llm.py](/src/run_llm.py)
+3. Once you've loaded your documents, run the LLM using [run.py](/src/run.py)
 
 Feel free to play around and please for the love of science, give me some feedback.
 
@@ -60,3 +62,10 @@ $env:GGML_CUDA_NO_PINNED=1
 - [Open LLM Leaderboard](https://huggingface.co/spaces/HuggingFaceH4/open_llm_leaderboard)
 - Best source for models: [TheBloke on HuggingFace](https://huggingface.co/TheBloke)
 - [LangChain Dev Blog](https://blog.langchain.dev/)
+
+# Update Notes {#update-notes}
+
+- 6/15/2023: Started to rework the project to separate the local and hosted (OpenAI) LLM stuff.  There are different prompting techniques, and other stuff that I want to play with when it comes to local vs. hosted LLMs.
+  - Renamed run_llm.py to run_local_llm.py
+  - Added run.py
+  - Updated some other random stuff

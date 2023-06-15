@@ -1,10 +1,12 @@
+import os
 import time
 import console_text
-from llm_selector import get_llm
+from selector import get_llm
 import prompts
 import documents
 from token_helper import num_tokens_from_string
-from calculate_timing import (calculate_total_processing_time, convert_milliseconds_to_english)
+import calculate_timing
+import shared
 
 
 def run_chain(initial_query, top_k, llm, db, history, pre_parse_query = False, verbose = False):      
@@ -16,18 +18,27 @@ def run_chain(initial_query, top_k, llm, db, history, pre_parse_query = False, v
         # Just use the initial query
         document_query = initial_query
 
-    if verbose:
-        print("Document query: ", document_query)
+    print("Document query: ", document_query)
 
     docs = documents.get_documents(db, document_query, top_k)
 
-    estimated_processing_time = calculate_total_processing_time(docs)
+    max_estimated_consolidation_time = calculate_timing.calculate_total_processing_time_from_tokens(shared.MAX_LOCAL_CONTEXT_SIZE)
+    docs_estimated_processing_time = calculate_timing.calculate_total_processing_time_from_tokens(shared.SPLIT_DOCUMENT_CHUNK_SIZE * len(docs))
+    prompt_estimated_processing_time = calculate_timing.calculate_total_processing_time_from_text(prompts.INITIAL_PROMPT_TMPL) * len(docs)
+    docs_estimated_processing_time += prompt_estimated_processing_time    
 
-    console_text.print_blue(f"************\nEstimated processing time is: {convert_milliseconds_to_english(estimated_processing_time)}\n************")
-
-    answer = 'No answer yet given'
+    console_text.print_blue(f"""
+    ************
+    \nEstimated processing time for retrieving intermediate answers is: {calculate_timing.convert_milliseconds_to_english(docs_estimated_processing_time)}
+    \nNote: This does not include the final consolidation query, which will be longer because of the increased context length.
+    \nAt most, the final run should take {calculate_timing.convert_milliseconds_to_english(max_estimated_consolidation_time)} (using the largest context size of {shared.MAX_LOCAL_CONTEXT_SIZE})
+    \nSo you're probably looking at around {calculate_timing.convert_milliseconds_to_english(max_estimated_consolidation_time + docs_estimated_processing_time)}
+    \n************
+    """)
 
     answers = []
+
+    print(f"Creating {len(docs)} initial queries")
 
     for doc in docs:     
         query = prompts.INITIAL_PROMPT_TMPL.format(question=initial_query, context_str=doc.page_content)        
@@ -37,10 +48,10 @@ def run_chain(initial_query, top_k, llm, db, history, pre_parse_query = False, v
 
         print("Query Tokens: ", num_tokens_from_string(query))
 
-        answer = llm(query)
+        answer = llm(query).strip()
 
-        if len(answer.strip()) != 0 and answer.strip() != 'No answer given':
-            answers.append(answer)
+        if len(answer) != 0 and answer != 'No answer given':
+            answers.append(answer + f"\nSource: '{os.path.basename(doc.metadata['source'])}'")
 
         console_text.print_blue(f"\nIntermediate answer: {answer}")      
     
@@ -58,8 +69,8 @@ def run_chain(initial_query, top_k, llm, db, history, pre_parse_query = False, v
 
 
 def main(top_k, pre_parse_queries, verbose = False):
-    llm = get_llm()
-    db = documents.get_database()
+    llm = get_llm(True)
+    db = documents.get_database(True)
 
     history = []
 
@@ -78,6 +89,5 @@ def main(top_k, pre_parse_queries, verbose = False):
         end_time = time.time()
         elapsed_time = end_time - start_time
 
-        print("Operation took: ", convert_milliseconds_to_english(elapsed_time*1000))
+        print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time*1000))
 
-main(int(input("top_k: ")), input("pre_parse_queries: (Y/N)").upper() == "Y")

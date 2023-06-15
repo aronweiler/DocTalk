@@ -63,7 +63,7 @@ $env:GGML_CUDA_NO_PINNED=1
 - Best source for models: [TheBloke on HuggingFace](https://huggingface.co/TheBloke)
 - [LangChain Dev Blog](https://blog.langchain.dev/)
 
-# Update Notes {#update-notes}
+# Update Notes
 
 - 6/15/2023: Started to rework the project to separate the local and hosted (OpenAI) LLM stuff.  There are different prompting techniques, and other stuff that I want to play with when it comes to local vs. hosted LLMs.
   - Renamed run_llm.py to run_local_llm.py

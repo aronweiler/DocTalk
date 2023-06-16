@@ -10,13 +10,28 @@ from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from langchain.vectorstores import (Chroma)
+from langchain.document_loaders import (
+    CSVLoader,    
+    PyPDFLoader,    
+    TextLoader,
+    Docx2txtLoader    
+)
 
 import shared
+import selector
+
+DOCUMENT_TYPES = {
+    ".txt": TextLoader,
+    ".pdf": PyPDFLoader,
+    ".csv": CSVLoader,
+    ".doc": Docx2txtLoader,
+    ".docx": Docx2txtLoader
+    }
 
 def load_single_document(file_path: str) -> List[Document]:
     # Loads a single document from a file path
     file_extension = os.path.splitext(file_path)[1]
-    loader_class = shared.DOCUMENT_TYPES.get(file_extension)
+    loader_class = DOCUMENT_TYPES.get(file_extension)
     
     if loader_class:
         loader = loader_class(file_path)
@@ -50,7 +65,7 @@ def load_documents(source_dir: str) -> List[Document]:
     for file_path in all_files:
         file_extension = os.path.splitext(file_path)[1]
         source_file_path = os.path.join(source_dir, file_path)
-        if file_extension in shared.DOCUMENT_TYPES.keys():
+        if file_extension in DOCUMENT_TYPES.keys():
             paths.append(source_file_path)
 
     num_processors = multiprocessing.cpu_count()
@@ -79,7 +94,7 @@ def load_documents(source_dir: str) -> List[Document]:
 
     return docs
 
-def main(document_directory:str, split_documents = True):
+def main(document_directory:str, run_local, split_documents):
     """ document_directory: Directory to load documents from
     split_documents: Should documents be split into chunks?  """
     documents = load_documents(document_directory)
@@ -90,12 +105,12 @@ def main(document_directory:str, split_documents = True):
     else:
         texts = documents
 
-    print(f"Loaded {len(documents)} pages of documents from {shared.DOCUMENT_DIRECTORY}")
+    print(f"Loaded {len(documents)} pages of documents from {document_directory}")
     
     if split_documents:
         print(f"Split into {len(texts)} chunks of text (chunk_size: {shared.SPLIT_DOCUMENT_CHUNK_SIZE}, chunk_overlap: {shared.SPLIT_DOCUMENT_CHUNK_OVERLAP})")
 
-    embeddings = shared.get_embedding()
+    embeddings = selector.get_embedding(run_local)
 
     db = Chroma.from_documents(
         texts,
@@ -109,4 +124,20 @@ def main(document_directory:str, split_documents = True):
     db = None
 
 if __name__ == "__main__":
-    main(document_directory=shared.DOCUMENT_DIRECTORY, split_documents=shared.SPLIT_DOCUMENTS)
+    #document_directory = "/repos/sample_docs/P&R"
+    document_directory = "/repos/sample_docs/work/fda"
+
+    split_documents = input("Do you want to split loaded documents? (Y/N): ").upper() == "Y"
+
+    print()
+    print("Select the embeddings you want to use:")
+    print("1: HuggingFaceInstructEmbeddings")
+    print("2: OpenAIEmbeddings")
+    
+    embedding_selection = input("Enter your selection: ")
+
+    if embedding_selection == "1":
+        main(document_directory=document_directory, run_local=True, split_documents=split_documents)
+    else:
+        main(document_directory=document_directory, run_local=False, split_documents=split_documents)
+    

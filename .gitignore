@@ -1,6 +1,6 @@
 #env
 _old/
-src/ChromaDB/
+src/ChromaDB_*/
 doctalk_venv/
 .vscode/
 

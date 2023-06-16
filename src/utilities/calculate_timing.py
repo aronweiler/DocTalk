@@ -1,5 +1,5 @@
 import io
-from token_helper import num_tokens_from_string
+from utilities.token_helper import num_tokens_from_string
 from shared import LLAMA_TIMINGS_FILE
 
 def calculate_average_timings(file_path):

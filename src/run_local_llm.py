@@ -1,19 +1,18 @@
 import os
 import time
-import console_text
+import utilities.console_text as console_text
 from selector import get_llm
 import prompts
 import documents
-from token_helper import num_tokens_from_string
-import calculate_timing
+from utilities.token_helper import num_tokens_from_string
+import utilities.calculate_timing as calculate_timing
 import shared
-
+from query_parser import parse_query
 
 def run_chain(initial_query, top_k, llm, db, history, pre_parse_query = False, verbose = False):      
     if pre_parse_query:
         # Get the best keyword query
-        document_query = prompts.PRE_PROCESS_QUERY_PROMPT_TMPL.format(question=initial_query)
-        document_query = llm(document_query)
+        document_query = parse_query(query=initial_query)
     else:
         # Just use the initial query
         document_query = initial_query
@@ -68,7 +67,7 @@ def run_chain(initial_query, top_k, llm, db, history, pre_parse_query = False, v
     return answer
 
 
-def main(top_k, pre_parse_queries, verbose = False):
+def main(top_k, pre_parse_queries, verbose):
     llm = get_llm(True)
     db = documents.get_database(True)
 

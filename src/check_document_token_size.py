@@ -3,7 +3,7 @@ from typing import List
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-import token_helper
+import utilities.token_helper as token_helper
 
 from shared import (DOCUMENT_DIRECTORY, DOCUMENT_TYPES, CHROMA_SETTINGS, CHROMA_DIRECTORY, get_embedding)
 

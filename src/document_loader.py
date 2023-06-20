@@ -100,7 +100,7 @@ def main(document_directory:str, run_local, split_documents):
     documents = load_documents(document_directory)
 
     if split_documents:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=shared.SPLIT_DOCUMENT_CHUNK_SIZE, chunk_overlap=shared.SPLIT_DOCUMENT_CHUNK_OVERLAP)
+        text_splitter = RecursiveCharacterTextSplitter(separators=["\r\n", "\n\n", "\n"], chunk_size=shared.SPLIT_DOCUMENT_CHUNK_SIZE, chunk_overlap=shared.SPLIT_DOCUMENT_CHUNK_OVERLAP)
         texts = text_splitter.split_documents(documents)
     else:
         texts = documents
@@ -125,7 +125,7 @@ def main(document_directory:str, run_local, split_documents):
 
 if __name__ == "__main__":
     #document_directory = "/repos/sample_docs/P&R"
-    document_directory = "/repos/sample_docs/work/fda"
+    document_directory = "/repos/sample_docs/work/design_docs"
 
     split_documents = input("Do you want to split loaded documents? (Y/N): ").upper() == "Y"
 

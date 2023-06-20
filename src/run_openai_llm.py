@@ -28,7 +28,7 @@ def main(verbose = False):
     qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever(), memory=memory, verbose=verbose)
 
     while True:        
-        query = input("Query: ")
+        query = input("Query (x to exit): ")
 
         if query == "x":
             exit()

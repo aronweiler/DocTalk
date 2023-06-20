@@ -21,7 +21,7 @@ def get_database(local):
         client_settings=CHROMA_SETTINGS,
     )
 
-    print(f"There are {len(db.get())} documents in the datastore")
+    print(f"There are {len(db.get()['documents'])} documents in the datastore")
 
     return db 
 

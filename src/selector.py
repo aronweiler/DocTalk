@@ -4,8 +4,8 @@ from langchain.embeddings import (OpenAIEmbeddings, HuggingFaceInstructEmbedding
 
 import shared
 
-def get_llm(local_llm):
-    if local_llm:  
+def get_llm(local):
+    if local:  
         return LlamaCpp(model_path=shared.LOCAL_MODEL_PATH, n_ctx=shared.MAX_LOCAL_CONTEXT_SIZE, temperature=shared.AI_TEMP, n_gpu_layers=shared.OFFLOAD_TO_GPU_LAYERS) 
     else:
         openai_api_key = os.getenv('OPENAI_API_KEY')

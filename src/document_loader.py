@@ -1,4 +1,5 @@
 import os
+import argparse
 import multiprocessing
 from typing import List
 
@@ -40,11 +41,6 @@ def load_single_document(file_path: str) -> List[Document]:
 
     # Should return a list[Document] from within the current file.  For PDFs this looks like a document per page.
     return loader.load()
-    # I think privateGPT was doing the loader.load()[0], but that wasn't working for me. 
-    # if file_extension == ".pdf":
-    #     return loader.load_and_split()
-    # else:
-    #     return loader.load()[0]
     
 
 def load_document_batch(filepaths):
@@ -94,51 +90,50 @@ def load_documents(source_dir: str) -> List[Document]:
 
     return docs
 
-def main(document_directory:str, run_local, split_documents):
-    """ document_directory: Directory to load documents from
-    split_documents: Should documents be split into chunks?  """
+def main(document_directory:str, database_name:str, run_local:bool, split_documents:bool, split_chunks:int, split_overlap:int):
     documents = load_documents(document_directory)
 
     if split_documents:
-        text_splitter = RecursiveCharacterTextSplitter(separators=["\r\n", "\n\n", "\n"], chunk_size=shared.SPLIT_DOCUMENT_CHUNK_SIZE, chunk_overlap=shared.SPLIT_DOCUMENT_CHUNK_OVERLAP)
+        text_splitter = RecursiveCharacterTextSplitter(separators=shared.SPLIT_SEPARATORS, chunk_size=split_chunks, chunk_overlap=split_overlap)
         texts = text_splitter.split_documents(documents)
+        
+        print(f"Split into {len(texts)} chunks of text (chunk_size: {split_chunks}, chunk_overlap: {split_overlap})")
     else:
         texts = documents
 
     print(f"Loaded {len(documents)} pages of documents from {document_directory}")
-    
-    if split_documents:
-        print(f"Split into {len(texts)} chunks of text (chunk_size: {shared.SPLIT_DOCUMENT_CHUNK_SIZE}, chunk_overlap: {shared.SPLIT_DOCUMENT_CHUNK_OVERLAP})")
 
     embeddings = selector.get_embedding(run_local)
 
     db = Chroma.from_documents(
         texts,
         embedding=embeddings,
-        persist_directory=shared.CHROMA_DIRECTORY,
-        client_settings=shared.CHROMA_SETTINGS,
+        persist_directory=shared.CHROMA_DIRECTORY.format(database_name=database_name),
+        client_settings=shared.get_chroma_settings(database_name),
     )
 
     print("Persisting DB")
     db.persist()
     db = None
 
-if __name__ == "__main__":
-    document_directory = "/repos/sample_docs/P&R"
-    #document_directory = "/repos/sample_docs/work/fda"
-    #document_directory = "/Repos/sample_docs/work/design_docs"
-
-    split_documents = input("Do you want to split loaded documents? (Y/N): ").upper() == "Y"
-
-    print()
-    print("Select the embeddings you want to use:")
-    print("1: HuggingFaceInstructEmbeddings")
-    print("2: OpenAIEmbeddings")
     
-    embedding_selection = input("Enter your selection: ")
-
-    if embedding_selection == "1":
-        main(document_directory=document_directory, run_local=True, split_documents=split_documents)
-    else:
-        main(document_directory=document_directory, run_local=False, split_documents=split_documents)
+#document_directory = "/repos/sample_docs/P&R"
+#document_directory = "/repos/sample_docs/work/fda"
+#document_directory = "/Repos/sample_docs/work/design_docs"    
     
+if __name__ == '__main__':    
+    parser = argparse.ArgumentParser()
+
+    # Add arguments
+    parser.add_argument('--document_directory', type=str, default='/repos/sample_docs/work/design_docs', help='Directory from where documents are ingested')
+    parser.add_argument('--database_name', type=str, default='default', help='Name of the ChromaDB to store documents in')
+    parser.add_argument('--run_open_ai', action='store_true', default=False, help='Use OpenAI vs. local embeddings')
+    parser.add_argument('--split_documents', type=bool, default=False, help='Split documents?')
+    parser.add_argument('--split_chunks', type=int, default=shared.SPLIT_DOCUMENT_CHUNK_SIZE, help='Split chunk size')
+    parser.add_argument('--split_overlap', type=int, default=shared.SPLIT_DOCUMENT_CHUNK_OVERLAP, help='Split overlap size')
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # Call the run() method with parsed arguments
+    main(document_directory=args.document_directory, database_name=args.database_name, run_local=args.run_open_ai == False, split_documents=args.split_documents, split_chunks=args.split_chunks, split_overlap=args.split_overlap)

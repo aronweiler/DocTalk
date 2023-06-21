@@ -1,19 +1,36 @@
-import run_local_llm
-import run_openai_llm
-import run_local_llm_langchain
+from selector import get_llm, get_embedding
+import run_llm_langchain
+import argparse
 
-print("Hello!  Answer some questions to get started.\n")
-
-verbose = input("Should we use verbose output (intermediate steps and such)?  Y/N:").upper()
-top_k = int(input("LOCAL- Select the top_k for search results (how many chunks of search results will be used to feed the LLM)\nNote- This can cause performance to nosedive on local LLMs.  Recommended is 5: "))    
-
-if input("Run Local LLM: (Y/N)").upper() == "Y":    
-    use_langchain = input("Use LangChain? (Y/N)").upper()
+def run(run_local:bool, database_name:str, verbose:bool, top_k:int, search_distance:float):    
+    print("-------- Running LLM --------")
+    print("run_local:", run_local)
+    print("database_name:", database_name)
+    print("verbose:", verbose)
+    print("top_k:", top_k)
+    print("search_distance:", search_distance)
+    print("-----------------------------")
     
-    if use_langchain:
-        run_local_llm_langchain.main(top_k, verbose == "Y")
+    if run_local:    
+        llm = get_llm(True)
+        embeddings = get_embedding(True)
     else:
-        pre_parse_queries = input("LOCAL- Should we pre-parse search queries?  (This could yield different/better results when searching for documents to feed to the LLM)  Y/N:").upper()
-        run_local_llm.main(top_k, pre_parse_queries == "Y", verbose == "Y")
-else:
-    run_openai_llm.main(top_k, verbose == "Y")
+        llm = get_llm(False)
+        embeddings = get_embedding(False)
+        
+    run_llm_langchain.main(llm, embeddings, database_name, top_k, search_distance, verbose)
+      
+parser = argparse.ArgumentParser()
+
+# Add arguments
+parser.add_argument('--run_open_ai', action='store_true', default=False, help='Use OpenAI vs. local LLM')
+parser.add_argument('--database_name', type=str, default="default", help='Database name to use for document storage')
+parser.add_argument('--verbose', action='store_true', default=False, help='Verbose mode')
+parser.add_argument('--top_k', type=int, default=5, help='Top K value- number of documents or chunks of documents for the LLM to use to answer a question (Note: this can kill performance locally)')
+parser.add_argument('--search_distance', type=float, default=0.1, help='Search distance limits the similarity search in the vector database (value should be 0 and 1, lower value indicates a wider search)')
+
+# Parse the command-line arguments
+args = parser.parse_args()
+
+# Call the run() method with parsed arguments
+run(run_local=args.run_open_ai == False, database_name=args.database_name, verbose=args.verbose, top_k=args.top_k, search_distance=args.search_distance)

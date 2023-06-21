@@ -1,7 +1,4 @@
-from shared import (CHROMA_DIRECTORY, CHROMA_SETTINGS)
-from selector import get_embedding
-
-# probably don't need langchain here, but I might still use it
+import shared
 from langchain.vectorstores import Chroma
 
 def get_documents(db:Chroma, query, top_k):
@@ -12,18 +9,14 @@ def get_documents(db:Chroma, query, top_k):
     # top_k_results = [d[0] for d in docs]
     # return top_k_documents
 
-def get_database(local):
-    embeddings = get_embedding(local)
+def get_database(embeddings, database_name):
 
     db = Chroma(
-        persist_directory=CHROMA_DIRECTORY,
+        persist_directory=shared.CHROMA_DIRECTORY.format(database_name=database_name),
         embedding_function=embeddings,
-        client_settings=CHROMA_SETTINGS,
+        client_settings=shared.get_chroma_settings(database_name),
     )
 
-    print(f"There are {len(db.get()['documents'])} documents in the datastore")
+    print(f"There are {len(db.get()['documents'])} chunks in the datastore")
 
     return db 
-
-# db = get_database()
-# results = get_documents(db, "Summarize the meeting that took place on February 17, 2022", 5)

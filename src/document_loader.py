@@ -124,9 +124,9 @@ def main(document_directory:str, run_local, split_documents):
     db = None
 
 if __name__ == "__main__":
-    #document_directory = "/repos/sample_docs/P&R"
+    document_directory = "/repos/sample_docs/P&R"
     #document_directory = "/repos/sample_docs/work/fda"
-    document_directory = "/Repos/sample_docs/work/design_docs"
+    #document_directory = "/Repos/sample_docs/work/design_docs"
 
     split_documents = input("Do you want to split loaded documents? (Y/N): ").upper() == "Y"
 

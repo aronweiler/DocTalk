@@ -5,10 +5,12 @@ I'm not 100% sure what I'm doing, but it's been great so far.
 
 *See [Update Notes](#update-notes) for changes I am making after the initial commit to this project.*
 
-## Usage
+## Usage (python developers)
 1. Install the requirements: `pip install -r requirements.txt`
 2. Load your documents using [document_loader.py](/src/document_loader.py)
 3. Once you've loaded your documents, run the LLM using [run.py](/src/run.py)
+
+## Usage (non-developers)
 
 Feel free to play around and please for the love of science, give me some feedback.
 
@@ -65,7 +67,13 @@ $env:GGML_CUDA_NO_PINNED=1
 
 # Update Notes
 
-- 6/15/2023: Started to rework the project to separate the local and hosted (OpenAI) LLM stuff.  There are different prompting techniques, and other stuff that I want to play with when it comes to local vs. hosted LLMs.
+- 6/15/2023: 
+  - Started to rework the project to separate the local and hosted (OpenAI) LLM stuff.  There are different prompting techniques, and other stuff that I want to play with when it comes to local vs. hosted LLMs.
   - Renamed run_llm.py to run_local_llm.py
   - Added run.py
   - Updated some other random stuff
+
+- 6/20/2023
+  - Updated splitting in [document_loader.py](/src/document_loader.py) so that it splits on newlines before hitting the character max.    
+  - Added [install.ps1](install.ps1)
+  - Added support for top_k in non-local llms

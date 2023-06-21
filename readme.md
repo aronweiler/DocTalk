@@ -6,17 +6,16 @@ I'm not 100% sure what I'm doing, but it's been great so far.
 *See [Update Notes](#update-notes) for changes I am making after the initial commit to this project.*
 
 ## Usage (python developers)
-1. Install the requirements: `pip install -r requirements.txt`
+1. To create the python env, and install requirements, run: [install.ps1](install.ps1)
 2. Load your documents using [document_loader.py](/src/document_loader.py)
 3. Once you've loaded your documents, run the LLM using [run.py](/src/run.py)
 
+The options for use are all prompts right now, which someday I'll change to command lines.
+
 ## Usage (non-developers)
+*Coming Soon*
 
 Feel free to play around and please for the love of science, give me some feedback.
-
-## **Here's the plan:**
-I have some longer term plans, which I put in this diagram:
-![The_Plan](images/docktalk_procecss_flow.png)
 
 I legit have no idea if this is going to be useful or anything, but it's certainly teaching me python, and renewing my interest in [snake_case](https://en.wikipedia.org/wiki/Snake_case) variables.
 

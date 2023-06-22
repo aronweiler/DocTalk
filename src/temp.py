@@ -34,19 +34,30 @@ def search_strings(keywords, strings):
     
     return sorted_strings
 
-db = documents.get_database(True)
+def search_stuff():
+    db = documents.get_database(True)
 
-search_terms = split_sentence("What requirements are associated with OSRS11?")
-document_chunks = [d for d in db.get()["documents"]]
+    search_terms = split_sentence("What requirements are associated with OSRS11?")
+    document_chunks = [d for d in db.get()["documents"]]
 
-matched_documents = search_strings(["OSRS11", "requirements"], document_chunks)
+    matched_documents = search_strings(["OSRS11", "requirements"], document_chunks)
 
-results0 = db.similarity_search("OSRS11", filter={"Exact"})
-results1 = db.max_marginal_relevance_search("OSRS11")
-results2 = db.similarity_search("OSRS11")
+    results0 = db.similarity_search("OSRS11", filter={"Exact"})
+    results1 = db.max_marginal_relevance_search("OSRS11")
+    results2 = db.similarity_search("OSRS11")
 
-#for doc in 
+    #for doc in 
 
 
-print(results1[0].page_content)
-print(results2[0].page_content)
+    print(results1[0].page_content)
+    print(results2[0].page_content)
+    
+    
+def measure_stuff():
+    import utilities.token_helper as token_helper
+    
+    with open("C:\\Temp\\measure.txt", "r") as f:
+        print(token_helper.num_tokens_from_string(f.read()))
+
+
+measure_stuff()

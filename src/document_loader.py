@@ -15,7 +15,8 @@ from langchain.document_loaders import (
     CSVLoader,    
     PyPDFLoader,    
     TextLoader,
-    Docx2txtLoader    
+    Docx2txtLoader,
+    #UnstructuredWordDocumentLoader 
 )
 
 import shared
@@ -25,7 +26,7 @@ DOCUMENT_TYPES = {
     ".txt": TextLoader,
     ".pdf": PyPDFLoader,
     ".csv": CSVLoader,
-    ".doc": Docx2txtLoader,
+    ".doc": Docx2txtLoader, #UnstructuredWordDocumentLoader,
     ".docx": Docx2txtLoader
     }
 
@@ -37,10 +38,17 @@ def load_single_document(file_path: str) -> List[Document]:
     if loader_class:
         loader = loader_class(file_path)
     else:
-        raise ValueError("Document type is undefined")
+        raise ValueError(f"Document type is undefined, {file_path}")
 
     # Should return a list[Document] from within the current file.  For PDFs this looks like a document per page.
-    return loader.load()
+    try:
+        documents = loader.load()
+        return documents
+    except:
+        err = f"Could not load {file_path}"
+        print(err)
+        raise(ValueError(err))
+    
     
 
 def load_document_batch(filepaths):
@@ -128,7 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('--document_directory', type=str, default='/repos/sample_docs/work/design_docs', help='Directory from where documents are ingested')
     parser.add_argument('--database_name', type=str, default='default', help='Name of the ChromaDB to store documents in')
     parser.add_argument('--run_open_ai', action='store_true', default=False, help='Use OpenAI vs. local embeddings')
-    parser.add_argument('--split_documents', type=bool, default=False, help='Split documents?')
+    parser.add_argument('--split_documents', action='store_true', default=False, help='Split documents?')
     parser.add_argument('--split_chunks', type=int, default=shared.SPLIT_DOCUMENT_CHUNK_SIZE, help='Split chunk size')
     parser.add_argument('--split_overlap', type=int, default=shared.SPLIT_DOCUMENT_CHUNK_OVERLAP, help='Split overlap size')
 

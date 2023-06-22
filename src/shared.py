@@ -5,6 +5,7 @@ from chromadb.config import Settings
 OFFLOAD_TO_GPU_LAYERS = 10
 AI_TEMP = 0
 MAX_LOCAL_CONTEXT_SIZE = 2048
+MAX_OPEN_AI_CONTEXT_SIZE = 4096
 
 ## If we split documents in the loader, need to know by how much
 SPLIT_DOCUMENT_CHUNK_SIZE = 300

@@ -1,6 +1,7 @@
 from selector import get_llm, get_embedding
 import run_llm_langchain
 import argparse
+import shared
 
 def run(run_local:bool, database_name:str, verbose:bool, top_k:int, search_distance:float):    
     print("-------- Running LLM --------")
@@ -14,11 +15,13 @@ def run(run_local:bool, database_name:str, verbose:bool, top_k:int, search_dista
     if run_local:    
         llm = get_llm(True)
         embeddings = get_embedding(True)
+        max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE
     else:
         llm = get_llm(False)
         embeddings = get_embedding(False)
+        max_tokens = shared.MAX_OPEN_AI_CONTEXT_SIZE
         
-    run_llm_langchain.main(llm, embeddings, database_name, top_k, search_distance, verbose)
+    run_llm_langchain.main(llm, embeddings, database_name, top_k, search_distance, verbose, max_tokens=max_tokens)
       
 parser = argparse.ArgumentParser()
 

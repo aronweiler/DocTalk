@@ -20,7 +20,7 @@ I legit have no idea if this is going to be useful or anything, but it's certain
       - `--split_documents`: If this is present, the loader will split loaded documents into smaller chunks
       - `--split_chunks`: How big the chunk sizes should be
       - `--split_overlap`: How much of an overlap there should be between chunks
-4. Once you've loaded your documents, run the LLM using [run.py](/src/run.py), e.g. `python .\run.py --verbose`
+4. Once you've loaded your documents, run the LLM using [run_chain.py](/src/run_chain.py), e.g. `python .\run_chain.py --verbose`
     - Options for running the LLM include:
       - `--run_open_ai`: When set, this will force the use of the OpenAI LLM and embeddings.  Make sure you set your API key.
       - `--database_name`: The name of the database from which to retrieve your documents
@@ -83,7 +83,7 @@ $env:GGML_CUDA_NO_PINNED=1
 - 6/15/2023: 
   - Started to rework the project to separate the local and hosted (OpenAI) LLM stuff.  There are different prompting techniques, and other stuff that I want to play with when it comes to local vs. hosted LLMs.
   - Renamed run_llm.py to run_local_llm.py
-  - Added run.py
+  - Added run_chain.py
   - Updated some other random stuff
 
 - 6/20/2023
@@ -92,6 +92,6 @@ $env:GGML_CUDA_NO_PINNED=1
   - Added support for top_k in non-local llms
 
 - 6/21/2023
-  - Added command line support for [run.py](/src/run.py) and [document_loader.py](/src/document_loader.py)
+  - Added command line support for [run_chain.py](/src/run_chain.py) and [document_loader.py](/src/document_loader.py)
   - Removed old unused code
   - Collapsed the local and remote LLM access (using langchain) into one file [run_llm_langchain.py](src/run_llm_langchain.py)

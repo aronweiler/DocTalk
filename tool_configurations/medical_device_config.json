@@ -1,0 +1,51 @@
+{
+    "tools": [
+        {
+            "friendly_name": "FDA Documentation QA Tool",
+            "description": "A tool that is useful for querying FDA documents, such as regulations and guidance documents.",
+            "tool_module_name": "tools.open_ai_vector_store_tool",
+            "tool_class_name": "OpenAIVectorStoreTool",
+            "arguments": {
+                "database_name": "fda",
+                "top_k": 5,
+                "search_type": "mmr",
+                "search_distance": 0.1,
+                "verbose": true,
+                "max_tokens": 4096,
+                "return_source_documents": true
+
+            }
+        },
+        {
+            "friendly_name": "ISO/AAMI/IEC Standards Documentation QA Tool",
+            "description": "A tool that is useful for querying ISO, AAMI, or IEC Standards documents.",
+            "tool_module_name": "tools.open_ai_vector_store_tool",
+            "tool_class_name": "OpenAIVectorStoreTool",
+            "arguments": {
+                "database_name": "iso",
+                "top_k": 5,
+                "search_type": "mmr",
+                "search_distance": 0.1,
+                "verbose": true,
+                "max_tokens": 4096,
+                "return_source_documents": true
+            }
+        },
+        {
+            "friendly_name": "Remote Control Project Documentation Tool",
+            "description": "A tool that is useful for querying for information about the Remote Control project / product.",
+            "tool_module_name": "tools.local_vector_store_tool",
+            "tool_class_name": "OpenAIVectorStoreTool",
+            "arguments": {
+                "database_name": "rc",
+                "top_k": 5,
+                "search_type": "mmr",
+                "search_distance": 0.1,
+                "verbose": true,
+                "max_tokens": 2048,
+                "return_source_documents": true
+            }
+        }
+    ]
+
+}

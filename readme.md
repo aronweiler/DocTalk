@@ -12,7 +12,7 @@ I legit have no idea if this is going to be useful or anything, but it's certain
 ## Usage (python developers)
 1. To create the python env, and install requirements, run: [install.ps1](install.ps1)
 2. Set your `OPENAI_API_KEY` environment variable, if you are going to use OpenAI's API
-3. Load your documents using [document_loader.py](/src/document_loader.py), e.g. `python .\document_loader.py --document_directory="/sample_docs" --database_name="my_db" --run_local`
+3. Load your documents using [document_loader.py](/src/document_loader.py)
     - Options for running the document loader include:
       - `--document_directory`: Directory from which to load documents
       - `--database_name`: The name of the database where you'd like to store the loaded documents
@@ -20,7 +20,8 @@ I legit have no idea if this is going to be useful or anything, but it's certain
       - `--split_documents`: If this is present, the loader will split loaded documents into smaller chunks
       - `--split_chunks`: How big the chunk sizes should be
       - `--split_overlap`: How much of an overlap there should be between chunks
-4. Once you've loaded your documents, run the LLM using [run_chain.py](/src/run_chain.py), e.g. `python .\run_chain.py --verbose`
+4. Once you've loaded your documents, run the LLM using either [run_chain.py](/src/run_chain.py) OR [run_vs_agent.py](/src/run_vs_agent.py)
+    - If you have multiple document stores that you have loaded and want to query, use [run_vs_agent.py](/src/run_vs_agent.py) after creating a tool configuration, like the example [medical_device_config.json](/tool_configurations/medical_device_config.json)
     - Options for running the LLM include:
       - `--run_open_ai`: When set, this will force the use of the OpenAI LLM and embeddings.  Make sure you set your API key.
       - `--database_name`: The name of the database from which to retrieve your documents
@@ -95,3 +96,8 @@ $env:GGML_CUDA_NO_PINNED=1
   - Added command line support for [run_chain.py](/src/run_chain.py) and [document_loader.py](/src/document_loader.py)
   - Removed old unused code
   - Collapsed the local and remote LLM access (using langchain) into one file [run_llm_langchain.py](src/run_llm_langchain.py)
+
+- 6/23/2023
+  - Added multi-document store querying capabilities using [run_vs_agent.py](src/run_vs_agent.py)
+  - Loading user defined tools using [tool_loader.py](src/tool_loader.py)
+  - Added an example tool configuration for my work-related stuff, [medical_device_config.json](/tool_configurations/medical_device_config.json)

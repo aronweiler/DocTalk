@@ -8,7 +8,7 @@
 #####
 
 
-import documents
+from document_loader import get_database
 import re
 
 def split_sentence(sentence):
@@ -35,7 +35,7 @@ def search_strings(keywords, strings):
     return sorted_strings
 
 def search_stuff():
-    db = documents.get_database(True)
+    db = get_database(True, "work")
 
     search_terms = split_sentence("What requirements are associated with OSRS11?")
     document_chunks = [d for d in db.get()["documents"]]

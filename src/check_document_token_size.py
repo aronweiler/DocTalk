@@ -5,7 +5,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 import utilities.token_helper as token_helper
 
-from shared import (DOCUMENT_DIRECTORY, DOCUMENT_TYPES, CHROMA_SETTINGS, CHROMA_DIRECTORY, get_embedding)
+from document_loader import DOCUMENT_TYPES
 
 def load_single_document(file_path: str) -> str:
     # Loads a single document from a file path

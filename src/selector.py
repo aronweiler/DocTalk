@@ -16,4 +16,4 @@ def get_embedding(local):
     if local:
         return HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl") #, embed_instruction="Represent the document for retrieval: ")
     else:
-        return OpenAIEmbeddings()    
+        return OpenAIEmbeddings()  

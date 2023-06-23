@@ -44,11 +44,10 @@ def load_single_document(file_path: str) -> List[Document]:
     try:
         documents = loader.load()
         return documents
-    except:
-        err = f"Could not load {file_path}"
+    except Exception as e:
+        err = f"Could not load {file_path}, {e}"
         print(err)
-        raise(ValueError(err))
-    
+        raise(ValueError(err))   
     
 
 def load_document_batch(filepaths):
@@ -123,6 +122,18 @@ def main(document_directory:str, database_name:str, run_local:bool, split_docume
     print("Persisting DB")
     db.persist()
     db = None
+
+def get_database(embeddings, database_name, collection_name = Chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME):
+
+    db = Chroma(
+        persist_directory=shared.CHROMA_DIRECTORY.format(database_name=database_name),        
+        embedding_function=embeddings,
+        client_settings=shared.get_chroma_settings(database_name),
+    )
+
+    print(f"There are {len(db.get()['documents'])} chunks in the datastore")
+
+    return db 
 
     
 #document_directory = "/repos/sample_docs/P&R"

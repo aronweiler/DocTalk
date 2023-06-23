@@ -3,7 +3,7 @@
 import os
 import time
 import utilities.console_text as console_text
-import documents
+from document_loader import get_database
 import shared
 import utilities.calculate_timing as calculate_timing
 import callback_handlers
@@ -14,7 +14,7 @@ import argparse
 import shared
 
 def main(llm, embeddings, database_name:str, top_k = 4, search_type = "mmr", search_distance = .5, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE):  
-    db = documents.get_database(embeddings, database_name) 
+    db = get_database(embeddings, database_name) 
     
     vectordbkwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
 

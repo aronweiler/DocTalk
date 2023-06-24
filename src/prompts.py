@@ -5,7 +5,7 @@ INITIAL_PROMPT_TMPL = (
 
     Given the context below, attempt to answer the following query: "{question}"     
 
-    If no answer exists in the given context, respond with: "No answer given"
+    If you don't know the answer, just say that you don't know, don't try to make up an answer.
     
     Context: {context_str}
 
@@ -13,6 +13,16 @@ INITIAL_PROMPT_TMPL = (
 
     """
 )
+
+OPEN_LLAMA_INSTRUCT_PROMPT_TMPL = ("""### Instruction: Given the context below, attempt to answer the following query: "{question}"     
+
+    If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    
+    Context: {context}
+
+### Response:""")
+
+
 
 # INITIAL_PROMPT_TMPL = (
 #     """### Instruction:  

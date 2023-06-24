@@ -12,6 +12,7 @@ def create_tool(tool_json) -> Tool:
     tool_class_name = tool_json["tool_class_name"]
     tool_module_name = tool_json["tool_module_name"]
 
+    run_locally = tool_json["arguments"]["run_locally"]
     database_name = tool_json["arguments"]["database_name"]
     top_k = tool_json["arguments"]["top_k"]
     search_type = tool_json["arguments"]["search_type"]
@@ -19,17 +20,19 @@ def create_tool(tool_json) -> Tool:
     verbose = tool_json["arguments"]["verbose"]
     max_tokens = tool_json["arguments"]["max_tokens"]
     return_source_documents = tool_json["arguments"]["return_source_documents"]
+    return_direct = tool_json["arguments"]["return_direct"]
 
     module = importlib.import_module(tool_module_name)
 
     # dynamically instantiate the tool based on the parameters
-    tool_instance = getattr(module, tool_class_name)(database_name, top_k, search_type, search_distance, verbose, max_tokens, return_source_documents)
+    tool_instance = getattr(module, tool_class_name)(database_name, run_locally, top_k, search_type, search_distance, verbose, max_tokens, return_source_documents)
     typed_instance = cast(BaseTool, tool_instance)
     
     tool = Tool(
         name=tool_name,
         func=typed_instance.run,
         description=tool_description,
+        return_direct = return_direct
     )
 
     return tool

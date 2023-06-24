@@ -1,49 +1,55 @@
 {
     "tools": [
         {
-            "friendly_name": "FDA Documentation QA Tool",
-            "description": "A tool that is useful for querying FDA documents, such as regulations and guidance documents.",
-            "tool_module_name": "tools.open_ai_vector_store_tool",
-            "tool_class_name": "OpenAIVectorStoreTool",
+            "friendly_name": "FDA Documentation Tool",
+            "description": "Useful for querying FDA documents, such as regulatory and guidance documents.  Any requests mentioning FDA should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "tool_module_name": "tools.vector_store_tool",
+            "tool_class_name": "VectorStoreTool",
             "arguments": {
                 "database_name": "fda",
+                "run_locally": false,
                 "top_k": 5,
-                "search_type": "mmr",
-                "search_distance": 0.1,
+                "search_type": "similarity",
+                "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 4096,
-                "return_source_documents": true
+                "return_source_documents": true,
+                "return_direct" : false
 
             }
         },
         {
-            "friendly_name": "ISO/AAMI/IEC Standards Documentation QA Tool",
-            "description": "A tool that is useful for querying ISO, AAMI, or IEC Standards documents.",
-            "tool_module_name": "tools.open_ai_vector_store_tool",
-            "tool_class_name": "OpenAIVectorStoreTool",
+            "friendly_name": "ISO/AAMI/IEC Standards Documentation Tool",
+            "description": "Useful for querying ISO, AAMI, or IEC Standards documents.  Any requests mentioning ISO, AAMI, or IEC should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "tool_module_name": "tools.vector_store_tool",
+            "tool_class_name": "VectorStoreTool",
             "arguments": {
                 "database_name": "iso",
+                "run_locally": false,
                 "top_k": 5,
-                "search_type": "mmr",
-                "search_distance": 0.1,
+                "search_type": "similarity",
+                "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 4096,
-                "return_source_documents": true
+                "return_source_documents": true,
+                "return_direct" : false
             }
         },
         {
-            "friendly_name": "Remote Control Project Documentation Tool",
-            "description": "A tool that is useful for querying for information about the Remote Control project / product.",
-            "tool_module_name": "tools.local_vector_store_tool",
-            "tool_class_name": "LocalVectorStoreTool",
-            "arguments": {
+            "friendly_name": "Remote Control Documentation Tool",
+            "description": "Useful for querying for information about Remote Control. Any requests mentioning Remote Control should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
+            "tool_module_name": "tools.vector_store_tool",
+            "tool_class_name": "VectorStoreTool",
+            "arguments": {                
                 "database_name": "rc",
+                "run_locally": true,
                 "top_k": 5,
                 "search_type": "mmr",
                 "search_distance": 0.1,
                 "verbose": true,
                 "max_tokens": 2048,
-                "return_source_documents": true
+                "return_source_documents": true,
+                "return_direct" : false
             }
         }
     ]

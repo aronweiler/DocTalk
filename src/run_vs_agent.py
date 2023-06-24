@@ -31,6 +31,8 @@ def main(router_llm, configuration_file, verbose, max_tokens = shared.MAX_LOCAL_
         # Time it
         start_time = time.time()
                 
+        query = "Without using knowledge prior to this conversation, and using one or more of the tools available to you, respond to the following: " + query             
+
         # Run the query
         result = agent_chain.run(input=query)
 
@@ -54,11 +56,9 @@ def run(run_local:bool, verbose:bool, configuration_file:str):
     
     if run_local:    
         llm = get_llm(True)
-        embeddings = get_embedding(True)
         max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE
     else:
         llm = get_llm(False)
-        embeddings = get_embedding(False)
         max_tokens = shared.MAX_OPEN_AI_CONTEXT_SIZE
         
     main(llm, configuration_file, verbose, max_tokens)

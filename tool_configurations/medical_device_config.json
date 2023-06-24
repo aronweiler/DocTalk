@@ -35,7 +35,7 @@
             "friendly_name": "Remote Control Project Documentation Tool",
             "description": "A tool that is useful for querying for information about the Remote Control project / product.",
             "tool_module_name": "tools.local_vector_store_tool",
-            "tool_class_name": "OpenAIVectorStoreTool",
+            "tool_class_name": "LocalVectorStoreTool",
             "arguments": {
                 "database_name": "rc",
                 "top_k": 5,

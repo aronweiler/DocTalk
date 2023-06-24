@@ -18,7 +18,10 @@ CHROMA_DIRECTORY = f"{APP_DIRECTORY}/ChromaDB_{{database_name}}"
 # Keeping the output from some runs here, which I use to estimate times for the local llm runs
 LLAMA_TIMINGS_FILE = f"{APP_DIRECTORY}/timings/llama_print_timings.txt"
 
+# Best model so far
 LOCAL_MODEL_PATH = "/Repos/LLM/WizardLM-13B-1.0.ggmlv3.q5_1.bin"
+
+#LOCAL_MODEL_PATH = "/Repos/LLM/open-llama-13b-open-instruct.ggmlv3.q5_1.bin"
 #LOCAL_MODEL_PATH = "/Repos/LLM/open-llama-7B-open-instruct.ggmlv3.q4_1.bin"
 
 def get_chroma_settings(database_name):

@@ -9,6 +9,7 @@
 
 
 from document_loader import get_database
+from selector import get_embedding
 import re
 
 def split_sentence(sentence):
@@ -35,16 +36,38 @@ def search_strings(keywords, strings):
     return sorted_strings
 
 def search_stuff():
-    db = get_database(True, "work")
+    embeddings = get_embedding(True)
+    db = get_database(embeddings, "rc")
 
-    search_terms = split_sentence("What requirements are associated with OSRS11?")
-    document_chunks = [d for d in db.get()["documents"]]
+    ## Filter to a single document: 
+    # where_file = {'source' : {'$eq' :'C:\\Repos\\sample_docs\\work\\combined\\PACKAGING PLAN, PB980 VENTILATOR - 10066593U00.docx'}}        
+    # filtered_docs = db._collection.get(where=where_file)['documents']
 
-    matched_documents = search_strings(["OSRS11", "requirements"], document_chunks)
+    search_term = "SBOM"
+    where_contains = {'$contains' :search_term}  
+    metadatas = db._collection.get(where_document=where_contains)['metadatas']
+    unique_list = list(set(item['source'] for item in metadatas))
+    where_file = {'source' : {'$eq' :'C:\\Repos\\sample_docs\\work\\combined\\PACKAGING PLAN, PB980 VENTILATOR - 10066593U00.docx'}}        
 
-    results0 = db.similarity_search("OSRS11", filter={"Exact"})
-    results1 = db.max_marginal_relevance_search("OSRS11")
-    results2 = db.similarity_search("OSRS11")
+    #search_kwargs={"filter": {"source": "C:\\Repos\\sample_docs\\Work\\Combined\\Product Security Plan, PB980 Connectivity - RE00317115A00.docx"}, "where_document":{"$contains": "SBOM"}}
+    # vec = VectorStoreRetriever(vectorstore=db, search_kwargs={"where_document":{ "$contains": "SBOM"}, "where": {"source": "C:\\Repos\\sample_docs\\Work\\Combined\\Product Security Plan, PB980 Connectivity - RE00317115A00.docx"}})
+    # result = vec.get_relevant_documents("SBOM")
+    search_kwargs = {'where':where_contains}
+    #vectordbkwargs = {"source": "C:\\Repos\\sample_docs\\Work\\Combined\\Product Security Plan, PB980 Connectivity - RE00317115A00.docx"}
+    db.as_retriever(search_kwargs=search_kwargs)
+
+    result = db.similarity_search_with_relevance_scores("SBOM Monitoring")
+
+    print(result)
+
+    # search_terms = split_sentence("What requirements are associated with OSRS11?")
+    # document_chunks = [d for d in db.get()["documents"]]
+
+    # matched_documents = search_strings(["OSRS11", "requirements"], document_chunks)
+
+    # results0 = db.similarity_search("OSRS11", filter={"Exact"})
+    # results1 = db.max_marginal_relevance_search("OSRS11")
+    # results2 = db.similarity_search("OSRS11")
 
     #for doc in 
 
@@ -60,4 +83,5 @@ def measure_stuff():
         print(token_helper.num_tokens_from_string(f.read()))
 
 
-measure_stuff()
+#measure_stuff()
+search_stuff()

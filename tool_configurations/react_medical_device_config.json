@@ -13,7 +13,7 @@
                 "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 4096,
-                "return_source_documents": true,
+                "return_source_documents": false,
                 "return_direct" : false
 
             }
@@ -31,27 +31,28 @@
                 "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 4096,
-                "return_source_documents": true,
+                "return_source_documents": false,
                 "return_direct" : false
             }
-        },
+        },        
         {
             "friendly_name": "Remote Control Documentation Tool",
-            "description": "Useful for querying for information about Remote Control. Any requests mentioning Remote Control should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
+            "description": "Useful for collating, summarizing, and explaining information in Remote Control documents. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
             "tool_module_name": "tools.vector_store_tool",
             "tool_class_name": "VectorStoreTool",
-            "arguments": {                
+            "arguments": {
                 "database_name": "rc",
                 "run_locally": true,
                 "top_k": 5,
                 "search_type": "mmr",
-                "search_distance": 0.1,
+                "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 2048,
-                "return_source_documents": true,
+                "return_source_documents": false,
                 "return_direct" : false
             }
-        }
+        }     
+        
     ]
 
 }

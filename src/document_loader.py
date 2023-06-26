@@ -10,21 +10,22 @@ from concurrent.futures import as_completed
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain.vectorstores import (Chroma)
+from langchain.vectorstores import Chroma
 from langchain.document_loaders import (
     CSVLoader,    
-    PyPDFLoader,    
+    #PyPDFLoader,    
     TextLoader,
     Docx2txtLoader,
     #UnstructuredWordDocumentLoader 
 )
 
+from pdf_loader import PDFLoader
 import shared
 import selector
 
 DOCUMENT_TYPES = {
     ".txt": TextLoader,
-    ".pdf": PyPDFLoader,
+    ".pdf": PDFLoader,
     ".csv": CSVLoader,
     ".doc": Docx2txtLoader, #UnstructuredWordDocumentLoader,
     ".docx": Docx2txtLoader
@@ -101,7 +102,7 @@ def main(document_directory:str, database_name:str, run_local:bool, split_docume
     documents = load_documents(document_directory)
 
     if split_documents:
-        text_splitter = RecursiveCharacterTextSplitter(separators=shared.SPLIT_SEPARATORS, chunk_size=split_chunks, chunk_overlap=split_overlap)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=split_chunks, chunk_overlap=split_overlap)
         texts = text_splitter.split_documents(documents)
         
         print(f"Split into {len(texts)} chunks of text (chunk_size: {split_chunks}, chunk_overlap: {split_overlap})")

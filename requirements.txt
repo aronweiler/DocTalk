@@ -8,3 +8,4 @@ sentence_transformers
 InstructorEmbedding
 docx2txt
 openai
+pdfminer.six

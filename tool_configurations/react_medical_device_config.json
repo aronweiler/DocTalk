@@ -2,9 +2,9 @@
     "tools": [
         {
             "friendly_name": "FDA Documentation Tool",
-            "description": "Useful for querying FDA documents, such as regulatory and guidance documents.  Any requests mentioning FDA should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
-            "tool_module_name": "tools.vector_store_tool",
-            "tool_class_name": "VectorStoreTool",
+            "description": "Useful for querying FDA documents, such as regulatory and guidance documents. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "tool_module_name": "tools.vector_store_retrieval_qa_tool",
+            "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
                 "database_name": "fda",
                 "run_locally": false,
@@ -13,16 +13,16 @@
                 "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 4096,
-                "return_source_documents": false,
+                "return_source_documents": true,
                 "return_direct" : false
 
             }
         },
         {
             "friendly_name": "ISO/AAMI/IEC Standards Documentation Tool",
-            "description": "Useful for querying ISO, AAMI, or IEC Standards documents.  Any requests mentioning ISO, AAMI, or IEC should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
-            "tool_module_name": "tools.vector_store_tool",
-            "tool_class_name": "VectorStoreTool",
+            "description": "Useful for querying ISO, AAMI, or IEC Standards documents. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "tool_module_name": "tools.vector_store_retrieval_qa_tool",
+            "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
                 "database_name": "iso",
                 "run_locally": false,
@@ -31,15 +31,15 @@
                 "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 4096,
-                "return_source_documents": false,
+                "return_source_documents": true,
                 "return_direct" : false
             }
         },        
         {
             "friendly_name": "Remote Control Documentation Tool",
             "description": "Useful for collating, summarizing, and explaining information in Remote Control documents. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
-            "tool_module_name": "tools.vector_store_tool",
-            "tool_class_name": "VectorStoreTool",
+            "tool_module_name": "tools.vector_store_retrieval_qa_tool",
+            "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
                 "database_name": "rc",
                 "run_locally": true,
@@ -48,7 +48,7 @@
                 "search_distance": 0.6,
                 "verbose": true,
                 "max_tokens": 2048,
-                "return_source_documents": false,
+                "return_source_documents": true,
                 "return_direct" : false
             }
         }     

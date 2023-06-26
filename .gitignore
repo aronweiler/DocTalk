@@ -3,6 +3,7 @@ _old/
 src/ChromaDB_*/
 doctalk_venv/
 .vscode/
+.chroma
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

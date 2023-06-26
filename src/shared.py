@@ -10,7 +10,7 @@ MAX_OPEN_AI_CONTEXT_SIZE = 4096
 ## If we split documents in the loader, need to know by how much
 SPLIT_DOCUMENT_CHUNK_SIZE = 300
 SPLIT_DOCUMENT_CHUNK_OVERLAP = 100
-SPLIT_SEPARATORS = ["\r\n", "\n\n", "\n"]
+SPLIT_SEPARATORS = ["\n\n", "\n", " ", ""]
 
 APP_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 CHROMA_DIRECTORY = f"{APP_DIRECTORY}/ChromaDB_{{database_name}}"

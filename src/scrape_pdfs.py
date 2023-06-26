@@ -6,9 +6,10 @@ from bs4 import BeautifulSoup
 # Obviously my source of documents is a government site haha
 #url = "https://www.sandiego.gov/parkandrecboard/meetings"
 url = "https://www.sandiego.gov/parkandrecboard/meetings/2022"
+url = "https://www.sandiego.gov/parkandrecboard/reports"
 
 #If there is no such folder, the script will create one automatically
-folder_location = '/Repos/sample_docs/P&R'
+folder_location = '/Repos/sample_docs/P&R/reports'
 if not os.path.exists(folder_location):os.mkdir(folder_location)
 
 response = requests.get(url)

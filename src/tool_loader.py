@@ -1,12 +1,14 @@
 import json
 import tool_creator
+from tool_header import ToolHeader
 
 def load_tools(config, memory):
     tools = []
 
     for tool_json in config["tools"]:
         # Load the JSON into the specified type, getting the tool back
-        tool = tool_creator.TOOL_TYPES[tool_json["tool_class_name"]](tool_json, memory)
+        header = ToolHeader(tool_json)
+        tool = tool_creator.TOOL_TYPES[header.tool_class_name](tool_json, memory)
         tools.append(tool)
     
     return tools

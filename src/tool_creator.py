@@ -1,14 +1,13 @@
 from langchain.agents import  Tool
-from langchain.tools import BaseTool
+from langchain.tools import BaseTool, StructuredTool
 import importlib
 from typing import cast
+from tool_header import ToolHeader
 
 def create_self_ask_tool(tool_json, memory) -> Tool:
-    """Creates a tool from a JSON representation"""        
-    tool_name = tool_json["friendly_name"]
-    tool_description = tool_json["description"]
-    tool_module_name = tool_json["tool_module_name"]
-    tool_class_name = tool_json["tool_class_name"]
+
+    header = ToolHeader(tool_json)
+
     run_locally = tool_json["run_locally"]
     verbose = tool_json["verbose"]
     max_tokens = tool_json["max_tokens"]
@@ -17,45 +16,61 @@ def create_self_ask_tool(tool_json, memory) -> Tool:
 
     search_tool = TOOL_TYPES[tool_json["arguments"]["tool_class_name"]](self_ask_tool_arguments, memory)
     
-    module = importlib.import_module(tool_module_name)
+    module = importlib.import_module(header.tool_module_name)
 
     # dynamically instantiate the tool based on the parameters
-    tool_instance = getattr(module, tool_class_name)(memory, run_locally, search_tool, verbose, max_tokens)
+    tool_instance = getattr(module, header.tool_class_name)(memory, run_locally, search_tool, verbose, max_tokens)
     typed_instance = cast(BaseTool, tool_instance)
 
     tool = Tool(
-        name=tool_name,
+        name=header.tool_name,
         func=typed_instance.run,
-        description=tool_description
+        description=header.tool_description
     )
 
     return tool
 
-def create_vector_store_tool(tool_json, memory) -> Tool: 
-    """Creates a tool from a JSON representation"""        
-    tool_name = tool_json["friendly_name"]
-    tool_description = tool_json["description"]
-    tool_class_name = tool_json["tool_class_name"]
-    tool_module_name = tool_json["tool_module_name"]
 
-    vector_store_tool_args = get_vector_store_tool_args(tool_json["arguments"])
+def create_vector_store_retrieval_qa_tool(tool_json, memory) -> Tool: 
 
-    module = importlib.import_module(tool_module_name)
+    header = ToolHeader(tool_json)
+
+    vector_store_retrieval_qa_tool_args = get_vector_store_retrieval_qa_tool_args(tool_json["arguments"])
+
+    module = importlib.import_module(header.tool_module_name)
 
     # dynamically instantiate the tool based on the parameters
-    tool_instance = getattr(module, tool_class_name)(memory, **vector_store_tool_args)
+    tool_instance = getattr(module, header.tool_class_name)(memory, **vector_store_retrieval_qa_tool_args)
     typed_instance = cast(BaseTool, tool_instance)
     
     tool = Tool(
-        name=tool_name,
+        name=header.tool_name,
         func=typed_instance.run,
-        description=tool_description,
-        return_direct = vector_store_tool_args["return_direct"]
+        description=header.tool_description,
+        return_direct = vector_store_retrieval_qa_tool_args["return_direct"]
     )
 
     return tool
 
-def get_vector_store_tool_args(tool_json):
+def create_vector_store_search_tool(tool_json, memory):
+   
+    header = ToolHeader(tool_json)
+    database_names = tool_json["arguments"]["database_names"]
+    run_locally = tool_json["arguments"]["run_locally"]
+    return_direct = tool_json["arguments"]["return_direct"]
+    return_source_documents = tool_json["arguments"]["return_source_documents"]
+    
+    module = importlib.import_module(header.tool_module_name)
+
+    # dynamically instantiate the tool based on the parameters
+    tool_instance = getattr(module, header.tool_class_name)(database_names, run_locally, return_source_documents)
+    typed_instance = cast(BaseTool, tool_instance)
+    
+    tool = StructuredTool.from_function(typed_instance.run, header.tool_name, header.tool_description, return_direct)
+
+    return tool
+
+def get_vector_store_retrieval_qa_tool_args(tool_json):
     return {
         "run_locally": tool_json["run_locally"],
         "database_name" : tool_json["database_name"],
@@ -70,5 +85,6 @@ def get_vector_store_tool_args(tool_json):
 
 TOOL_TYPES = {
     "SelfAskAgentTool": create_self_ask_tool,
-    "VectorStoreTool": create_vector_store_tool
+    "VectorStoreRetrievalQATool": create_vector_store_retrieval_qa_tool,
+    "VectorStoreSearchTool": create_vector_store_search_tool
     } 

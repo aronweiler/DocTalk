@@ -4,9 +4,10 @@ import shared
 from document_loader import get_database
 from selector import get_llm, get_embedding
 from langchain.chains import RetrievalQA
+from langchain.prompts import Prompt
 import utilities.calculate_timing as calculate_timing
 
-class VectorStoreTool:
+class VectorStoreRetrievalQATool:
 
     def __init__(self, memory, database_name, run_locally, top_k = 4, search_type = "mmr", search_distance = .5, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
             self.database_name = database_name
@@ -17,22 +18,20 @@ class VectorStoreTool:
             self.max_tokens = max_tokens
             self.return_source_documents = return_source_documents
 
-            # Load the specified database using non-local embeddings
+            # Load the specified database 
             db = get_database(get_embedding(run_locally), database_name)    
 
             vectordbkwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
 
-            # Get the open ai llm
+            # Get the llm
             llm = get_llm(run_locally)
             
-            chain_type_kwargs = {}
+            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
 
-            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=db.as_retriever(search_kwargs=vectordbkwargs), memory=memory, verbose=verbose, return_source_documents=return_source_documents, chain_type_kwargs=chain_type_kwargs)           
-
-            print(f"VectorStoreTool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
+            print(f"VectorStoreRetrievalQATool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
 
     def run(self, query:str) -> str:
-        print(f"\nVectorStoreTool got: {query}")
+        print(f"\nVectorStoreRetrievalQATool got: {query}")
 
         start_time = time.time()
         result = self.retrieval_qa({"query": query})
@@ -41,7 +40,6 @@ class VectorStoreTool:
         elapsed_time = end_time - start_time
         print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
-        result = self.retrieval_qa({"query": query})
         result_string = result['result']
 
         # When this tool is used from the self_ask_agent_tool, it doesn't 

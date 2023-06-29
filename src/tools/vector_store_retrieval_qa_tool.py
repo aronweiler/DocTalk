@@ -9,7 +9,7 @@ import utilities.calculate_timing as calculate_timing
 
 class VectorStoreRetrievalQATool:
 
-    def __init__(self, memory, database_name, run_locally, top_k = 4, search_type = "mmr", search_distance = .5, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
+    def __init__(self, memory, database_name, run_locally, top_k = 4, chain_type="stuff", search_type = "mmr", search_distance = .5, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
             self.database_name = database_name
             self.top_k = top_k
             self.search_type = search_type
@@ -26,7 +26,7 @@ class VectorStoreRetrievalQATool:
             # Get the llm
             llm = get_llm(run_locally)
             
-            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
+            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type=chain_type, retriever=db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
 
             print(f"VectorStoreRetrievalQATool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
 

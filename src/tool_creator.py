@@ -80,7 +80,8 @@ def get_vector_store_retrieval_qa_tool_args(tool_json):
         "verbose" : tool_json["verbose"],
         "max_tokens" : tool_json["max_tokens"],
         "return_source_documents" : tool_json["return_source_documents"],
-        "return_direct" : tool_json["return_direct"]
+        "return_direct" : tool_json["return_direct"],
+        "chain_type": tool_json["chain_type"],
     }
 
 TOOL_TYPES = {

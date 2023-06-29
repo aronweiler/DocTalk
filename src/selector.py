@@ -15,11 +15,10 @@ def get_llm(local):
         return LlamaCpp(model_path=shared.LOCAL_MODEL_PATH, n_ctx=shared.MAX_LOCAL_CONTEXT_SIZE, temperature=shared.AI_TEMP, n_gpu_layers=offload_layers) 
     else:
         openai_api_key = os.getenv('OPENAI_API_KEY')
-        return OpenAI(temperature=shared.AI_TEMP, openai_api_key=openai_api_key)
+        return OpenAI(temperature=shared.AI_TEMP, openai_api_key=openai_api_key, max_tokens=-1)
     
-def get_embedding(local):
-    
+def get_embedding(local, device_type = "cpu"):    
     if local:
-        return HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl") #, embed_instruction="Represent the document for retrieval: ")
+        return HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl", model_kwargs={"device": device_type}) #, embed_instruction="Represent the document for retrieval: ")
     else:
         return OpenAIEmbeddings()  

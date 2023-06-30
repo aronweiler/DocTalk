@@ -4,7 +4,7 @@ import importlib
 from typing import cast
 from tool_header import ToolHeader
 
-def create_self_ask_tool(tool_json, memory) -> Tool:
+def create_self_ask_tool(tool_json, memory, override_llm) -> Tool:
 
     header = ToolHeader(tool_json)
 
@@ -19,7 +19,7 @@ def create_self_ask_tool(tool_json, memory) -> Tool:
     module = importlib.import_module(header.tool_module_name)
 
     # dynamically instantiate the tool based on the parameters
-    tool_instance = getattr(module, header.tool_class_name)(memory, run_locally, search_tool, verbose, max_tokens)
+    tool_instance = getattr(module, header.tool_class_name)(memory, run_locally, search_tool, verbose, max_tokens, override_llm=override_llm)
     typed_instance = cast(BaseTool, tool_instance)
 
     tool = Tool(
@@ -31,7 +31,7 @@ def create_self_ask_tool(tool_json, memory) -> Tool:
     return tool
 
 
-def create_vector_store_retrieval_qa_tool(tool_json, memory) -> Tool: 
+def create_vector_store_retrieval_qa_tool(tool_json, memory, override_llm) -> Tool: 
 
     header = ToolHeader(tool_json)
 
@@ -40,7 +40,7 @@ def create_vector_store_retrieval_qa_tool(tool_json, memory) -> Tool:
     module = importlib.import_module(header.tool_module_name)
 
     # dynamically instantiate the tool based on the parameters
-    tool_instance = getattr(module, header.tool_class_name)(memory, **vector_store_retrieval_qa_tool_args)
+    tool_instance = getattr(module, header.tool_class_name)(memory, **vector_store_retrieval_qa_tool_args, override_llm=override_llm)
     typed_instance = cast(BaseTool, tool_instance)
     
     tool = Tool(
@@ -52,7 +52,7 @@ def create_vector_store_retrieval_qa_tool(tool_json, memory) -> Tool:
 
     return tool
 
-def create_vector_store_search_tool(tool_json, memory):
+def create_vector_store_search_tool(tool_json, memory, override_llm):
    
     header = ToolHeader(tool_json)
     database_names = tool_json["arguments"]["database_names"]
@@ -63,7 +63,7 @@ def create_vector_store_search_tool(tool_json, memory):
     module = importlib.import_module(header.tool_module_name)
 
     # dynamically instantiate the tool based on the parameters
-    tool_instance = getattr(module, header.tool_class_name)(database_names, run_locally, return_source_documents)
+    tool_instance = getattr(module, header.tool_class_name)(database_names=database_names, run_locally=run_locally, return_source_documents=return_source_documents)
     typed_instance = cast(BaseTool, tool_instance)
     
     tool = StructuredTool.from_function(typed_instance.run, header.tool_name, header.tool_description, return_direct)

@@ -17,12 +17,7 @@ from tool_loader import load_tools_from_file
 
 def main(router_llm, configuration_file, verbose, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE):  
     
-    memory = ConversationTokenBufferMemory(llm=router_llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True)
-    # Sometimes I need to set inputs / outputs on the above, like:
-    #, input_key="input", output_key="result"
-
-    # If I want to create readonly memory for the tools
-    #readonlymemory = ReadOnlySharedMemory(memory=memory)
+    memory = ConversationTokenBufferMemory(llm=router_llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True)   
 
     # Share my memory with all my buds
     tools = load_tools_from_file(configuration_file, memory)

@@ -4,12 +4,11 @@ import shared
 from document_loader import get_database
 from selector import get_llm, get_embedding
 from langchain.chains import RetrievalQA
-from langchain.prompts import Prompt
 import utilities.calculate_timing as calculate_timing
 
 class VectorStoreRetrievalQATool:
 
-    def __init__(self, memory, database_name, run_locally, top_k = 4, chain_type="stuff", search_type = "mmr", search_distance = .5, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
+    def __init__(self, memory, database_name, run_locally, override_llm = None, top_k = 4, search_type = "mmr", chain_type = "stuff", search_distance = .5, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
             self.database_name = database_name
             self.top_k = top_k
             self.search_type = search_type
@@ -19,16 +18,23 @@ class VectorStoreRetrievalQATool:
             self.return_source_documents = return_source_documents
 
             # Load the specified database 
-            db = get_database(get_embedding(run_locally), database_name)    
+            self.db = get_database(get_embedding(run_locally), database_name)    
 
             vectordbkwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
 
             # Get the llm
-            llm = get_llm(run_locally)
+            if override_llm != None:
+                 llm = override_llm
+            else:
+                llm = get_llm(run_locally)
             
-            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type=chain_type, retriever=db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
+            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type=chain_type, retriever=self.db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
 
             print(f"VectorStoreRetrievalQATool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
+
+    @property
+    def database(self):
+        return self.db
 
     def run(self, query:str) -> str:
         print(f"\nVectorStoreRetrievalQATool got: {query}")

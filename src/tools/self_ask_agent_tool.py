@@ -8,12 +8,15 @@ import utilities.calculate_timing as calculate_timing
 
 class SelfAskAgentTool:
 
-    def __init__(self, memory, local, search_tool:Tool, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE):            
+    def __init__(self, memory, local, search_tool:Tool, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, override_llm = None):            
             self.verbose = verbose
             self.max_tokens = max_tokens
             self.search_tool = search_tool
 
-            llm = get_llm(local=local)
+            if(override_llm == None):
+                llm = get_llm(local=local)
+            else:
+                llm = override_llm
 
             #memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True) #, input_key="input", output_key="answer"
             self.agent_chain = initialize_agent([search_tool], llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=verbose, memory=memory)

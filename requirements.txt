@@ -9,3 +9,5 @@ InstructorEmbedding
 docx2txt
 openai
 pdfminer.six
+fastapi
+bs4

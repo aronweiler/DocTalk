@@ -58,7 +58,7 @@ def run_chain(qa):
 
         print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
-def run(run_local:bool, database_name:str, verbose:bool, top_k:int, search_type:str, search_distance:float, chain_type:str):    
+def run(run_local:bool, database_name:str, verbose:bool, top_k:int, search_type:str, search_distance:float, chain_type:str, ai_temp:float):    
     print("-------- Running LLM --------")
     print("run_local:", run_local)
     print("database_name:", database_name)
@@ -70,11 +70,11 @@ def run(run_local:bool, database_name:str, verbose:bool, top_k:int, search_type:
     print("-----------------------------")
     
     if run_local:    
-        llm = get_llm(True)
+        llm = get_llm(True, ai_temp=ai_temp)
         embeddings = get_embedding(True)
         max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE
     else:
-        llm = get_llm(False)
+        llm = get_llm(False, ai_temp=ai_temp)
         embeddings = get_embedding(False)
         max_tokens = shared.MAX_OPEN_AI_CONTEXT_SIZE
         
@@ -92,9 +92,10 @@ if __name__ == "__main__":
     parser.add_argument('--search_distance', type=float, default=0.1, help='Search distance limits the similarity search in the vector database (value should be 0 and 1, lower value indicates a wider search)')
     parser.add_argument('--search_type', type=str, default='mmr', help='Search type can be either "similarity", or "mmr". Default is "mmr"')
     parser.add_argument('--chain_type', type=str, default='stuff', help='Chain type supported by langchain')
+    parser.add_argument('--ai_temp', type=str, default='0', help='AI temp')
 
     # Parse the command-line arguments
     args = parser.parse_args()
 
     # Call the run() method with parsed arguments
-    run(run_local=args.run_open_ai == False, database_name=args.database_name, verbose=args.verbose, top_k=args.top_k, search_type=args.search_type, chain_type=args.chain_type, search_distance=args.search_distance)    
+    run(run_local=args.run_open_ai == False, database_name=args.database_name, verbose=args.verbose, top_k=args.top_k, search_type=args.search_type, chain_type=args.chain_type, search_distance=args.search_distance, ai_temp=args.ai_temp)    

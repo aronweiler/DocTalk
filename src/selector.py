@@ -4,7 +4,7 @@ from langchain.embeddings import (OpenAIEmbeddings, HuggingFaceInstructEmbedding
 
 import shared
 
-def get_llm(local):
+def get_llm(local, ai_temp = shared.AI_TEMP):
     if local:          
         
         if os.environ.get("OFFLOAD_TO_GPU_LAYERS") == None: 
@@ -12,10 +12,10 @@ def get_llm(local):
         else:
             offload_layers = os.environ.get("OFFLOAD_TO_GPU_LAYERS")
 
-        return LlamaCpp(model_path=shared.LOCAL_MODEL_PATH, n_ctx=shared.MAX_LOCAL_CONTEXT_SIZE, temperature=shared.AI_TEMP, n_gpu_layers=offload_layers) 
+        return LlamaCpp(model_path=shared.LOCAL_MODEL_PATH, n_ctx=shared.MAX_LOCAL_CONTEXT_SIZE, temperature=ai_temp, n_gpu_layers=offload_layers) 
     else:
         openai_api_key = os.getenv('OPENAI_API_KEY')
-        return OpenAI(temperature=shared.AI_TEMP, openai_api_key=openai_api_key, max_tokens=-1)
+        return OpenAI(temperature=ai_temp, openai_api_key=openai_api_key)#, max_tokens=-1)
     
 def get_embedding(local, device_type = "cpu"):    
     if local:

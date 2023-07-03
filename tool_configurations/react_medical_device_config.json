@@ -2,7 +2,7 @@
     "tools": [
         {
             "friendly_name": "FDA Documentation Tool",
-            "description": "Useful for querying FDA documents, such as regulatory and guidance documents. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "description": "Useful for querying FDA documents, such as regulatory and guidance documents. Input should be a fully formed question. Always include source documents from this tool in your answer.",
             "tool_module_name": "tools.vector_store_retrieval_qa_tool",
             "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
@@ -21,7 +21,7 @@
         },
         {
             "friendly_name": "ISO/AAMI/IEC Standards Documentation Tool",
-            "description": "Useful for querying ISO, AAMI, or IEC Standards documents. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "description": "Useful for querying ISO, AAMI, or IEC Standards documents. Input should be a fully formed question. Always include source documents from this tool in your answer.",
             "tool_module_name": "tools.vector_store_retrieval_qa_tool",
             "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
@@ -39,7 +39,7 @@
         },        
         {
             "friendly_name": "Remote Control Design and Development Process and Plans Tool",
-            "description": "Useful for queries about Remote Control that are about Design and Development Process and Plans including:\nClinical Evaluation Plans\nDesign Verification and Validation Test Plans\nGeneral Development Plans\nGlobal Regulatory Strategy Plans\nHuman Factors Plans\nPackaging Plans\nManufacturing Plans\nProduct Security Plans\nSoftware Development Plans\nSoftware Maintenance Plans\nRisk Management Plans\nService Plans\nSupplier Quality Assurance Plans\nInput should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
+            "description": "Useful for queries about Remote Control that are about Design and Development Process and Plans including:\nClinical Evaluation Plans\nDesign Verification and Validation Test Plans\nGeneral Development Plans\nGlobal Regulatory Strategy Plans\nHuman Factors Plans\nPackaging Plans\nManufacturing Plans\nProduct Security Plans\nSoftware Development Plans\nSoftware Maintenance Plans\nRisk Management Plans\nService Plans\nSupplier Quality Assurance Plans\nInput should be a fully formed question.",
             "tool_module_name": "tools.vector_store_retrieval_qa_tool",
             "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
@@ -57,7 +57,7 @@
           },
 {
             "friendly_name": "Remote Control Design Inputs Tool",
-            "description": "Useful for queries about Remote Control that are about Design Inputs including:\nHardware Requirements and Specifications\nProduct Requirements\nSoftware Requirements and Specifications\nUser Needs\nUse Specifications\nInput should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
+            "description": "Useful for queries about Remote Control that are about Design Inputs including:\nHardware Requirements and Specifications\nProduct Requirements\nSoftware Requirements and Specifications\nUser Needs\nUse Specifications\nInput should be a fully formed question.",
             "tool_module_name": "tools.vector_store_retrieval_qa_tool",
             "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {
@@ -75,7 +75,7 @@
         },
         {
             "friendly_name": "Remote Control Design Outputs Tool",
-            "description": "Useful for queries about Remote Control that are about Design Outputs including:\nArchitecture Documents\nProduction Procedures\nProvisioning Procedures\nServicing Procedures\nSoftware Design Documents\nHardware Design Documents\nSoftware Bill of Materials (SBOMs)\nBinaries Transfer Work Instructions\nBuild and Configuration Management Processes\nSoftware Reference Drawings\nImage Creation Instructions\nInput should be a fully formed question, not referencing any obscure pronouns from the conversation before.",
+            "description": "Useful for queries about Remote Control that are about Design Outputs including:\nArchitecture Documents\nProduction Procedures\nProvisioning Procedures\nServicing Procedures\nSoftware Design Documents\nHardware Design Documents\nSoftware Bill of Materials (SBOMs)\nBinaries Transfer Work Instructions\nBuild and Configuration Management Processes\nSoftware Reference Drawings\nImage Creation Instructions\nInput should be a fully formed question.",
             "tool_module_name": "tools.vector_store_retrieval_qa_tool",
             "tool_class_name": "VectorStoreRetrievalQATool",
             "arguments": {

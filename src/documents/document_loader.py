@@ -2,7 +2,7 @@ import os
 import argparse
 import multiprocessing
 from typing import List
-
+import vector_database
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
@@ -13,10 +13,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.document_loaders import (
     CSVLoader,    
-    #PyPDFLoader,    
     TextLoader,
     Docx2txtLoader,
-    #UnstructuredWordDocumentLoader 
 )
 
 from pdf_loader import PDFLoader
@@ -27,7 +25,7 @@ DOCUMENT_TYPES = {
     ".txt": TextLoader,
     ".pdf": PDFLoader,
     ".csv": CSVLoader,
-    ".doc": Docx2txtLoader, #UnstructuredWordDocumentLoader,
+    ".doc": Docx2txtLoader, 
     ".docx": Docx2txtLoader
     }
 
@@ -111,41 +109,18 @@ def main(document_directory:str, database_name:str, run_local:bool, split_docume
 
     print(f"Loaded {len(documents)} pages of documents from {document_directory}")
 
+    # Get the correct embeddings
     embeddings = selector.get_embedding(run_local)
-
-    db = Chroma.from_documents(
-        texts,
-        embedding=embeddings,
-        persist_directory=shared.CHROMA_DIRECTORY.format(database_name=database_name),
-        client_settings=shared.get_chroma_settings(database_name),
-    )
-
-    print("Persisting DB")
-    db.persist()
-    db = None
-
-def get_database(embeddings, database_name, collection_name = Chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME):
-
-    db = Chroma(
-        persist_directory=shared.CHROMA_DIRECTORY.format(database_name=database_name),        
-        embedding_function=embeddings,
-        client_settings=shared.get_chroma_settings(database_name),
-    )
-
-    print(f"There are {len(db.get()['documents'])} chunks in the datastore")
-
-    return db 
-
     
-#document_directory = "/repos/sample_docs/P&R"
-#document_directory = "/repos/sample_docs/work/fda"
-#document_directory = "/Repos/sample_docs/work/design_docs"    
-    
+    # Store the embeddings
+    vector_database.store_embeddings(embeddings, texts, database_name)
+
+
 if __name__ == '__main__':    
     parser = argparse.ArgumentParser()
 
     # Add arguments
-    parser.add_argument('--document_directory', type=str, default='/repos/sample_docs/work/design_docs', help='Directory from where documents are ingested')
+    parser.add_argument('--document_directory', type=str, required=True, help='Directory from where documents are ingested')
     parser.add_argument('--database_name', type=str, default='default', help='Name of the ChromaDB to store documents in')
     parser.add_argument('--run_open_ai', action='store_true', default=False, help='Use OpenAI vs. local embeddings')
     parser.add_argument('--split_documents', action='store_true', default=False, help='Split documents?')

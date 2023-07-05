@@ -5,10 +5,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 import utilities.token_helper as token_helper
 
-from document_loader import DOCUMENT_TYPES
+from documents.document_loader import DOCUMENT_TYPES
 
-def load_single_document(file_path: str) -> str:
-    # Loads a single document from a file path
+def get_token_length_for_document(file_path: str) -> int:    
+    '''This mostly gets a good representation of the token count in a document.'''
     file_extension = os.path.splitext(file_path)[1]
     loader_class = DOCUMENT_TYPES.get(file_extension)
     
@@ -17,11 +17,6 @@ def load_single_document(file_path: str) -> str:
     else:
         raise ValueError("Document type is undefined")
     
-    return "\n\n".join([d.page_content for d in loader.load()])# .load_and_split()
+    document_text = "\n\n".join([d.page_content for d in loader.load()])# .load_and_split()
     
-    
-document = load_single_document("/Repos/sample_docs/P&R/prba20220421b.pdf")
-
-print("Tokens in document: ", token_helper.num_tokens_from_string(document))
-
-
+    return token_helper.num_tokens_from_string(document_text)

@@ -1,7 +1,7 @@
 import time
 import os
 import shared
-from document_loader import get_database
+from documents.document_loader import get_database
 from selector import get_llm, get_embedding
 from langchain.chains import RetrievalQA
 import utilities.calculate_timing as calculate_timing

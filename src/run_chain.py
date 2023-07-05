@@ -3,7 +3,7 @@
 import os
 import time
 import utilities.console_text as console_text
-from document_loader import get_database
+from documents.document_loader import get_database
 import shared
 import utilities.calculate_timing as calculate_timing
 import callback_handlers

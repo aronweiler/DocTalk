@@ -2,7 +2,7 @@ import os
 import time
 import json
 from typing import List
-from document_loader import get_database
+from documents.document_loader import get_database
 from selector import get_llm, get_embedding
 from langchain.chains import RetrievalQA
 from langchain.prompts import Prompt

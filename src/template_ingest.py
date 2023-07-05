@@ -4,7 +4,7 @@ import io
 from langchain.text_splitter import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from run_chain import get_chain
 from selector import get_llm, get_embedding
-from document_loader import get_database
+from documents.document_loader import get_database
 from tools.vector_store_retrieval_qa_tool import VectorStoreRetrievalQATool
 from langchain.memory import ConversationTokenBufferMemory
 from langchain.agents import initialize_agent

@@ -1,26 +1,25 @@
 import os
 import argparse
 import multiprocessing
-from typing import List
-import vector_database
-from concurrent.futures import ProcessPoolExecutor
-from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
 
-from langchain.docstore.document import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-from langchain.vectorstores import Chroma
-from langchain.document_loaders import (
-    CSVLoader,    
-    TextLoader,
-    Docx2txtLoader,
-)
-
-from pdf_loader import PDFLoader
 import shared
 import selector
 
+import vector_database
+
+from typing import List
+
+from concurrent.futures import (ProcessPoolExecutor, ThreadPoolExecutor, as_completed)
+
+from langchain.docstore.document import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+# TODO: Add loaders for PPT, and other document types
+from langchain.document_loaders import (CSVLoader, TextLoader, Docx2txtLoader) 
+
+# Custom PDF loader
+from pdf_loader import PDFLoader
+
+# TODO: Add loaders for PPT, and other document types
 DOCUMENT_TYPES = {
     ".txt": TextLoader,
     ".pdf": PDFLoader,

@@ -7,7 +7,7 @@ from typing import List
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from langchain.tools import Tool
-from tools.vector_store_retrieval_qa_tool import VectorStoreRetrievalQATool
+from agent_tools.vector_store_retrieval_qa_tool import VectorStoreRetrievalQATool
 from tool_loader import load_tools_from_file
 
 app = FastAPI()

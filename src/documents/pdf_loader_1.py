@@ -2,12 +2,13 @@ import re
 import os
 import io
 from langchain.document_loaders import PDFMinerPDFasHTMLLoader
+from langchain.docstore.document import Document
 from bs4 import BeautifulSoup
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfpage import PDFPage
 
-class PDFLoader:
+class PDFLoader_AW:
     def __init__(self, file_path):
         self.file_path = file_path
 
@@ -19,27 +20,28 @@ class PDFLoader:
             return number
         else:
             return None
-    
-    def load(self):
-        loader = PDFMinerPDFasHTMLLoader(self.file_path)
 
-        data = loader.load()[0]   # entire pdf is loaded as a single Document
-
-        process_doc(data)      
-
-    def process_doc(data:Document):
+    def process_doc(self, data:Document):
         soup = BeautifulSoup(data.page_content,'html.parser')
         content = soup.find_all('div')
 
-        cur_page = None
+        cur_page = 1
         cur_fs = None
         cur_text = ''
         snippets = []   # first collect all snippets that have the same font size
         for c in content:
             if len(c) > 0:
-                temp_page = self.extract_page_number(str(c.contents[0]))  
+                temp_page = self.extract_page_number(str(c.contents[0]))                 
+                    
                 if temp_page != None:
-                    cur_page = temp_page
+                    if cur_page != temp_page:
+                        # did we have any text that is spanning a page break?
+                        # treat it like a font size change, and complete the snippet
+                        snippets.append((cur_text, cur_fs, cur_page))
+                        cur_fs = fs
+                        cur_text = c.text                        
+                        cur_page = temp_page
+                        continue
 
             print("Page: ", cur_page)
             sp = c.find('span')
@@ -57,15 +59,15 @@ class PDFLoader:
             if fs == cur_fs:
                 cur_text += c.text
             else:
-                snippets.append((cur_text,cur_fs, cur_page))
+                snippets.append((cur_text, cur_fs, cur_page))
                 cur_fs = fs
                 cur_text = c.text
-        snippets.append((cur_text,cur_fs, cur_page))
+        snippets.append((cur_text, cur_fs, cur_page))
         # Note: The above logic is very straightforward. One can also add more strategies such as removing duplicate snippets (as
         # headers/footers in a PDF appear on multiple pages so if we find duplicatess safe to assume that it is redundant info)
 
 
-        from langchain.docstore.document import Document
+        
         cur_idx = -1
         semantic_snippets = []
         # Assumption: headings have higher font size than their respective content
@@ -94,72 +96,86 @@ class PDFLoader:
 
         return semantic_snippets  
     
-file_name = "C:\\Repos\\sample_docs\\Rene\\jul_5\\RWQCB DPEIR Comment_signed.pdf"
-fp = open(file_name, 'rb')
-parser = PDFParser(fp)    
+    def load(self):
+        loader = PDFMinerPDFasHTMLLoader(self.file_path)
 
-document = PDFDocument(parser)
+        data = loader.load()[0]   # entire pdf is loaded as a single Document
+        
+        self.process_doc(data)
+    
+file_name = "C:\\Temp\\RC_510k\\PT00151460-PT00151460A00 US Remote Control Addendum PB980 English.pdf"
 
-from pdfminer.high_level import extract_text_to_fp
-from pdfminer.layout import LAParams
-# from pdfminer.utils import open_filename
-#from anyio.streams.memory import create_string_io
+pdf = PDFLoader_AW(file_name)
 
-# from typing import Container
+docs = pdf.load()
 
-# page_numbers = []
+print(docs)
 
-# output_string = io.StringIO()    
-# extract_text_to_fp(
-#     fp,  # type: ignore[arg-type]
-#     output_string,
-#     page_numbers=page_numbers,
-#     codec="",
-#     laparams=LAParams(),
-#     output_type="html",
-# )
+# fp = open(file_name, 'rb')
+# parser = PDFParser(fp)    
 
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
+# document = PDFDocument(parser)
 
-rsrcmgr = PDFResourceManager()
-retstr = io.StringIO()
+# from pdfminer.high_level import extract_text_to_fp
+# from pdfminer.layout import LAParams
+# # from pdfminer.utils import open_filename
+# #from anyio.streams.memory import create_string_io
 
-laparams = LAParams()
-device = TextConverter(rsrcmgr, retstr, codec='', laparams=laparams)
-rsrcmgr = PDFResourceManager()
-interpreter = PDFPageInterpreter(rsrcmgr, device)
+# # from typing import Container
 
-num_pages = 0
-page_no = 1
-for pageNumber, page in enumerate(PDFPage.get_pages(fp)):
-#for page in PDFPage.create_pages(document):    
-    num_pages += 1
-    interpreter.process_page(page)
+# # page_numbers = []
 
-    data = retstr.getvalue()
+# # output_string = io.StringIO()    
+# # extract_text_to_fp(
+# #     fp,  # type: ignore[arg-type]
+# #     output_string,
+# #     page_numbers=page_numbers,
+# #     codec="",
+# #     laparams=LAParams(),
+# #     output_type="html",
+# # )
+
+# from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+# from pdfminer.converter import XMLConverter, HTMLConverter, TextConverter
+
+# rsrcmgr = PDFResourceManager()
+# retstr = io.StringIO()
+
+# laparams = LAParams()
+# device = TextConverter(rsrcmgr, retstr, codec='', laparams=laparams)
+# rsrcmgr = PDFResourceManager()
+# interpreter = PDFPageInterpreter(rsrcmgr, device)
+
+# num_pages = 0
+# page_no = 1
+# for pageNumber, page in enumerate(PDFPage.get_pages(fp)):
+# #for page in PDFPage.create_pages(document):    
+#     num_pages += 1
+#     interpreter.process_page(page)
+
+#     data = retstr.getvalue()
 
     
-    data = ''
-    retstr.truncate(0)
-    retstr.seek(0)
+#     data = ''
+#     retstr.truncate(0)
+#     retstr.seek(0)
 
-    page_no += 1
+#     page_no += 1
 
-    # output_string = io.StringIO()    
-    # extract_text_to_fp(
-    #     io.BytesIO(page.contents[0].rawdata),  # type: ignore[arg-type]
-    #     output_string,
-    #     codec="",
-    #     laparams=LAParams(),
-    #     output_type="html",
-    # )
+#     # output_string = io.StringIO()    
+#     # extract_text_to_fp(
+#     #     io.BytesIO(page.contents[0].rawdata),  # type: ignore[arg-type]
+#     #     output_string,
+#     #     codec="",
+#     #     laparams=LAParams(),
+#     #     output_type="html",
+#     # )
 
-print(num_pages)
+# print(num_pages)
 
 
-# loader = PDFLoader(file_name)
+# # loader = PDFLoader(file_name)
 
-# docs = loader.load()
+# # docs = loader.load()
 
-#print(docs)
+# #print(docs)

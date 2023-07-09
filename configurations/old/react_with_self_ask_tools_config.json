@@ -1,0 +1,66 @@
+{
+    "tools": [
+        {
+            "friendly_name": "FDA Documentation Tool",
+            "description": "Useful for querying FDA documents, such as regulatory and guidance documents.  Any requests mentioning FDA should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "tool_module_name": "tools.vector_store_retrieval_qa_tool",
+            "tool_class_name": "VectorStoreRetrievalQATool",
+            "arguments": {
+                "database_name": "fda",
+                "run_locally": false,
+                "top_k": 5,
+                "search_type": "similarity",
+                "search_distance": 0.6,
+                "verbose": true,
+                "max_tokens": 4096,
+                "return_source_documents": false,
+                "return_direct" : false
+
+            }
+        },
+        {
+            "friendly_name": "ISO/AAMI/IEC Standards Documentation Tool",
+            "description": "Useful for querying ISO, AAMI, or IEC Standards documents.  Any requests mentioning ISO, AAMI, or IEC should use this tool. Input should be a fully formed question, not referencing any obscure pronouns from the conversation before. Always include source documents from this tool in your answer.",
+            "tool_module_name": "tools.vector_store_retrieval_qa_tool",
+            "tool_class_name": "VectorStoreRetrievalQATool",
+            "arguments": {
+                "database_name": "iso",
+                "run_locally": false,
+                "top_k": 5,
+                "search_type": "similarity",
+                "search_distance": 0.6,
+                "verbose": true,
+                "max_tokens": 4096,
+                "return_source_documents": false,
+                "return_direct" : false
+            }
+        },        
+        {
+            "friendly_name": "Remote Control Documentation Search Tool",
+            "description": "Useful for searching for factual information in Remote Control documents. Input should be a fully formed question.",
+            "tool_module_name": "tools.self_ask_agent_tool",
+            "tool_class_name": "SelfAskAgentTool",
+            "run_locally": false,
+            "verbose": true,
+            "max_tokens": 2048,
+            "arguments": {
+                "friendly_name": "Intermediate Answer",
+                "description": "Useful for searching Remote Control. Include relevent context in your request. Input should be a fully formed question.",
+                "tool_module_name": "tools.vector_store_retrieval_qa_tool",
+                "tool_class_name": "VectorStoreRetrievalQATool",
+                "arguments": {
+                    "database_name": "rc",
+                    "run_locally": true,
+                    "top_k": 5,
+                    "search_type": "mmr",
+                    "search_distance": 0.6,
+                    "verbose": true,
+                    "max_tokens": 2048,
+                    "return_source_documents": false,
+                    "return_direct" : false
+                }
+            }
+        }
+    ]
+
+}

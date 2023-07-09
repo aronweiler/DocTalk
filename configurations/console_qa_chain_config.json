@@ -1,0 +1,21 @@
+{
+    "ai_type": "qa_chain",
+    "run_mode": "console",
+    "arguments": {
+        "arguments": {
+            "database_name": "jul_5",            
+            "use_memory": true,
+            "run_locally": false,
+            "ai_temp": 0,
+            "top_k": 5,
+            "chain_type": "stuff",
+            "search_type": "mmr",
+            "search_distance": 0.6,
+            "verbose": true,
+            "max_tokens": 4096,
+            "return_source_documents": false,
+            "return_direct" : false
+        }  
+    }
+
+}

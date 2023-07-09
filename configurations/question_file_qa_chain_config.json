@@ -3,20 +3,23 @@
         "type": "qa_chain",
         "arguments": {
             "database_name": "jul_5",
-            "use_memory": true,
+            "use_memory": false,
             "run_locally": false,
             "ai_temp": 0,
             "top_k": 5,
             "chain_type": "stuff",
             "search_type": "mmr",
-            "search_distance": 0.6,
+            "search_distance": 0.5,
             "verbose": true,
             "max_tokens": 4096,
             "return_source_documents": true
         }
     },
     "runner": {
-        "type": "console",
-        "arguments": {}
+        "type": "question_file",
+        "arguments": {
+            "question_file": "C:\\Repos\\sample_docs\\Rene\\jul_5_questions.txt",
+            "answer_file": "C:\\Repos\\sample_docs\\Rene\\jul_5_answers.txt"
+        }
     }
 }

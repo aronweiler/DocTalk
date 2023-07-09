@@ -16,8 +16,8 @@ Some day soon I will fill the rest of this documentation in!
 
 ## Basic Usage (python developers)
 1. To create the python env, and install requirements, run: [install.ps1](install.ps1)
-2. Set your `OPENAI_API_KEY` environment variable, if you are going to use OpenAI's API
-3. Load your documents using [document_loader.py](/src/document_loader.py)
+2. Set your `OPENAI_API_KEY` environment variable, if you are going to use OpenAI's API. See [.env.template](.env.template) for guidance.
+3. Load your documents using [ingest_documents.py](/src/ingest_documents.py)
     - Options for running the document loader include:
       - `--document_directory`: Directory from which to load documents
       - `--database_name`: The name of the database where you'd like to store the loaded documents
@@ -27,7 +27,8 @@ Some day soon I will fill the rest of this documentation in!
       - `--split_overlap`: How much of an overlap there should be between chunks
   
 4. Select a configuration file [from the configurations folder](configurations/), or create your own
-5. Once you've loaded your documents, run `run.py --config=<path to config file>`
+   - Currently there are a few supported AIs and runners- check the [run.py](src/run.py) for the supported types.
+5. Once you've loaded your documents, and selected a configuration file, run `run.py --config=<path to config file>`
 
 ## Usage (non-developers)
 *Coming Soon*

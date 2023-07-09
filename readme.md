@@ -9,7 +9,12 @@ Feel free to play around and please for the love of science, give me some feedba
 
 I legit have no idea if this is going to be useful or anything, but it's certainly teaching me python, and renewing my interest in [snake_case](https://en.wikipedia.org/wiki/Snake_case) variables.
 
-## Usage (python developers)
+## Major Update July 9th, 2023:
+I pretty much gutted the project and moved a bunch of things around.  I implemented a different architecture, with the runners and what not. 
+
+Some day soon I will fill the rest of this documentation in!
+
+## Basic Usage (python developers)
 1. To create the python env, and install requirements, run: [install.ps1](install.ps1)
 2. Set your `OPENAI_API_KEY` environment variable, if you are going to use OpenAI's API
 3. Load your documents using [document_loader.py](/src/document_loader.py)
@@ -20,16 +25,9 @@ I legit have no idea if this is going to be useful or anything, but it's certain
       - `--split_documents`: If this is present, the loader will split loaded documents into smaller chunks
       - `--split_chunks`: How big the chunk sizes should be
       - `--split_overlap`: How much of an overlap there should be between chunks
-4. Once you've loaded your documents, run the LLM using either [run_chain.py](/src/run_chain.py) OR [run_react_agent.py](/src/run_react_agent.py)
-    - If you have multiple document stores that you have loaded and want to query, use [run_react_agent.py](/src/run_react_agent.py) after creating a tool configuration, like the example [react_medical_device_config.json](/tool_configurations/react_medical_device_config.json)
-    - Options for running the LLM include:
-      - `--run_open_ai`: When set, this will force the use of the OpenAI LLM and embeddings.  Make sure you set your API key.
-      - `--database_name`: The name of the database from which to retrieve your documents
-      - `--verbose`: When set, outputs more data, such as intermediate steps.
-      - `--top_k`: Number of relevant document chunks to pull into the LLM when querying (default is 5)
-      - `--search_distance`: Search distance threshold when looking for documents- default is 0.1 (lower # is a broader search)
-
-*Note: the options, such as run_local and database_name, must align between the document loading and the running of the LLM.*
+  
+4. Select a configuration file [from the configurations folder](configurations/), or create your own
+5. Once you've loaded your documents, run `run.py --config=<path to config file>`
 
 ## Usage (non-developers)
 *Coming Soon*
@@ -104,3 +102,11 @@ $env:GGML_CUDA_NO_PINNED=1
 
 - 6/24/2023
   - Updated ReAct agent to support self-ask, and call tools in a dynamic way: [run_react_agent.py](src/run_react_agent.py)
+
+- 7/9/2023
+  - Major refactor and reorganization
+  - Removed a bunch of unused old stuff
+  - Implemented selection of AI (QA chain for now) and runners
+  - Simplified document ingestion and running
+  - Added better support for API
+  - Started on getting Docker into the solution

@@ -1,9 +1,10 @@
 #env
 _old/
-src/ChromaDB_*/
+data/ChromaDB_*/
 doctalk_venv/
 .vscode/
 .chroma
+docker.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

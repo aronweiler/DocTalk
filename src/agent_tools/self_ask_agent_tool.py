@@ -1,6 +1,6 @@
 import time
-import shared
-from selector import get_llm
+import shared.constants as constants
+from shared.selector import get_llm
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from langchain.agents import  Tool
@@ -8,7 +8,7 @@ import utilities.calculate_timing as calculate_timing
 
 class SelfAskAgentTool:
 
-    def __init__(self, memory, local, search_tool:Tool, verbose = False, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE, override_llm = None):            
+    def __init__(self, memory, local, search_tool:Tool, verbose = False, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE, override_llm = None):            
             self.verbose = verbose
             self.max_tokens = max_tokens
             self.search_tool = search_tool

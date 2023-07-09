@@ -3,19 +3,19 @@
 ## and then have the chains associated with the different vector stores use their own LLMs
 ## e.g. a publicly available set of documents is used with the OpenAI LLM and private docs use a local LLM
 
-from selector import get_llm, get_embedding
+from shared.selector import get_llm, get_embedding
 import argparse
-import shared
+import shared.constants as constants
 import time
 import utilities.console_text as console_text
-import shared
+import shared.constants as constants
 import utilities.calculate_timing as calculate_timing
 from langchain.memory import ConversationTokenBufferMemory
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from tool_loader import load_tools_from_file
 
-def main(router_llm, configuration_file, verbose, max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE):  
+def main(router_llm, configuration_file, verbose, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE):  
     
     memory = ConversationTokenBufferMemory(llm=router_llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True) #, input_key="input", output_key="answer"
 
@@ -57,10 +57,10 @@ def run(run_local:bool, verbose:bool, configuration_file:str):
     
     if run_local:    
         llm = get_llm(True)
-        max_tokens = shared.MAX_LOCAL_CONTEXT_SIZE
+        max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE
     else:
         llm = get_llm(False)
-        max_tokens = shared.MAX_OPEN_AI_CONTEXT_SIZE
+        max_tokens = constants.MAX_OPEN_AI_CONTEXT_SIZE
         
     main(llm, configuration_file, verbose, max_tokens)
       

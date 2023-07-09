@@ -9,7 +9,7 @@
 
 
 from documents.document_loader import get_database
-from selector import get_embedding
+from shared.selector import get_embedding
 import re
 
 def split_sentence(sentence):

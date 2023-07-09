@@ -1,5 +1,5 @@
 import prompts
-import selector
+import shared.selector as selector
 
 def parse_query(query):
     # always use the local llm to do this

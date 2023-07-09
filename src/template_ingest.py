@@ -3,7 +3,7 @@ import os
 import io
 from langchain.text_splitter import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from run_chain import get_chain
-from selector import get_llm, get_embedding
+from shared.selector import get_llm, get_embedding
 from documents.document_loader import get_database
 from agent_tools.vector_store_retrieval_qa_tool import VectorStoreRetrievalQATool
 from langchain.memory import ConversationTokenBufferMemory

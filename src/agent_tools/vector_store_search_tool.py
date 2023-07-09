@@ -3,13 +3,13 @@ import time
 import json
 from typing import List
 from documents.document_loader import get_database
-from selector import get_llm, get_embedding
+from shared.selector import get_llm, get_embedding
 from langchain.chains import RetrievalQA
 from langchain.prompts import Prompt
 import utilities.calculate_timing as calculate_timing
 from utilities.token_helper import num_tokens_from_string
 from langchain.vectorstores import Chroma
-import selector
+import shared.selector as selector
 from langchain.docstore.document import Document
 from langchain.retrievers import KNNRetriever
 

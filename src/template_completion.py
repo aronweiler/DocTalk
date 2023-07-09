@@ -8,7 +8,7 @@ from langchain.agents import AgentType
 from langchain.tools import Tool
 from langchain.chains import LLMChain
 from run_chain import get_chain
-from selector import get_llm, get_embedding
+from shared.selector import get_llm, get_embedding
 from documents.document_loader import get_database
 from agent_tools.vector_store_retrieval_qa_tool import VectorStoreRetrievalQATool
 from utilities.calculate_timing import convert_milliseconds_to_english

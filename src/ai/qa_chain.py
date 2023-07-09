@@ -1,5 +1,5 @@
 import os
-import callback_handlers
+from utilities.callback_handlers import DebugCallbackHandler
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationTokenBufferMemory
@@ -13,21 +13,21 @@ from ai.ai_result import AIResult
 
 class QAChainAI(AbstractAI):
 
-    def configure(self, json_args) -> None:
-        configuration = QAChainConfiguration(json_args)
-        embeddings = get_embedding(configuration.run_locally)    
-        db = get_database(embeddings, configuration.database_name) 
-        llm = get_llm(configuration.run_locally, float(configuration.ai_temp))
+    def configure(self, json_args) -> None:        
+        self.configuration = QAChainConfiguration(json_args)
+        embeddings = get_embedding(self.configuration.run_locally)    
+        db = get_database(embeddings, self.configuration.database_name) 
+        llm = get_llm(self.configuration.run_locally, float(self.configuration.ai_temp))
         
-        memory = self._get_memory(llm, configuration.max_tokens) if configuration.use_memory else None    
+        memory = self._get_memory(llm, self.configuration.max_tokens) if self.configuration.use_memory else None    
         
-        self.qa_chain = self._get_chain(llm, memory, db, configuration.top_k, configuration.chain_type, configuration.search_type, configuration.search_distance, configuration.verbose)
+        self.qa_chain = self._get_chain(llm, memory, db, self.configuration.top_k, self.configuration.chain_type, self.configuration.search_type, self.configuration.search_distance, self.configuration.verbose)
 
 
     def _get_chain(self, llm, memory, db, top_k, chain_type, search_type, search_distance, verbose):
         vectordbkwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
         
-        qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever(search_kwargs=vectordbkwargs), chain_type=chain_type, memory=memory, verbose=verbose, return_source_documents=True, callbacks=[callback_handlers.DebugCallbackHandler()])
+        qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever(search_kwargs=vectordbkwargs), chain_type=chain_type, memory=memory, verbose=verbose, return_source_documents=True, callbacks=[DebugCallbackHandler()])
 
         return qa
 
@@ -38,7 +38,12 @@ class QAChainAI(AbstractAI):
      
     def query(self, input):
 
-        result = self.qa_chain({"question": input})
+        # If there is no memory, we have to fake it for the prompt.  
+        # Langchain should be better about this and automatically hand it
+        if self.configuration.use_memory:
+            result = self.qa_chain({"question": input})
+        else:
+            result = self.qa_chain({"question": input, "chat_history": []})
 
         source_docs = [{"document": os.path.basename(d.metadata['source']).split('.')[0], "page": d.metadata['page']} if 'page' in d.metadata else os.path.basename(d.metadata['source']).split('.')[0] for d in result["source_documents"]]
 

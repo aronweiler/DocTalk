@@ -1,11 +1,9 @@
-## Run a single chain LLM over a single vector store
-
 import os
 import time
 import utilities.console_text as console_text
 import utilities.calculate_timing as calculate_timing
 from ai.abstract_ai import AbstractAI
-from runner.runner import Runner
+from runners.runner import Runner
 
 class ConsoleRunner(Runner):
     def __init__(self):

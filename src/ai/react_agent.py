@@ -1,3 +1,6 @@
+# Moved this here from src where it was being run stand-alone
+# TODO: Refactor to be an AbstractAI and use with a runner
+
 ## Run a vector store agent over multiple vector stores
 ## The intent here would be to use OpenAI's LLM to route requests to the proper chain
 ## and then have the chains associated with the different vector stores use their own LLMs
@@ -10,29 +13,31 @@ import time
 import utilities.console_text as console_text
 import shared.constants as constants
 import utilities.calculate_timing as calculate_timing
-from langchain.memory import ConversationTokenBufferMemory
+from langchain.memory import ConversationTokenBufferMemory, ReadOnlySharedMemory
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from tool_loader import load_tools_from_file
 
 def main(router_llm, configuration_file, verbose, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE):  
     
-    memory = ConversationTokenBufferMemory(llm=router_llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True) #, input_key="input", output_key="answer"
+    memory = ConversationTokenBufferMemory(llm=router_llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True)   
 
+    # Share my memory with all my buds
     tools = load_tools_from_file(configuration_file, memory)
     
-    agent_chain = initialize_agent(tools, router_llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=verbose, memory=memory)
-    
-    while True:        
+    agent_chain = initialize_agent(tools, router_llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, verbose=verbose, memory=memory)
+
+    while True:
         query = input("Query (x to exit): ")
 
         if query == "x":
             exit()
 
+        if len(memory.buffer) == 0:
+            query = "Without using knowledge prior to this conversation, and using one or more of the tools available to you, respond to the following: " + query             
+
         # Time it
-        start_time = time.time()
-                
-        #query = "Without using knowledge prior to this conversation, and using one or more of the tools available to you, respond to the following: " + query             
+        start_time = time.time()       
 
         # Run the query
         result = agent_chain.run(input=query)

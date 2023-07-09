@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from ai.abstract_ai import AbstractAI
-from runner.runner import Runner
+from runners.runner import Runner
 
 class RestAPIRunner(Runner):
     def __init__(self):

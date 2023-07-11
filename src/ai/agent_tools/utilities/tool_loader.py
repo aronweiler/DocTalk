@@ -1,6 +1,6 @@
 import json
-import tool_creator
-from tool_header import ToolHeader
+import ai.agent_tools.utilities.tool_creator as tool_creator
+from ai.agent_tools.utilities.tool_header import ToolHeader
 
 def load_tools(config, memory, override_llm):
     tools = []

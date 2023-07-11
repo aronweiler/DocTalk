@@ -2,7 +2,7 @@ from langchain.agents import  Tool
 from langchain.tools import BaseTool, StructuredTool
 import importlib
 from typing import cast
-from tool_header import ToolHeader
+from ai.agent_tools.utilities.tool_header import ToolHeader
 
 def create_self_ask_tool(tool_json, memory, override_llm) -> Tool:
 
@@ -70,6 +70,21 @@ def create_vector_store_search_tool(tool_json, memory, override_llm):
 
     return tool
 
+def create_cvss_tool(tool_json, memory, override_llm):
+    header = ToolHeader(tool_json)
+
+    return_direct = tool_json["return_direct"]
+
+    module = importlib.import_module(header.tool_module_name)
+
+    # dynamically instantiate the tool based on the parameters
+    tool_instance = getattr(module, header.tool_class_name)()
+    typed_instance = cast(BaseTool, tool_instance)
+    
+    tool = StructuredTool.from_function(typed_instance.run, header.tool_name, header.tool_description, return_direct)
+
+    return tool
+
 def get_vector_store_retrieval_qa_tool_args(tool_json):
     return {
         "run_locally": tool_json["run_locally"],
@@ -87,5 +102,6 @@ def get_vector_store_retrieval_qa_tool_args(tool_json):
 TOOL_TYPES = {
     "SelfAskAgentTool": create_self_ask_tool,
     "VectorStoreRetrievalQATool": create_vector_store_retrieval_qa_tool,
-    "VectorStoreSearchTool": create_vector_store_search_tool
+    "VectorStoreSearchTool": create_vector_store_search_tool,
+    "CVSSTool": create_cvss_tool,
     } 

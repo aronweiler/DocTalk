@@ -2,20 +2,24 @@ import argparse
 import json
 
 from ai.qa_chain import QAChainAI
+from ai.llm_chain import LLMChain
+from ai.react_agent import ReActAgent
 from runners.api.rest_api_runner import RestAPIRunner
 from runners.console.console_runner import ConsoleRunner
 from runners.question_file.question_file_runner import QuestionFileRunner
+from runners.cvss.cvss_runner import CvssRunner
 
 AI_TYPES = {
     "qa_chain": QAChainAI,
-    # TODO: this
-    # "agent_with_tools" : xxx
+    "agent_with_tools" : ReActAgent,
+    "llm_chain": LLMChain
 }
 
 RUNNER_TYPES = {
     "api": RestAPIRunner,
     "console" : ConsoleRunner,
-    "question_file": QuestionFileRunner
+    "question_file": QuestionFileRunner,
+    "cvss": CvssRunner
     # TODO: this     
     # "web_ui" : xxx,
 }
@@ -37,6 +41,20 @@ ai_args = config['ai']['arguments']
 
 runner_type = config['runner']['type']
 runner_args = config['runner']['arguments']
+
+print("ai_type: ", ai_type)
+
+# Print out the list of arguments in a nice human readable format: 
+print("ai_args:")
+for key, value in ai_args.items():
+    print(f"\t{key}: {value}")
+
+print("runner_type: ", runner_type)
+
+# Print out the list of arguments in a nice human readable format:
+print("runner_args:")
+for key, value in runner_args.items():
+    print(f"\t{key}: {value}")
 
 # start the application in the specified mode for the specified type
 

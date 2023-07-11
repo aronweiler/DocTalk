@@ -73,7 +73,7 @@ class PDFLoader:
         for s in snippets:
             # if current snippet's font size > previous section's heading => it is a new heading
             # or it could be the begining of the first page, or a header of some sort.
-            if not semantic_snippets or s[1] > semantic_snippets[cur_idx].metadata['heading_font']:
+            if not semantic_snippets or (s[1] is not None and s[1] > semantic_snippets[cur_idx].metadata.get('heading_font', 0)):
                 # throw the 'heading', or whatever it is, into the heading metadata, but also into content
                 # TODO: look at deduping the various headings (in the case of headers/footers)
                 metadata={'heading':s[0], 'content_font': 0, 'heading_font': s[1], 'page': s[2]}
@@ -107,10 +107,6 @@ class PDFLoader:
         
         return self.process_doc(data)
     
-# file_name = "C:\\Repos\\sample_docs\\Rene\\jul_5\\CDFW De Anza Natural Draft PEIR_CDFW Comments 2023.pdf"
-
-# pdf = PDFLoader(file_name)
-
-# docs = pdf.load()
-
-# print(docs)
+# loader = PDFLoader("C:\\Repos\\DocTalk\\src\\runners\\cvss\\documents\\spec\\cvss-v31-specification_r1.pdf")
+# docs = loader.load()
+# print(docs[0].page_content)

@@ -16,14 +16,19 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 # TODO: Add loaders for PPT, and other document types
 from langchain.document_loaders import (CSVLoader, TextLoader, Docx2txtLoader) 
 
-# Custom PDF loader
+# Custom loaders
 from documents.pdf_loader import PDFLoader
+from langchain.document_loaders import BSHTMLLoader
+
+from shared.constants import SPLIT_SEPARATORS
+
 
 # TODO: Add loaders for PPT, and other document types
 DOCUMENT_TYPES = {    
     ".txt": TextLoader,
     ".pdf": PDFLoader,
-    ".csv": CSVLoader
+    ".csv": CSVLoader,
+    ".html": BSHTMLLoader,
     }
 
 WORD_DOC_TYPES = {
@@ -144,12 +149,19 @@ def main(document_directory:str, database_name:str, run_local:bool, split_docume
     documents = load_documents(document_directory)
 
     if split_documents:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=split_chunks, chunk_overlap=split_overlap)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=split_chunks, chunk_overlap=split_overlap, separators=SPLIT_SEPARATORS)
         texts = text_splitter.split_documents(documents)
         
         print(f"Split into {len(texts)} chunks of text (chunk_size: {split_chunks}, chunk_overlap: {split_overlap})")
     else:
         texts = documents
+
+    # Remove TLP:WHITE from the page_content
+    # This is something that some of the PDFs have in them, and it's not useful for us
+    for text in texts:
+        #if the page_content contains 'TLP:WHITE\t\n' then remove it
+        if 'TLP:WHITE' in text.page_content:
+            text.page_content = text.page_content.replace('TLP:WHITE', '')
 
     print(f"Loaded {len(documents)} pages of documents from {document_directory}")
 

@@ -5,6 +5,7 @@ doctalk_venv/
 .vscode/
 .chroma
 docker.env
+src/runners/cvss/examples/output
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -4,7 +4,7 @@ class QAChainConfiguration:
         self.run_locally = json_args["run_locally"]
         self.use_memory = json_args["use_memory"]
         self.ai_temp = json_args["ai_temp"]
-        self.database_name = json_args["database_name"]
+        self.database_name = json_args.get("database_name", None)
         self.top_k = json_args["top_k"]
         self.search_type = json_args["search_type"]
         self.search_distance = json_args["search_distance"]

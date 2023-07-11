@@ -1,0 +1,18 @@
+{
+    "ai": {
+        "type": "llm_chain",
+        "arguments": {            
+            "run_locally": false,
+            "ai_temp": 0,
+            "verbose": true,
+            "max_tokens": 4096
+        }
+    },
+    "runner": {
+        "type": "cvss",
+        "arguments": {
+            "input_directory": "src\\runners\\cvss\\examples\\input",
+            "output_directory": "src\\runners\\cvss\\examples\\output"
+        }
+    }
+}

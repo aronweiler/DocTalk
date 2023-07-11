@@ -1,0 +1,44 @@
+{
+    "ai": {
+        "type": "agent_with_tools",
+        "arguments": {
+            "use_memory": true,
+            "run_locally": false,
+            "ai_temp": "0",
+            "verbose": true,
+            "max_tokens": 4096,
+            "tools": [
+                {
+                    "friendly_name": "MITRE CVSS Specification Tool",
+                    "description": "Useful for analyzing input and creating a CVSS Vector String to be used by the CVSS Vector Tool. Generates a CVSS Vector String for input data, along with specific reasoning as why values were selected.",
+                    "tool_module_name": "ai.agent_tools.vector_store_retrieval_qa_tool",
+                    "tool_class_name": "VectorStoreRetrievalQATool",
+                    "arguments": {
+                        "database_name": "mitre_spec",
+                        "run_locally": false,
+                        "top_k": 8,
+                        "chain_type": "refine",
+                        "search_type": "mmr",
+                        "search_distance": 0.6,
+                        "verbose": true,
+                        "max_tokens": 4096,
+                        "return_source_documents": false,
+                        "return_direct" : false
+                    }
+                },
+                {
+                    "friendly_name": "CVSS Vector Tool",
+                    "description": "Useful for making calculations related to CVSS scores. Input should be a CVSS vector string (such as CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:N/I:N/A:H) that was calculated using the MITRE CVSS Specification Tool. Returns a JSON representation of the CVSS vector, along with the calculated CVSS score.",
+                    "tool_module_name": "ai.agent_tools.cvss_tool",
+                    "tool_class_name": "CVSSTool",
+                    "return_direct": false,
+                    "arguments": {}
+                }
+            ]
+        }
+    },
+    "runner": {
+        "type": "console",
+        "arguments": {}
+    }
+}

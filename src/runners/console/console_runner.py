@@ -11,8 +11,12 @@ class ConsoleRunner(Runner):
         
 
     def run(self, abstract_ai: AbstractAI):
-        while True:        
-            query = input("Query (x to exit): ")
+        while True:    
+            # Get the query, which can be multiple lines            
+            print("Query (Enter twice to run, X to exit):")
+            
+            query = self.get_multi_line_console_input()
+
 
             if query == "x":
                 exit()
@@ -26,10 +30,21 @@ class ConsoleRunner(Runner):
             end_time = time.time()
 
             # print the answer
-            console_text.print_green(result.result)
-            source_docs = "\n".join([f"\t-{doc['document']} - Page {doc['page']}" for doc in result.source_documents])
+            console_text.print_green(result.result)            
+            source_docs = self.get_source_docs_to_print(result.source_documents)
             console_text.print_blue("Source documents:\n" + source_docs)
             
             elapsed_time = end_time - start_time
 
             print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+
+    def get_multi_line_console_input(self):
+        # Get the query, which can be multiple lines, until the user presses enter twice
+        query = ""
+        while True:
+            line = input()
+            if line == "":
+                break
+            query += line + "\n"
+
+        return query

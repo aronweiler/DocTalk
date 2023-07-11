@@ -1,0 +1,20 @@
+SUMMARY
+Medtronic has identified a vulnerability in an optional messaging feature in the Paceart Optima cardiac device data workflow system. This feature is not configured by default, and it cannot be exploited unless enabled. As a precautionary measure, Medtronic is notifying customers that if exploited, this vulnerability could result in a healthcare delivery organization’s Paceart Optima system’s cardiac device data being deleted, stolen, or modified, or the Paceart Optima system being used for further network penetration.
+
+Healthcare delivery organizations should work with Medtronic Paceart technical support to install an update to the Paceart Optima application to eliminate this vulnerability from the Paceart Application Server. This security bulletin also includes immediate, temporary steps for a healthcare delivery organization to take to prevent the exploitation of this vulnerability.
+
+Paceart Optima System
+PRODUCTS IMPACTED
+Paceart Optima™ is a software application that runs on a healthcare delivery organization’s Windows server. The application collects, stores, and retrieves cardiac device data from programmers and remote monitoring systems from all major cardiac device manufacturers to aid in standard workflows. The Paceart Optima product consists of multiple components that work together to deliver product functionality. This vulnerability impacts the Application Server component.
+
+Versions affected:
+
+Paceart Optima application versions 1.11 and earlier 
+VULNERABILITY OVERVIEW
+At this time, Medtronic has not observed any cyberattacks, unauthorized access to or loss of patient data, or harm to patients related to this issue.
+
+During routine monitoring, Medtronic identified a vulnerability in the optional Paceart Messaging Service within the Paceart Optima system, specifically in the Paceart Messaging Service’s implementation of the Microsoft Message Queuing Protocol. The Paceart Messaging Service enables healthcare delivery organizations to send fax, email, and pager messages within the Paceart Optima system.
+
+If a healthcare delivery organization has enabled the optional Paceart Messaging Service in the Paceart Optima system, an unauthorized user could exploit this vulnerability to perform Remote Code Execution (RCE) and/or Denial of Service (DoS) attacks by sending specially crafted messages to the Paceart Optima system. RCE could result in the Paceart Optima system’s cardiac device data being deleted, stolen, or modified, or the Paceart Optima system being used for further network penetration. A DoS attack could cause the Paceart Optima system to become slow or unresponsive.
+
+The vulnerability is present in Paceart Optima system versions 1.11 and earlier.

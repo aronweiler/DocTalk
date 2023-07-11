@@ -1,0 +1,34 @@
+Dear Medtronic,
+
+I am writing to report a cybersecurity vulnerability discovered in one of your ventilator models, which has raised significant concerns regarding the safety and security of patient data and critical medical infrastructure. We believe it is crucial to address this matter promptly to ensure patient safety and maintain the trust of healthcare providers and patients.
+
+Complaint Details:
+
+Customer Name: Made Up Company, Inc.
+Ventilator Model: PB980
+Incident Date: 7/10/2023
+
+Description of the Vulnerability:
+During routine monitoring and security assessments, our cybersecurity team identified a critical vulnerability in the PB980 ventilator. This vulnerability exposes the device to potential unauthorized access, compromising patient data security and posing a significant risk to the functionality and integrity of the ventilator system.
+
+Vulnerability Details:
+
+Vulnerability Type: Remote Code Execution
+The vulnerability allows an attacker with network access to execute arbitrary code on the ventilator, potentially granting them unauthorized control over critical functions. Exploiting this vulnerability could lead to unauthorized manipulation of patient settings, disruption of ventilation operations, or the extraction of sensitive patient data.
+
+Our team conducted a thorough investigation, and we have implemented temporary measures to mitigate the risk, including isolating the affected devices from the network and implementing enhanced monitoring protocols. However, we recognize the urgent need for a permanent solution to ensure the safety and integrity of our ventilator systems.
+
+We urge Medtronic to address this vulnerability promptly by:
+
+Developing and releasing a firmware update or patch to remediate the vulnerability.
+Providing clear instructions to customers on how to apply the necessary security updates.
+Conducting a comprehensive review of the entire ventilator product line to identify and address any similar vulnerabilities.
+We understand that cybersecurity incidents can occur, but it is vital for Medtronic to take immediate action to rectify this issue and provide reassurance to your customers that their patients' safety and data security are top priorities.
+
+Please acknowledge the receipt of this complaint and provide us with a timeline for addressing and resolving the vulnerability. We are willing to collaborate and support you in any way necessary to ensure the security and reliability of your ventilator systems.
+
+We look forward to your prompt response and resolution of this matter.
+
+Sincerely,
+
+Angry Customer

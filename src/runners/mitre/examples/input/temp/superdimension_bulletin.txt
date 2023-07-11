@@ -1,0 +1,26 @@
+IMPACTED PRODUCTS
+superDimension collage
+superDimension™ navigation system and planning station version 7 (V7) family of applications including:
+
+Procedure software versions: 7.0, 7.1, 7.2 
+Planning software versions 7.0.3, 7.0.4, 7.1
+superDimension screenshot
+Prior versions of the superDimension™ navigation system, V61 and earlier, are also impacted. 
+
+OVERVIEW
+The superDimension™ navigation system is used to perform electromagnetic navigation bronchoscopy procedures.  During a procedure, a physician uses the system to navigate endoscopic tools to targets in the lungs such as lymph nodes and solitary pulmonary nodules.  The system is used in two phases and has two corresponding software applications – planning and procedure. 
+All versions of the superDimension™ navigation system run on Microsoft Window’s operating system platforms that are no longer supported by Microsoft (Windows 7 end of support was in 2020, Windows XP end of support was in 2014).  Due to the age and support status of the underlying technologies, the superDimension™ navigation system has security vulnerabilities, primarily related to the Microsoft Windows operating system, which could allow an unauthorized user to execute code on the system.
+
+The superDimension™ navigation system hardware is not compatible with newer versions of the Windows operating system.  Due to this and limited availability of replacement parts, Medtronic has communicated global end of guaranteed service (EOGS)2 dates for the superDimension™ navigation system.  Please contact your Medtronic sales or marketing representative for more information and alternate product options.
+
+To date, no cyberattack, no unauthorized access to patient data, and no harm to patients has been observed with these vulnerabilities.
+
+The majority of known vulnerabilities apply when the superDimension™ system is connected to the hospital network.  In this scenario, an attacker with access to the network when the device is on could exploit these vulnerabilities and compromise the system.  If this were to happen the system may become unavailable for the procedure. Other vulnerabilities require local access to the system. 
+
+Medtronic recommends that healthcare providers continue to use these devices as intended.  However, if the superDimension™ system is currently configured to connect to a hospital network, Medtronic recommends disconnecting the superDimension™ system from the hospital network.
+
+In all cases, Medtronic recommends special care be taken to control the physical security of the device.
+
+If you experience any unusual or unexpected behavior from the device, please contact the Medtronic Lung Health Technical Service Hotline: 1-877-501-8737.
+
+If you are concerned about your care delivery associated with the superDimension™ navigation system, please consult your care provider.

@@ -1,0 +1,92 @@
+VULNERABILITY SUMMARY
+Based on earlier work performed by external researchers including Nathanael Paul, Jay Radcliffe, and Barnaby Jack, and from recent work performed by external researchers Billy Rios, Jonathan Butts and Jesse Young, potential security vulnerabilities have been identified in select Medtronic insulin pumps. Based on additional internal testing, Medtronic is publicly disclosing this matter.
+
+The vulnerability allows a potential attacker with special technical skills and equipment to potentially send radiofrequency (RF) signals to a nearby insulin pump to change settings, impacting insulin delivery. This change could result in a patient experiencing hypoglycemia (if additional insulin is delivered) or hyperglycemia (if not enough insulin is delivered).
+
+Affected products are listed at the end of this document.
+
+As of the date of this bulletin, we have received no confirmed reports of unauthorized persons changing settings or controlling insulin delivery because of this vulnerability.
+
+MITIGATIONS
+Medtronic recommends that patients and physicians continue to use these devices as prescribed and intended, along with taking the following required actions:
+
+For U.S. Patients:
+Due to this potential cybersecurity issue, Medtronic recommends that patients who are currently using the affected products speak with their healthcare provider about changing to a newer model insulin pump with increased cybersecurity protection, such as the MiniMed™ 770G insulin pump.
+
+For Patients Outside the U.S.:
+Patients will receive a notification letter with instructions based on their country of residence.  Medtronic recommends that patients speak with their healthcare provider to discuss the cybersecurity issue and the steps they can take to protect themselves.
+
+If you live in a country that does not have a newer model Medtronic insulin pump available, Medtronic recommends taking the cybersecurity precautions below to minimize the potential for a cybersecurity attack and to continue to take advantage of the benefits of insulin pump therapy.
+
+In the meantime, Medtronic recommends that all patients using affected pump models follow the cybersecurity precautions included below.
+
+Action Recommended for All Patients:
+
+Keep your insulin pump and devices connected to your pump within your control at all times.
+Keep your pump serial number secure.
+Be attentive to pump notifications, alarms, and alerts.
+Immediately cancel any unintended boluses.
+Monitor your blood glucose levels closely and act as appropriate.
+Do not connect to any third-party devices or use any software not authorized by Medtronic.
+Disconnect your CareLink™ software USB device from your computer when it is not being used to download data from your pump.
+Get medical help right away if you experience symptoms of severe hypoglycemia or diabetic ketoacidosis, or suspect that your insulin pump settings, or insulin delivery changed unexpectedly.
+The complete advisory issued by ICS-CERT can be found here(opens new window).
+
+AFFECTED PRODUCTS
+The following pump models ARE vulnerable to this potential issue:
+
+SORT: 
+COLUMNS:TOGGLE
+TOGGLE
+Columns	
+Insulin Pump	Software Versions
+MiniMed™ 508 pump
+
+All
+
+MiniMed™ Paradigm™ 511 pump
+
+All
+
+MiniMed™ Paradigm™ 512/712 pumps
+
+All
+
+MiniMed™ Paradigm™ 712E pump
+
+All
+
+MiniMed™ Paradigm™ 515/715 pumps
+
+All
+
+MiniMed™ Paradigm™ 522/722 pumps
+
+All
+
+MiniMed™ Paradigm™ 522K/722K pumps
+
+All
+
+MiniMed™ Paradigm™ 523/723 pumps
+
+Software Versions 2.4A or lower
+
+MiniMed™ Paradigm™ 523K/723K pumps
+
+Software Versions 2.4A or lower
+
+MiniMedTM Paradigm™ Veo™ 554/754 pumps
+
+Software Versions 2.6A or lower
+
+MiniMedTM Paradigm™ Veo™ 554CM/754CM pumps
+
+Software Versions 2.7A or lower
+
+To find the software version for theMiniMedTM ParadigmTM pumps:
+
+Go to the STATUS screen
+To open the STATUS screen, press ESC until the STATUS screen appears
+To view more text on the STATUS screen, press the up or down arrow to scroll and view all the information.
+To exit the STATUS screen, press ESC until the STATUS screen disappears.

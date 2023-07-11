@@ -21,7 +21,7 @@ class QuestionFileRunner(Runner):
                 result = abstract_ai.query(question)
                 
                 result_text = result.result
-                source_docs = "\n".join([f"\t-{doc['document']} - Page {doc['page']}" for doc in result.source_documents])
+                source_docs = self.get_source_docs_to_print(result.source_documents)
 
                 output_text += f"QUESTION: {question}:\n\nANSWER:\n{result_text}\n\nSource Documents:\n{source_docs}\n\n"
 

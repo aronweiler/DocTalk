@@ -11,3 +11,4 @@ openai
 pdfminer.six
 fastapi
 bs4
+cvss

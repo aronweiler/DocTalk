@@ -12,7 +12,7 @@ Evaluation:
 - The data mentions requiring a user to perform the attack, 'a local privileged user could simply replace the non-Apache XML parser with a malicious variant', so Privileges Required (PR) is H (High)
 - The vulnerability does not require any user interaction, so User Interaction (UI) is N (None)
 - The data provided does not include information about a scope change, so Scope (S) is U (Unchanged)
-- There is some loss of confidedntiallity (the content of the victim web app XML can be disclosed), so Confidentiality (C) is L (Low)
+- There is some loss of confidentiality (the content of the victim web app XML can be disclosed), so Confidentiality (C) is L (Low)
 - The integrity of the XML parser is lost (the resulting JSP could be corrupted), but not a total loss of integrity, so Integrity (I) is L (Low)
 - The reasonable outcome behind modifying the XML parser is to make certain web applications unavailable, but the attacker does not have the ability to completely deny service to legitimate users, so Availability (A) is L (Low)
 
@@ -23,7 +23,7 @@ CHAIN_OF_THOUGHT_EXAMPLE_DATA_2 = """
 Data:
 Our medical device, which helps healthcare professionals manage patient medications, experienced a vulnerability that allowed unauthorized individuals to modify the drug library. 
 The drug library contains vital information about medications, including dosages, interactions, and safety guidelines. 
-The attacker can use the lowest-level user account on the device to exploit the vulnerability, administrative privliges are not required.
+The attacker can use the lowest-level user account on the device to exploit the vulnerability, administrative privileges are not required.
 The attacker must be highly skilled, and have access to special packet-crafting equipment to exploit the vulnerability.
 Due to the vulnerability, an attacker with access to the device over the Internet could make unauthorized changes to this essential database, such as changing doses, or completely mangling the data within it to make it unusable.
 The drug library also contains proprietary information which an attacker can obtain using this vulnerability.
@@ -47,7 +47,7 @@ Therefor, the CVSS Vector String is: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:
 CVSS_INSTRUCT_PROMPT = """You are a security AI tasked with evaluating the CVSS score of a vulnerability.
 Instructions for determining each metric:
 - Use the following information to evaluate the data to arrive at a CVSS Evaluation, including Base Metric Group CVSS 3.1 Vector String and evaluation explanations (cite detailed source data in your explanation) for each metric.
-    - Instructions for determining each metric:    
+    - When scoring Base metrics, it should be assumed that the attacker has advanced knowledge of the weaknesses of the target system, including general configuration and default defense mechanisms (e.g., built-in firewalls, rate limits, traffic policing). For example, exploiting a vulnerability that results in repeatable, deterministic success should still be considered a Low value for Attack Complexity, independent of the attacker's knowledge or capabilities.
         Attack Vector (AV) represents how the vulnerability can be exploited, the default value is 'N'.
         If the vulnerability does not require any special conditions to be exploited, assign the value 'N' (Network).
         If the vulnerable component is bound to the network stack and the set of possible attackers extends beyond the other options listed below, up to and including the entire Internet, or if an attack can be launched over a wide area network or from outside the logically adjacent administrative network domain, assign the value 'N' (Network).
@@ -55,7 +55,7 @@ Instructions for determining each metric:
         If the vulnerable component is not bound to the network stack and the attacker's path is via read/write/execute capabilities, assign the value 'L' (Local).
         If the vulnerability requires requires the attacker to physically touch or manipulate the vulnerable component, assign the value 'P' (Physical).
 
-        Attack Complexity (AC) represents the level of complexity required to exploit the vulnerability, the default value is 'L'.
+        Attack Complexity (AC) describes the conditions outside of the attacker's control that must exist in order to exploit the vulnerability, the default value is 'L'.        
         If the vulnerability does not contain specialized access conditions or extenuating circumstances, assign the value 'L' (Low).
         If the vulnerability depends on conditions beyond the attacker's control, i.e. a successful attack cannot be accomplished at will, but requires the attacker to invest in some measurable amount of effort in preparation or execution against the vulnerable component before a successful attack can be expected, assign the value 'H' (High).
 
@@ -94,29 +94,6 @@ Instructions for determining each metric:
 - Don't forget to prefix the CVSS vector with 'CVSS:3.1/'
 """
 
-OLD_CVSS_INSTRUCT_PROMPT = """
-Instructions:
-- Use the following information to provide a Base Metric Group CVSS 3.1 Vector String for the data I will provide you.    
-    - Attack Vector (AV): N (Network), A (Adjacent Network), L (Local), or P (Physical). Default to N.
-    - Attack Complexity (AC): L (Low) or H (High). Default to L.
-    - Privileges Required (PR): N (None), L (Low), or H (High). Default to N.
-    - User Interaction (UI): N (None) or R (Required). Default to N.
-    - Scope (S): U (Unchanged) or C (Changed). Default to U.
-    - Confidentiality (C): N (None), L (Low), or H (High). Default to H.
-    - Integrity (I): N (None), L (Low), or H (High). Default to H.
-    - Availability (A): N (None), L (Low), or H (High). Default to H.
-    - Assign the corresponding option value to each metric.
-    - Calculate the CVSS score based on the assigned values. 
-- Include the reasoning as to why you selected each value, and make sure to provide explicit examples in your response.
-- If the data does not include enough information for a metric, do the following:
-    - Select the default value for that metric and,
-    - Make sure to include an indication that you used a default value for that particular metric in your response
-- Don't forget to prefix the CVSS vector with 'CVSS:3.1/'
-
-DATA:
-{data}
-"""
-
 CRITIQUE_PROMPT = """
 {instructions}
 
@@ -130,75 +107,79 @@ Proposed CVSS Evaluation:
 {evaluation}
 """
 
-DETAILED_BASE_METRICS_INSTRUCTIONS = """
-Detailed instructions for determining each metric:
+CRITIQUE_PROMPT_SINGLE_METRIC = """
+{instructions}
 
-Attack Vector (AV):
-AV represents how the vulnerability can be exploited.
-Determine the appropriate value based on the provided information:
-If the vulnerability can only be exploited locally (within the same machine or user context), assign the value 'L' (Local).
-If the vulnerability can be exploited adjacent to the target system (e.g., through the same local network), assign the value 'A' (Adjacent Network).
-If the vulnerability can be exploited remotely (across different networks or the Internet), assign the value 'N' (Network).
-If the vulnerability requires physical access or special conditions that limit its availability, assign the value 'P' (Physical).
+Use the workflow above to critique the CVSS Evaluation provided below.
+Examine the reasoning behind the original decisions for the '{metric}' metric and, where possible, improve the accuracy of the evaluation by adding more context.
+If you think the initial evaluation for the '{metric}' metric is incorrect, suggest changes where necessary, making sure to explain your reasoning behind the suggestions.
+Return only the updated '{metric}' evaluation, ensuring that it only uses one of the defined values for that metric.
 
-Attack Complexity (AC):
-AC represents the level of complexity required to exploit the vulnerability.
-Determine the appropriate value based on the provided information:
-If the vulnerability can be exploited with low complexity, assign the value 'L' (Low).
-If the vulnerability requires specialized conditions or high-level skills to exploit, assign the value 'H' (High).
-
-Privileges Required (PR):
-PR represents the level of privileges an attacker needs to exploit the vulnerability.
-Determine the appropriate value based on the provided information:
-If no privileges are required to exploit the vulnerability, assign the value 'N' (None).
-If limited privileges are required, assign the value 'L' (Low).
-If high privileges or administrative access are required, assign the value 'H' (High).
-
-User Interaction (UI):
-UI represents the level of user interaction required to exploit the vulnerability.
-Determine the appropriate value based on the provided information:
-If no user interaction is required to exploit the vulnerability, assign the value 'N' (None).
-If some form of user interaction is needed, assign the value 'R' (Required).
-
-Scope (S):
-S represents the impact of a successful exploit on the system's component or other components.
-Determine the appropriate value based on the provided information:
-If the vulnerability's impact is limited to the vulnerable component (e.g., an application), assign the value 'U' (Unchanged).
-If a successful exploit can impact components beyond the vulnerable component (e.g., other applications or the underlying operating system), assign the value 'C' (Changed).
-
-Confidentiality (C), Integrity (I), and Availability (A):
-C, I, and A represent the impact on each of these security aspects when the vulnerability is exploited.
-Determine the appropriate value for each based on the provided information:
-If there is no impact on the specific security aspect, assign the value 'N' (None).
-If there is partial impact, assign the value 'L' (Low).
-If there is complete impact or a total loss, assign the value 'H' (High).
-"""
-
-
-BASE_METRIC_PROMPT = """
-Generate a Base Metric Group CVSS 3.1 score and Vector String for the following data. Ensure that you include the reasoning as to why you selected that value, and quote the report in your response.  If it was not completely clear which option to use for a metric, make sure to let me know in the response.
-
+Here is the original data that was used to make the initial evaluation:
 {data}
+
+Here is the initial CVSS evaluation I would like you to critique:
+{evaluation}
 """
 
-
-METRICS_TABLE = """
-| Metric               | Description                                                                                                                  | Options and Explanation                                                                                      |
-|----------------------|------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| Attack Vector (AV)   | Describes how an attacker can exploit the vulnerability.                                                                     | Network (N): The vulnerability can be exploited remotely over a network connection.                           
-                        |                                                                                                                              | Adjacent Network (A): The vulnerability can be exploited from a network adjacent to the target system.           
-                        |                                                                                                                              | Local (L): The vulnerability requires local access to the target system.                                        
-                        |                                                                                                                              | Physical (P): The vulnerability requires physical access to the target system.                                 |
-| Attack Complexity (AC) | Represents the level of complexity required to exploit the vulnerability.                                                    | Low (L): The vulnerability is relatively easy to exploit.                                                        
-                        |                                                                                                                              | High (H): The vulnerability is more complex and requires advanced techniques or conditions to exploit.         |
-| Privileges Required (PR) | Indicates the level of privileges an attacker needs to exploit the vulnerability.                                           | None (N): The vulnerability can be exploited without any special privileges.                                     
-                        |                                                                                                                              | Low (L): The vulnerability requires some privileges but not necessarily those of an administrator or root user.
-                        |                                                                                                                              | High (H): The vulnerability requires elevated privileges, such as administrator or root access.                 |
-| User Interaction (UI) | Considers whether user interaction is required for successful exploitation.                                                  | None (N): The vulnerability can be exploited without any user interaction.                                      
-                        |                                                                                                                              | Required (R): Successful exploitation of the vulnerability depends on user interaction, such as opening a file or clicking a link.         |
-| Scope (S)            | Defines the impact of a successful attack.                                                                                    | Unchanged (U): The vulnerability only affects the vulnerable component itself.                                 
-                        |                                                                                                                              | Changed (C): The vulnerability has the potential to impact other components or resources in addition to the vulnerable component.                                          |
-"""
-
-
-
+SINGLE_METRIC_INSTRUCTIONS = [
+    [
+        "Attack Vector (AV)", 
+        """Determine the Attack Vector (AV). Only use one of the following values: 'N', 'A', 'L', or 'P'.
+- Can the attacker use some type of network or communication protocol to exploit the vulnerability?
+    - Yes: Does the network use OSI layer 3 or 4 protocols, e.g. IP, TCP/IP, UDP?
+        - Yes: Then the Attack Vector is Network (N)
+        - No: Is the communication over a wireless channel?
+            - Yes: Is the range of the wireless channel approximately 10 feet or less?
+                - Yes: Then the Attack Vector is Local (L)
+                - No: Then the Attack Vector is Adjacent (A)
+                - Unknown: Then the Attack Vector is Adjacent (A)
+            - No: Then the Attack Vector is Adjacent (A)
+            - Unknown: Then the Attack Vector is Adjacent (A)
+        - Unknown: Then the Attack Vector is Network (N)
+    - No: Must the attacker have physical contact with the device?
+        - Yes: Then the Attack Vector is Physical (P)
+        - No: Then the Attack Vector is Local (L)
+        - Unknown: Then the Attack Vector is Local (L)
+    - Unknown: Then the Attack Vector is Network (N)"""
+    ],
+    [
+        "Attack Complexity (AC)", 
+        """Determine the Attack Complexity (AC). Only use one of the following values: 'L' or 'H'.
+- Can the attacker exploit the vulnerability at will, without requiring special circumstances, configurations, or other vulnerabilities/attacks before attacking this vulnerability?
+    - Yes: Then the Attack Complexity is Low (L)
+    - No: Then the Attack Complexity is High (H)
+    - Unknown: Then the Attack Complexity is Low (L)"""
+    ],
+    [
+        "Privileges Required (PR)",
+        """Determine the Privileges Required (PR). Only use one of the following values: 'N', 'L', or 'H'.
+- Does the device/component use an authorization model that supports login for multiple different users or roles with different privilege levels?
+	- Yes: Before attempting to exploit the vulnerability, must the attacker be authorized to the affected component(s)?
+        - Yes: Must the attacker have administrator, maintainer, or other system-level privileges to attempt to exploit the vulnerability?
+            - Yes: Then the Privileges Required is High (H)
+            - No: Then the Privileges Required is Low (L)
+            - Unknown: Then the Privileges Required is None (N)
+        - No: Then the Privileges Required is None (N)
+        - Unknown: Then the Privileges Required is None (N)
+	- No: Then the Privileges Required is None (N)
+	- Unknown: Then the Privileges Required is None (N)"""
+    ],
+    [
+        "User Interaction (UI)",
+        """Determine the User Interaction (UI). Only use one of the following values: 'N' or 'R'.
+- To successfully exploit the vulnerability, must the attacker depend on some user or victim to perform an action or otherwise interact with the system?
+	- Yes: Then User Interaction is Required (R)
+	- No: Then User Interaction is None (N)
+	- Unknown: Then User Interaction is None (N)"""
+    ],
+    [
+        "Scope (S)",
+        """Determine the Scope (S). Only use one of the following values: 'U' or 'C'.
+- Can the attacker affect a component who's authority ("authorization scope") is different than that of the vulnerable component?
+	- Yes: Then the Scope is Changed (C)
+	- No: Then the Scope is Unchanged (U)
+	- Unknown: Then the Scope is Changed (C)"""
+    ],
+    # TODO: Add instructions for the CIA metrics    
+]

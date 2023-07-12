@@ -30,7 +30,7 @@ class ConsoleRunner(Runner):
             end_time = time.time()
 
             # print the answer
-            console_text.print_green(result.result)            
+            console_text.print_green(result.result_string)            
             source_docs = self.get_source_docs_to_print(result.source_documents)
             console_text.print_blue("Source documents:\n" + source_docs)
             

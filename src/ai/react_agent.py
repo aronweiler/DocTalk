@@ -33,7 +33,7 @@ class ReActAgent(AbstractAI):
 
         result = self.agent_chain.run(input=input)
 
-        ai_results = AIResult(result) 
+        ai_results = AIResult(result, result) 
 
         return ai_results
 

@@ -47,7 +47,7 @@ class QAChainAI(AbstractAI):
 
         source_docs = [{"document": os.path.basename(d.metadata['source']).split('.')[0], "page": d.metadata['page']} if 'page' in d.metadata else os.path.basename(d.metadata['source']).split('.')[0] for d in result["source_documents"]]
 
-        ai_results = AIResult(result['answer'], source_docs) 
+        ai_results = AIResult(result, result['answer'], source_docs) 
 
         return ai_results
     

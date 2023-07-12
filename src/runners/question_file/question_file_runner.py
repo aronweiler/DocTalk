@@ -20,7 +20,7 @@ class QuestionFileRunner(Runner):
             if len(question) > 0:
                 result = abstract_ai.query(question)
                 
-                result_text = result.result
+                result_text = result.result_string
                 source_docs = self.get_source_docs_to_print(result.source_documents)
 
                 output_text += f"QUESTION: {question}:\n\nANSWER:\n{result_text}\n\nSource Documents:\n{source_docs}\n\n"

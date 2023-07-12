@@ -3,6 +3,7 @@
         "type": "llm_chain",
         "arguments": {            
             "run_locally": false,
+            "chat_model": true,
             "ai_temp": 0,
             "verbose": true,
             "max_tokens": 4096

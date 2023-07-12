@@ -1,10 +1,18 @@
 import os
 from langchain.llms import (OpenAI, LlamaCpp)
+from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import (OpenAIEmbeddings, HuggingFaceInstructEmbeddings)
 
 import shared.constants as constants
 
-def get_llm(local, ai_temp = constants.AI_TEMP, max_tokens = -1):
+def get_chat_model(local, ai_temp = constants.AI_TEMP): #, max_tokens = -1
+    if local:                  
+        raise Exception("Chat model not supported locally")
+    else:
+        openai_api_key = get_openai_api_key()
+        return ChatOpenAI(temperature=ai_temp, openai_api_key=openai_api_key)
+
+def get_llm(local, ai_temp = constants.AI_TEMP, max_tokens = -1):    
     if local:          
         
         if os.environ.get("OFFLOAD_TO_GPU_LAYERS") == None: 

@@ -43,28 +43,32 @@ class CvssRunner(Runner):
             
             # Use the raw data to get the CVSS vector 
             messages = [
-                SystemMessage(content=CVSS_INSTRUCT_PROMPT),
-                HumanMessage(content=CHAIN_OF_THOUGHT_EXAMPLE_DATA_1, example=True),
-                AIMessage(content=CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1, example=True),
-                HumanMessage(content=CHAIN_OF_THOUGHT_EXAMPLE_DATA_2, example=True),
-                AIMessage(content=CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2, example=True),
-                HumanMessage(content="DATA:\n" + input_file_data)
+                CVSS_INSTRUCT_PROMPT,
+                CHAIN_OF_THOUGHT_EXAMPLE_DATA_1,
+                CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1,
+                CHAIN_OF_THOUGHT_EXAMPLE_DATA_2,
+                CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2,
+                "Data:\n" + input_file_data
             ]
 
-            raw_data_result = abstract_ai.query(messages)
-            print("Evaluation result: ", raw_data_result.result_string)
+            results = abstract_ai.query(messages)
 
-            raw_data_vector_strings = self.extract_cvss_vector(raw_data_result.result_string)
+            vector_strings = self.extract_cvss_vector(results.result_string)
 
+            # Should be only one vector string, but just in case
             vectors = ''
-            for cvss_vector_string in raw_data_vector_strings:
+            for cvss_vector_string in vector_strings:
                 c = CVSS3(cvss_vector_string)    
-                vectors += f"\nInitial Evaluation: {c.clean_vector()}\nBase Score: {c.base_score} ({c.severities()[0]})"
+                vectors += f"{c.clean_vector()} - Base Score: {c.base_score} - Severity: {c.severities()[0]}\n"
             
-            output_text = f"Initial Evaluation:\n{raw_data_result.result_string}\n{vectors}\n\nInput File: {input_file_path}"
+            output_text = f"Generated CVSS Vector(s)\n{'-'*80}\n{'-'*80}\n\n{vectors}\nGenerated Evaluation(s)\n{'-'*80}\n{'-'*80}\n\n{results.result_string}\n\nOriginal Data\n{'-'*80}\n{'-'*80}\n\n{input_file_data}"
 
-            with io.open(output_file_path, "w") as file:
-                file.write(output_text)    
+            print(output_text)
+
+            # Write the output file- if it already exists, overwrite it
+            with io.open(output_file_path, "w", encoding="utf-8") as output_file:
+                output_file.write(output_text)
+            
 
     def extract_cvss_vector(self, text):
         pattern = r"(CVSS:[0-9.]+\/[A-Za-z0-9:\/]+)+"

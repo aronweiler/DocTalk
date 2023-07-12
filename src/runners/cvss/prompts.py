@@ -1,23 +1,26 @@
-CHAIN_OF_THOUGHT_EXAMPLE_DATA_1 = """DATA:
+CHAIN_OF_THOUGHT_EXAMPLE_DATA_1 = """
+Data: 
 Apache Tomcat 4.1.0 through 4.1.39, 5.5.0 through 5.5.27, and 6.0.0 through 6.0.18 permits web applications to replace an XML parser used for other web applications, which allows local users to read or modify the (1) web.xml, (2) context.xml, or (3) tld files of arbitrary web applications via a crafted application that is loaded earlier than the target application.
 This Tomcat vulnerability allows a web-apps to reference an XML parser instead of using the default Apache XML parser. The attacker must remove all existing web-apps including those in server/webapps, then install a web-app with an XML parser is stored in WEB-INF/lib. This will cause Tomcat to use the new XML parser to process all web.xml, context.xml and tld files of other webapps. If that non-standard XML parser is replaced with a malicious one, the content of the victim web app XML can be disclosed, the resulting JSP could be corrupted (if it compiled at all) or possibly even weaponized for further attacks.
 There are 2 different ways this attack may manifest. First a local privileged user could simply replace the non-Apache XML parser with a malicious variant. The second is that an attacker may use social engineering and user interaction to inject the malicious XML parser into the system. We will score for the former.
 """
 
-CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1 = """CVSS Evaluation:
-Local user access is required to 'remove all existing web-apps including those in server/webapps, then install a web-app with an XML parser is stored in WEB-INF/lib', so the Attack Vector (AV) is L (Local)
-The data provided does not contain any attack prerequisites, so Attack Complexity (AC) is L (Low)
-The data mentions requiring a user to perform the attack, 'a local privileged user could simply replace the non-Apache XML parser with a malicious variant', so Privileges Required (PR) is H (High)
-The vulnerability does not require any user interaction, so User Interaction (UI) is N (None)
-The data provided does not include information about a scope change, so Scope (S) is U (Unchanged)
-There is some loss of confidedntiallity (the content of the victim web app XML can be disclosed), so Confidentiality (C) is L (Low)
-The integrity of the XML parser is lost (the resulting JSP could be corrupted), but not a total loss of integrity, so Integrity (I) is L (Low)
-The reasonable outcome behind modifying the XML parser is to make certain web applications unavailable, but the attacker does not have the ability to completely deny service to legitimate users, so Availability (A) is L (Low)
+CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1 = """
+Evaluation:
+- Local user access is required to 'remove all existing web-apps including those in server/webapps, then install a web-app with an XML parser is stored in WEB-INF/lib', so the Attack Vector (AV) is L (Local)
+- The data provided does not contain any attack prerequisites, so Attack Complexity (AC) is L (Low)
+- The data mentions requiring a user to perform the attack, 'a local privileged user could simply replace the non-Apache XML parser with a malicious variant', so Privileges Required (PR) is H (High)
+- The vulnerability does not require any user interaction, so User Interaction (UI) is N (None)
+- The data provided does not include information about a scope change, so Scope (S) is U (Unchanged)
+- There is some loss of confidedntiallity (the content of the victim web app XML can be disclosed), so Confidentiality (C) is L (Low)
+- The integrity of the XML parser is lost (the resulting JSP could be corrupted), but not a total loss of integrity, so Integrity (I) is L (Low)
+- The reasonable outcome behind modifying the XML parser is to make certain web applications unavailable, but the attacker does not have the ability to completely deny service to legitimate users, so Availability (A) is L (Low)
 
-The CVSS Vector String is: CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:L
+Therefor, the CVSS Vector String is: CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:L
 """
 
-CHAIN_OF_THOUGHT_EXAMPLE_DATA_2 = """DATA:
+CHAIN_OF_THOUGHT_EXAMPLE_DATA_2 = """
+Data:
 Our medical device, which helps healthcare professionals manage patient medications, experienced a vulnerability that allowed unauthorized individuals to modify the drug library. 
 The drug library contains vital information about medications, including dosages, interactions, and safety guidelines. 
 The attacker can use the lowest-level user account on the device to exploit the vulnerability, administrative privliges are not required.
@@ -25,20 +28,23 @@ The attacker must be highly skilled, and have access to special packet-crafting 
 Due to the vulnerability, an attacker with access to the device over the Internet could make unauthorized changes to this essential database, such as changing doses, or completely mangling the data within it to make it unusable.
 The drug library also contains proprietary information which an attacker can obtain using this vulnerability.
 """
-CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2 = """CVSS Evaluation:
-The attacker can access the medical device over the Internet, so the Attack Vector (AV) is N (Network)
-The data provided does not say the attacker needs any special knowledge to exploit the vulnerability, so Attack Complexity (AC) is L (Low)
-The attacker 'can use the lowest-level user account on the device to exploit the vulnerability', so Privileges Required (PR) is L (Low)
-The vulnerability does not require any user interaction, so User Interaction (UI) is N (None)
-The attacker can only impact the drug library, so Scope (S) is U (Unchanged)
-The proprietary information in the drug library can be obtained using this exploit, so Confidentiality (C) is L (Low)
-The attacker can modify the drug library, so Integrity (I) is H (High)
-The attacker can make the drug library unusable, so Availability (A) is H (High)
 
-The CVSS Vector String is: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H
+CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2 = """
+Evaluation:
+- The attacker can access the medical device over the Internet, so the Attack Vector (AV) is N (Network)
+- The data provided does not say the attacker needs any special knowledge to exploit the vulnerability, so Attack Complexity (AC) is L (Low)
+- The attacker 'can use the lowest-level user account on the device to exploit the vulnerability', so Privileges Required (PR) is L (Low)
+- The vulnerability does not require any user interaction, so User Interaction (UI) is N (None)
+- The attacker can only impact the drug library, so Scope (S) is U (Unchanged)
+- The proprietary information in the drug library can be obtained using this exploit, so Confidentiality (C) is L (Low)
+- The attacker can modify the drug library, so Integrity (I) is H (High)
+- The attacker can make the drug library unusable, so Availability (A) is H (High)
+
+Therefor, the CVSS Vector String is: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H
+
 """
 
-CVSS_INSTRUCT_PROMPT = """
+CVSS_INSTRUCT_PROMPT = """You are a security AI tasked with evaluating the CVSS score of a vulnerability.
 Instructions for determining each metric:
 - Use the following information to evaluate the data to arrive at a CVSS Evaluation, including Base Metric Group CVSS 3.1 Vector String and evaluation explanations (cite detailed source data in your explanation) for each metric.
     - Instructions for determining each metric:    

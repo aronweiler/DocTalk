@@ -5,12 +5,12 @@ from langchain.embeddings import (OpenAIEmbeddings, HuggingFaceInstructEmbedding
 
 import shared.constants as constants
 
-def get_chat_model(local, ai_temp = constants.AI_TEMP): #, max_tokens = -1
+def get_chat_model(local, ai_temp = constants.AI_TEMP, max_tokens = None): 
     if local:                  
         raise Exception("Chat model not supported locally")
     else:
         openai_api_key = get_openai_api_key()
-        return ChatOpenAI(temperature=ai_temp, openai_api_key=openai_api_key)
+        return ChatOpenAI(temperature=ai_temp, openai_api_key=openai_api_key, max_tokens=max_tokens)
 
 def get_llm(local, ai_temp = constants.AI_TEMP, max_tokens = -1):    
     if local:          

@@ -1,6 +1,7 @@
 import os
 
 from langchain import PromptTemplate
+from langchain.schema import BaseMessage
 from langchain.chains import LLMChain as llm_chain
 from langchain.memory import ConversationTokenBufferMemory
 
@@ -21,12 +22,12 @@ class LLMChain(AbstractAI):
         else:
             llm = get_llm(self.configuration.run_locally, float(self.configuration.ai_temp), -1)#self.configuration.max_tokens)
         
-        self.chain = llm_chain(llm=llm, verbose=self.configuration.verbose, prompt=PromptTemplate.from_template("{query}"))
+        self.chain = llm_chain(llm=llm, verbose=self.configuration.verbose, prompt=PromptTemplate.from_template("{inputs}"))
      
     def query(self, input):
 
-        result = self.chain(input)
-
+        result = self.chain(inputs=input)
+        
         ai_results = AIResult(result, result['text']) 
 
         return ai_results

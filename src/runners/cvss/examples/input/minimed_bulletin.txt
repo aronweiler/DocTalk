@@ -1,0 +1,4 @@
+VULNERABILITY SUMMARY
+Based on earlier work performed by external researchers including Nathanael Paul, Jay Radcliffe, and Barnaby Jack, and from recent work performed by external researchers Billy Rios, Jonathan Butts and Jesse Young, potential security vulnerabilities have been identified in select Medtronic insulin pumps. Based on additional internal testing, Medtronic is publicly disclosing this matter.
+
+The vulnerability allows a potential attacker with special technical skills and equipment to potentially send radiofrequency (RF) signals to a nearby insulin pump to change settings, impacting insulin delivery. This change could result in a patient experiencing hypoglycemia (if additional insulin is delivered) or hyperglycemia (if not enough insulin is delivered).

@@ -3,7 +3,7 @@ import io
 import re
 from ai.abstract_ai import AbstractAI
 from runners.runner import Runner
-from runners.cvss.prompts import  CVSS_INSTRUCT_PROMPT, CHAIN_OF_THOUGHT_EXAMPLE_DATA_1, CHAIN_OF_THOUGHT_EXAMPLE_DATA_2, CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1, CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2
+from runners.cvss.prompts import  CRITIQUE_PROMPT, CVSS_INSTRUCT_PROMPT, CHAIN_OF_THOUGHT_EXAMPLE_DATA_1, CHAIN_OF_THOUGHT_EXAMPLE_DATA_2, CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1, CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2
 
 from utilities.token_helper import num_tokens_from_string
 
@@ -53,25 +53,64 @@ class CvssRunner(Runner):
 
             results = abstract_ai.query(messages)
 
-            vector_strings = self.extract_cvss_vector(results.result_string)
+            # Critique the results
+            critique = abstract_ai.query([CRITIQUE_PROMPT.format(instructions=CVSS_INSTRUCT_PROMPT, data=input_file_data, evaluation=results.result_string)])
 
-            # Should be only one vector string, but just in case
-            vectors = ''
-            for cvss_vector_string in vector_strings:
-                c = CVSS3(cvss_vector_string)    
-                vectors += f"{c.clean_vector()} - Base Score: {c.base_score} - Severity: {c.severities()[0]}\n"
+            initial_vectors = self.get_vectors(results.result_string)
+            critique_vectors = self.get_vectors(critique.result_string)
             
-            output_text = f"Generated CVSS Vector(s)\n{'-'*80}\n{'-'*80}\n\n{vectors}\nGenerated Evaluation(s)\n{'-'*80}\n{'-'*80}\n\n{results.result_string}\n\nOriginal Data\n{'-'*80}\n{'-'*80}\n\n{input_file_data}"
+            output_text = f"""
+{'-'*80}
+Critiqued CVSS Vector(s)
+{'-'*80}            
+
+{critique_vectors}
+
+{'-'*80}
+Critiqued Evaluation(s)            
+{'-'*80}
+
+{critique.result_string}
+
+{'-'*80}
+Initial CVSS Vector(s)
+{'-'*80}            
+
+{initial_vectors}
+
+{'-'*80}
+Initial Evaluation(s)            
+{'-'*80}
+
+{results.result_string}
+
+{'-'*80}
+Original Data            
+{'-'*80}            
+
+{input_file_data}
+            """
 
             print(output_text)
 
             # Write the output file- if it already exists, overwrite it
             with io.open(output_file_path, "w", encoding="utf-8") as output_file:
                 output_file.write(output_text)
-            
+                        
 
     def extract_cvss_vector(self, text):
         pattern = r"(CVSS:[0-9.]+\/[A-Za-z0-9:\/]+)+"
         matches = re.findall(pattern, text)
         
         return matches
+    
+    def get_vectors(self, result_string):
+        vector_strings = self.extract_cvss_vector(result_string)
+
+        # Should be only one vector string, but just in case
+        vectors = ''
+        for cvss_vector_string in vector_strings:
+            c = CVSS3(cvss_vector_string)    
+            vectors += f"{c.clean_vector()} - Base Score: {c.base_score} - Severity: {c.severities()[0]}\n"
+
+        return vectors

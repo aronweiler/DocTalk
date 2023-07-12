@@ -69,8 +69,9 @@ Instructions for determining each metric:
         If some form of user interaction is needed, to exploit the vulnerability, assign the value 'R' (Required).
 
         Scope (S) represents the impact of a successful exploit on the system's component or other components, the default value is 'U'.
-        If the vulnerability's impact is limited to the vulnerable component (e.g., an application), or can only affect resources managed by the same security authority, assign the value 'U' (Unchanged).
-        If a successful exploit can impact components beyond the vulnerable component (e.g., other applications or the underlying operating system), assign the value 'C' (Changed).
+        If the data does not mention, or does not include enough information to determine the scope, assign the default value 'U' (Unchanged).
+        If the vulnerability's impact is limited to the vulnerable component (e.g., the target application or device), assign the value 'U' (Unchanged).
+        If a successful exploit can impact components beyond the vulnerable component (e.g., other software applications or the underlying operating system), assign the value 'C' (Changed).
 
         Confidentiality (C), Integrity (I), and Availability (A):
         C, I, and A represent the impact on each of these security aspects when the vulnerability is exploited, the default value is 'H'.
@@ -117,20 +118,16 @@ DATA:
 """
 
 CRITIQUE_PROMPT = """
-Use these instructions:
 {instructions}
 
-Look at the Original Data and the Proposed CVSS Evaluation. 
-Critique the CVSS Evaluation using the instructions above, and the Original Data.
-Evaluate reasoning behind the original decisions for each metric and improve the evaluation if possible, making sure to explain why you made changes.
+Use the instructions above to critique the CVSS Evaluation below.
+Critique the reasoning behind the original decisions for each metric and improve the accuracy of the evaluation, making sure to explain why you made changes.
 
 Original Data:
 {data}
 
 Proposed CVSS Evaluation:
 {evaluation}
-
-Revised Evaluation (including updated 'CVSS:3.1/' Vector String):
 """
 
 DETAILED_BASE_METRICS_INSTRUCTIONS = """

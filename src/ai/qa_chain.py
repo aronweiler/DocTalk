@@ -4,7 +4,7 @@ from utilities.callback_handlers import DebugCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationTokenBufferMemory
 
-from shared.selector import get_embedding, get_llm
+from shared.selector import get_embedding, get_chat_model
 from documents.vector_database import get_database
 
 from ai.qa_chain_configuration import QAChainConfiguration
@@ -17,7 +17,7 @@ class QAChainAI(AbstractAI):
         self.configuration = QAChainConfiguration(json_args)
         embeddings = get_embedding(self.configuration.run_locally)    
         db = get_database(embeddings, self.configuration.database_name) 
-        llm = get_llm(self.configuration.run_locally, float(self.configuration.ai_temp))
+        llm = get_chat_model(self.configuration.run_locally, float(self.configuration.ai_temp))
         
         memory = self._get_memory(llm, self.configuration.max_tokens) if self.configuration.use_memory else None    
         

@@ -14,7 +14,7 @@ def create_self_ask_tool(tool_json, memory, override_llm) -> Tool:
 
     self_ask_tool_arguments = tool_json["arguments"]       
 
-    search_tool = TOOL_TYPES[tool_json["arguments"]["tool_class_name"]](self_ask_tool_arguments, memory)
+    search_tool = TOOL_TYPES[tool_json["arguments"]["tool_class_name"]](self_ask_tool_arguments, memory, override_llm)
     
     module = importlib.import_module(header.tool_module_name)
 

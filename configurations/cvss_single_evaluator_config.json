@@ -1,0 +1,20 @@
+{
+    "ai": {
+        "type": "llm_chain",
+        "arguments": {
+            "run_locally": false,
+            "chat_model": true,
+            "ai_temp": 0,
+            "verbose": true,
+            "max_tokens": 4096
+        }
+    },
+    "runner": {
+        "type": "cvss",
+        "arguments": {
+            "run_type": "one_shot_iterative_single_metric_critique_evaluation",
+            "input_directory": "src\\runners\\cvss\\examples\\input",
+            "output_directory": "src\\runners\\cvss\\examples\\output"
+        }
+    }
+}

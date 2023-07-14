@@ -1,3 +1,10 @@
+IDENTIFY_VULNERABLE_COMPONENT_PROMPT = """
+Identify the vulnerable component(s) and/or system(s) in the following data.  Return only the description of the vulnerable components and/or systems.
+
+Data:
+{data}
+"""
+
 CHAIN_OF_THOUGHT_EXAMPLE_DATA_1 = """
 Data: 
 Apache Tomcat 4.1.0 through 4.1.39, 5.5.0 through 5.5.27, and 6.0.0 through 6.0.18 permits web applications to replace an XML parser used for other web applications, which allows local users to read or modify the (1) web.xml, (2) context.xml, or (3) tld files of arbitrary web applications via a crafted application that is loaded earlier than the target application.
@@ -6,6 +13,8 @@ There are 2 different ways this attack may manifest. First a local privileged us
 """
 
 CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1 = """
+Vulnerable Component: 
+- Apache Tomcat 4.1.0 through 4.1.39, 5.5.0 through 5.5.27, and 6.0.0 through 6.0.18
 Evaluation:
 - Local user access is required to 'remove all existing web-apps including those in server/webapps, then install a web-app with an XML parser is stored in WEB-INF/lib', so the Attack Vector (AV) is L (Local)
 - The data provided does not contain any attack prerequisites, so Attack Complexity (AC) is L (Low)
@@ -30,6 +39,8 @@ The drug library also contains proprietary information which an attacker can obt
 """
 
 CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2 = """
+Vulnerable Component:
+- Medication management medical device
 Evaluation:
 - The attacker can access the medical device over the Internet, so the Attack Vector (AV) is N (Network)
 - The data provided does not say the attacker needs any special knowledge to exploit the vulnerability, so Attack Complexity (AC) is L (Low)
@@ -44,7 +55,57 @@ Therefor, the CVSS Vector String is: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:
 
 """
 
+CHAIN_OF_THOUGHT_EXAMPLE_DATA_3 = """
+Data:
+Our social media platform, which allows users to share photos and videos, has discovered a vulnerability that allows unauthorized users to delete content posted by other users.
+The vulnerability can be exploited remotely without any special privileges. An attacker only needs to know the ID of the content they want to delete.
+Once an attacker identifies the ID of a specific post or video, they can send a crafted request to the server, causing the targeted content to be deleted permanently.
+This vulnerability poses a significant risk to user data integrity and can lead to the loss of important or sensitive content.
+"""
+
+CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_3 = """
+Vulnerable Component: Social media platform for sharing photos and videos
+
+Evaluation:
+The vulnerability can be exploited remotely, so the Attack Vector (AV) is N (Network)
+The data does not mention any complexity required to exploit the vulnerability, so Attack Complexity (AC) is L (Low)
+The vulnerability does not require any special privileges, so Privileges Required (PR) is N (None)
+The attacker does not need any user interaction to exploit the vulnerability, so User Interaction (UI) is N (None)
+The scope of the vulnerability is limited to the targeted content, so Scope (S) is U (Unchanged)
+The vulnerability does not directly impact confidentiality, but it can result in the loss of important or sensitive content, so Confidentiality (C) is N (None)
+The attacker can delete content, resulting in a loss of data integrity, so Integrity (I) is H (High)
+The vulnerability does not impact availability directly, so Availability (A) is N (None)
+
+Therefore, the CVSS Vector String is: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N
+
+"""
+
+CHAIN_OF_THOUGHT_EXAMPLE_DATA_4 = """
+Data:
+Our e-commerce website, which processes online transactions, has identified a vulnerability that allows attackers to inject malicious scripts into the checkout page.
+The vulnerability occurs due to improper input sanitization, which allows attackers to insert JavaScript code into the payment form fields.
+Once a user submits the payment form, the injected script gets executed in the user's browser, potentially capturing sensitive information such as credit card details or login credentials.
+The vulnerability can be exploited remotely without any special privileges, and it requires user interaction through the payment process.
+The impact of this vulnerability can lead to significant financial loss, compromised customer data, and damage to the reputation of our e-commerce platform.
+"""
+
+CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_4 = """
+Vulnerable Component: E-commerce website's checkout page
+
+Evaluation:
+The vulnerability can be exploited remotely, so the Attack Vector (AV) is N (Network)
+The vulnerability occurs due to improper input sanitization, indicating a low complexity to exploit, so Attack Complexity (AC) is L (Low)
+The vulnerability does not require any special privileges, so Privileges Required (PR) is N (None)
+The attacker relies on user interaction during the payment process to execute the injected script, so User Interaction (UI) is R (Required)
+The vulnerability affects the checkout page and potentially captures sensitive information, indicating a change in scope, so Scope (S) is C (Changed)
+The impact includes the compromise of customer data and financial loss, signifying high confidentiality (C) and integrity (I) impacts, respectively, so C (Confidentiality) is H (High) and I (Integrity) is H (High)
+The vulnerability does not directly impact availability, so Availability (A) is N (None)
+
+Therefore, the CVSS Vector String is: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+"""
+
 CVSS_INSTRUCT_PROMPT = """You are a security AI tasked with evaluating the CVSS score of a vulnerability.
+For the vulnerable component(s): {vulnerable_component}
 Instructions for determining each metric:
 - Use the following information to evaluate the data to arrive at a CVSS Evaluation, including Base Metric Group CVSS 3.1 Vector String and evaluation explanations (cite detailed source data in your explanation) for each metric.
     - When scoring Base metrics, it should be assumed that the attacker has advanced knowledge of the weaknesses of the target system, including general configuration and default defense mechanisms (e.g., built-in firewalls, rate limits, traffic policing). For example, exploiting a vulnerability that results in repeatable, deterministic success should still be considered a Low value for Attack Complexity, independent of the attacker's knowledge or capabilities.
@@ -89,16 +150,20 @@ Instructions for determining each metric:
         assign the value 'H' (High).
     - Assume that all preconditions for the vulnerability to exist are met, and that the attacker has all of the skills and equipment necessary to exploit the vulnerability.
     - DO NOT INCLUDE SPECIAL SKILLS OR EQUIPMENT REQUIRED TO EXPLOIT THE VULNERABILITY IN YOUR EVALUATION!
+    - Prepend your evaluation with a description of the vulnerable component.
     - Assign the corresponding option value to each metric.
 - IMPORTANT: If the data does not contain enough information to determine a metric's value, select the default value and explain why you selected it in your response.
 - Don't forget to prefix the CVSS vector with 'CVSS:3.1/'
 """
 
+# TODO: Add examples to the prompts below
 CRITIQUE_PROMPT = """
 {instructions}
 
-Use the instructions above to critique the CVSS Evaluation below.
-Critique the reasoning behind the original decisions for each metric and improve the accuracy of the evaluation, making sure to explain why you made changes.
+Given the context above, use the following instructions to critique the Proposed CVSS Evaluation:
+- Examine the reasoning behind the original decisions for each metric.
+- Where possible, improve the accuracy of the evaluation by adding more context or making changes where necessary.
+- Make sure to explain why you made changes, if any were made.
 
 Original Data:
 {data}
@@ -107,53 +172,127 @@ Proposed CVSS Evaluation:
 {evaluation}
 """
 
+# TODO: Add examples to the prompts below
 CRITIQUE_PROMPT_SINGLE_METRIC = """
 {instructions}
+
+{example_data}
+{example_evaluation}  
 
 Use the workflow above to critique the CVSS Evaluation provided below.
 Examine the reasoning behind the original decisions for the '{metric}' metric and, where possible, improve the accuracy of the evaluation by adding more context.
 If you think the initial evaluation for the '{metric}' metric is incorrect, suggest changes where necessary, making sure to explain your reasoning behind the suggestions.
-Return only the updated '{metric}' evaluation, ensuring that it only uses one of the defined values for that metric.
+Return only the updated '{metric}' evaluation, ensuring that it only uses one of the defined values for that metric, do not return an updated CVSS vector.
 
-Here is the original data that was used to make the initial evaluation:
+Here is the data that was used to make the initial evaluation:
 {data}
 
 Here is the initial CVSS evaluation I would like you to critique:
 {evaluation}
 """
 
+# TODO: Add examples to the prompts below
+SINGLE_METRIC_EVALUATION_PROMPT = """
+{instructions}
+
+For the vulnerable component(s): {vulnerable_component}
+- Use the instructions above to evaluate the data provided below for the '{metric}' metric, providing an explanation for your evaluation in your response.
+- Assume that all preconditions for the vulnerability to exist are met, and that the attacker has all of the skills and equipment necessary to exploit the vulnerability.    
+- IMPORTANT: If the data provided does not contain enough information to determine a metric's value, select the default value and explain why you selected it in your response.
+
+{example_data}
+{example_evaluation}    
+
+Data:
+{data}
+"""
+
+COMBINE_SINGLE_RESULTS_PROMPT = """
+Combine the following single metric evaluations into a single complete evaluation for the vulnerable component(s), including all of the original observations.
+Generate a final Base Metric Group CVSS 3.1 Vector String (combining all of the single evaluation metrics).
+Don't forget to prefix the CVSS vector string with 'CVSS:3.1/'
+Try to format the final combined evaluation in a way that is easy to read and understand.
+
+The final combined evaluation should look like this:
+'Evaluation for vulnerable component(s): {{vulnerable component}}
+- The Attack Vector (AV) is {{AV option}}, because {{detailed AV explanation}}.
+- The Attack Complexity (AC) is {{AC option}}, because {{detailed AC explanation}}.
+- The Privileges Required (PR) is {{PR option}}, because {{detailed PR explanation}}.
+- The User Interaction (UI) is {{UI option}}, because {{detailed UI explanation}}.
+- The Scope (S) is {{S option}}, because {{detailed S explanation}}.
+- The Confidentiality (C) is {{C option}}, because {{detailed C explanation}}.
+- The Integrity (I) is {{I option}}, because {{detailed I explanation}}.
+- The Availability (A) is {{A option}}, because {{detailed A explanation}}.
+
+Final CVSS 3.1 Vector String: CVSS:3.1/AV:{{AV option}}/AC:{{AC option}}/PR:{{PR option}}/UI:{{UI option}}/S:{{S option}}/C:{{C option}}/I:{{I option}}/A:{{A option}}'
+
+Single Metric Evaluations:
+{evaluations}
+"""
+
+SINGLE_METRIC_SAMPLE_DATA = """EXAMPLE DATA:
+Our social media platform, which allows users to share photos and videos, has discovered a vulnerability that allows unauthorized users to delete content posted by other users.
+The vulnerability can be exploited remotely without any special privileges. An attacker only needs to know the ID of the content they want to delete.
+Once an attacker identifies the ID of a specific post or video, they can send a crafted HTTP request to the server, causing the targeted content to be deleted permanently.
+Using a crafted request, the attacker can also associate the content with a different account, potentially exposing sensitive data to unauthorized users.
+This vulnerability poses a significant risk to user data integrity and can lead to the loss of important or sensitive content."""
+
 SINGLE_METRIC_INSTRUCTIONS = [
     [
         "Attack Vector (AV)", 
-        """Determine the Attack Vector (AV). Only use one of the following values: 'N', 'A', 'L', or 'P'.
-- Can the attacker use some type of network or communication protocol to exploit the vulnerability?
-    - Yes: Does the network use OSI layer 3 or 4 protocols, e.g. IP, TCP/IP, UDP?
+        """Attack Vector (AV) represents the path or means through which a vulnerability can be exploited. It characterizes the specific entry point or method used by an attacker to target the system. The default value of Attack Vector is Network (N).
+Determine the Attack Vector (AV). Only use one of the following values: 'N', 'A', 'L', or 'P'.
+- Can the attacker use the vulnerability to exploit the system remotely in any manner? (e.g. using things such as Radio Frequency, Wi-Fi, Bluetooth, TCP, HTTP, UDP, Zigbee, Z-Wave, etc.)
+    - Yes: Does the network use OSI layer 3 or 4 protocols? (e.g. IP, ICMP, TCP, UDP, OSPF, BGP, SNMP, FTP, SSH, Telnet, etc.)
         - Yes: Then the Attack Vector is Network (N)
-        - No: Is the communication over a wireless channel?
-            - Yes: Is the range of the wireless channel approximately 10 feet or less?
+        - No: Is the communication over a wireless channel?  (e.g. Bluetooth, Wi-Fi, Zigbee, Z-Wave, NFC, LTE, LoRa, 5G, RF, etc.)
+            - Yes: Is the range of the wireless channel approximately 10 feet or less?  (e.g. short-range wireless such as NFC, Zigbee, RFID, wireless charging, etc.)
                 - Yes: Then the Attack Vector is Local (L)
                 - No: Then the Attack Vector is Adjacent (A)
                 - Unknown: Then the Attack Vector is Adjacent (A)
             - No: Then the Attack Vector is Adjacent (A)
             - Unknown: Then the Attack Vector is Adjacent (A)
         - Unknown: Then the Attack Vector is Network (N)
-    - No: Must the attacker have physical contact with the device?
+    - No: Must the attacker have direct physical contact with the device (e.g. in order to open it, insert something into a port, physically extract memory, etc.), excluding input devices such as mouse and keyboard?
         - Yes: Then the Attack Vector is Physical (P)
         - No: Then the Attack Vector is Local (L)
         - Unknown: Then the Attack Vector is Local (L)
-    - Unknown: Then the Attack Vector is Network (N)"""
+    - Unknown: Then the Attack Vector is Network (N)""",
+    """Example Evaluation:
+Vulnerable Component:
+- Social Media Platform
+Evaluation:
+1. Can the attacker use the vulnerability to exploit the system remotely in any manner?
+   - Yes, the vulnerability can be exploited remotely via an HTTP request over a network.
+    1a. Does the network use OSI layer 3 or 4 protocols, e.g., IP, TCP/IP, UDP?
+        - Yes, the attacker can use the HTTP protocol to exploit the vulnerability, which uses TCP/IP.
+
+The Attack Vector (AV) is Network (N).
+    """
     ],
     [
         "Attack Complexity (AC)", 
-        """Determine the Attack Complexity (AC). Only use one of the following values: 'L' or 'H'.
+        """Attack Complexity (AC) describes the conditions outside of the attacker's control that must exist in order to exploit the vulnerability, the default value of Attack Complexity is Low (L).
+Determine the Attack Complexity (AC). Only use one of the following values: 'L' or 'H'.
 - Can the attacker exploit the vulnerability at will, without requiring special circumstances, configurations, or other vulnerabilities/attacks before attacking this vulnerability?
     - Yes: Then the Attack Complexity is Low (L)
     - No: Then the Attack Complexity is High (H)
-    - Unknown: Then the Attack Complexity is Low (L)"""
+    - Unknown: Then the Attack Complexity is Low (L)""",
+    """Example Evaluation:
+Vulnerable Component:
+- Social Media Platform
+Evaluation:
+1. Can the attacker exploit the vulnerability at will, without requiring special circumstances, configurations, or other vulnerabilities/attacks before attacking this vulnerability?
+    - Yes, the attacker can exploit the vulnerability at will, without requiring special circumstances, configurations, or other vulnerabilities/attacks before attacking this vulnerability.
+
+ The Attack Complexity (AC) is Low (L).    
+
+    """
     ],
     [
         "Privileges Required (PR)",
-        """Determine the Privileges Required (PR). Only use one of the following values: 'N', 'L', or 'H'.
+        """Privileges Required (PR) describes the privileges an attacker must possess, such as user account access, kernel access, access to a VM, PIN code, etc., before successfully exploiting the vulnerability, the default value of Privileges Required is None (N).
+Determine the Privileges Required (PR). Only use one of the following values: 'N', 'L', or 'H'.        
 - Does the device/component use an authorization model that supports login for multiple different users or roles with different privilege levels?
 	- Yes: Before attempting to exploit the vulnerability, must the attacker be authorized to the affected component(s)?
         - Yes: Must the attacker have administrator, maintainer, or other system-level privileges to attempt to exploit the vulnerability?
@@ -163,23 +302,114 @@ SINGLE_METRIC_INSTRUCTIONS = [
         - No: Then the Privileges Required is None (N)
         - Unknown: Then the Privileges Required is None (N)
 	- No: Then the Privileges Required is None (N)
-	- Unknown: Then the Privileges Required is None (N)"""
+	- Unknown: Then the Privileges Required is None (N)""",
+    """Example Evaluation:
+    Vulnerable Component:
+    - Social Media Platform
+    Evaluation:
+1. Does the social media platform use an authorization model that supports login for multiple different users or roles with different privilege levels?
+    - Yes: The social media platform supports login for multiple users with different privilege levels.
+
+2. Before attempting to exploit the vulnerability, must the attacker be authorized to the affected component(s)?
+    - No: The attacker does not need to be authorized to the affected component(s).
+
+3. Must the attacker have administrator, maintainer, or other system-level privileges to attempt to exploit the vulnerability?
+    - No: The attacker does not need administrator or system-level privileges.
+
+The Privileges Required (PR) is None (N)."""
     ],
     [
         "User Interaction (UI)",
-        """Determine the User Interaction (UI). Only use one of the following values: 'N' or 'R'.
+        """User Interaction (UI) represents the level of user (not attacker) interaction required to exploit the vulnerability, the default value of User Interaction is None (N).
+Determine the User Interaction (UI). Only use one of the following values: 'N' or 'R'.
 - To successfully exploit the vulnerability, must the attacker depend on some user or victim to perform an action or otherwise interact with the system?
 	- Yes: Then User Interaction is Required (R)
 	- No: Then User Interaction is None (N)
-	- Unknown: Then User Interaction is None (N)"""
+	- Unknown: Then User Interaction is None (N)""",
+    """Example Evaluation:
+Vulnerable Component:
+- Social Media Platform
+Evaluation:
+1. To successfully exploit the vulnerability, must the attacker depend on some user or victim to perform an action or otherwise interact with the system?
+    - No, the attacker does not depend on any user or victim interaction, because the attacker can exploit the vulnerability independently by directly sending the crafted request to the server.
+
+The User Interaction (UI) is None (N)."""
     ],
     [
         "Scope (S)",
-        """Determine the Scope (S). Only use one of the following values: 'U' or 'C'.
-- Can the attacker affect a component who's authority ("authorization scope") is different than that of the vulnerable component?
-	- Yes: Then the Scope is Changed (C)
-	- No: Then the Scope is Unchanged (U)
-	- Unknown: Then the Scope is Changed (C)"""
+        """Scope (S) represents the extent of impact a successful exploit has on the system's component or other components. It determines whether the vulnerability's effect is limited to the specific component being targeted or if it has the potential to affect other interconnected components within the vulnerable system itself or other systems (excluding users), the default value of Scope is Changed (C).
+Determine the Scope (S). Only use one of the following values: 'U' or 'C'.
+- Is a successful exploit contained within the targeted component only and does it not have a cascading effect on other system components, or does the impact remain localized without propagating to other parts of the system?
+	- Yes: Then the Scope is Unchanged (U)
+	- No: Then the Scope is Changed (C)
+	- Unknown: Then the Scope is Changed (C)""",
+    """Example Evaluation:
+    Vulnerable Component:
+    - Social Media Platform
+    Evaluation:
+1. Is a successful exploit contained within the targeted component only and does it not have a cascading effect on other system components, or does the impact remain localized without propagating to other parts of the system?
+    - Yes. The vulnerable component is the social media platform, which includes the functionality to manage and store user-generated content. The content is a part of the social media platform. The attacker can only affect the content within the social media platform. The attacker cannot affect a component outside of the vulnerable component. In this case, the impact is limited to the content within the social media platform. The attacker's actions do not extend beyond the content itself.
+    
+The Scope (S) is Unchanged (U)."""
     ],
-    # TODO: Add instructions for the CIA metrics    
+    [
+        "Confidentiality (C)",
+        """Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones, the default value of Confidentiality is High (H).
+Determine the Confidentiality Impact (C). Only use one of the following values: 'N', 'L', or 'H'.
+- Can the attacker can gain access to read (or exfiltrate) any data?
+    - Yes: Is the data sensitive (e.g. financial, health, or personal data)?
+        - Yes: Then the Confidentiality Impact is High (H)
+        - No: Then the Confidentiality Impact is Low (L)
+    - No: Then the Confidentiality Impact is None (N)""",
+    """Example Evaluation:
+Vulnerable Component:
+- Social Media Platform
+Evaluation:
+1. Can the attacker can gain access to read (or exfiltrate) any data?
+    - Yes, the vulnerability allows the attacker to associate content with a different account.  The attacker could create their own separate account, and then associate someone elses content with their account, which would allow them to read the content.
+    1a. Is the data sensitive (e.g. financial, health, or personal data)?
+        - Yes, the data is sensitive. The description of the vulnerability itself calls the data sensitive.  Additionally, while the content is not financial or health data, it is personal data.
+
+The Confidentiality Impact (C) is High (H)."""
+    ],
+    [
+        "Integrity (I)",
+        """Integrity refers to the trustworthiness and veracity of information, the default value of Integrity is High (H).
+Determine the Integrity Impact (I). Only use one of the following values: 'N', 'L', or 'H'.
+- Can the attacker can modify any data?
+    - Yes: Is the data sensitive (e.g. financial, health, or personal data)?
+        - Yes: Then the Integrity Impact is High (H)
+        - No: Then the Integrity Impact is Low (L)
+    - No: Then the Integrity Impact is None (N)""",
+    """Example Evaluation:
+Vulnerable Component:
+- Social Media Platform
+Evaluation:
+1. Can the attacker can modify any data?
+    - Yes, The vulnerability allows the attacker to delete content.  Additionally, the vulnerability allows the attacker to associate content with a different account.  The attacker could create their own separate account, and then associate someone elses content with their account, which could also allow them to modify the content.
+    1a. Is the data sensitive (e.g. financial, health, or personal data)?
+        - Yes, the data is sensitive. The description of the vulnerability itself calls the data sensitive.  Additionally, while the content is not financial or health data, it is personal data.
+
+The Integrity Impact (I) is High (H)."""
+    ],
+    [
+        "Availability (A)",
+        """Availability refers to the loss of availability of the impacted component itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of an impacted component. The default value of Availability is High (H).
+Determine the Availability Impact (A). Only use one of the following values: 'N', 'L', or 'H'.
+- Can the attacker cause a denial of service (DoS) to the vulnerable component, or any sub-component within the vulnerable component?
+    - Yes: Is the DoS a complete DoS (i.e. the entire component is unavailable)?
+        - Yes: Then the Availability Impact is High (H)
+        - No: Then the Availability Impact is Low (L)
+    - No: Then the Availability Impact is None (N)""",
+    """Example Evaluation:
+Vulnerable Component:
+- Social Media Platform
+Evaluation:
+1. Can the attacker cause a denial of service (DoS) to the vulnerable component, or any sub-component within the vulnerable component?
+    - Yes, The vulnerability allows the attacker to delete content.  Additionally, the vulnerability allows the attacker to associate content with a different account.  The attacker could create their own separate account, and then associate someone elses content with their account, which could also allow them to delete the content.
+    1a. Is the DoS a complete DoS (i.e. the entire component is unavailable)?
+        - No, the DoS is not a complete DoS.  The attacker can only delete or modify the content, but the social media platform itself is still available.
+
+The Availability Impact (A) is Low (L)."""
+    ]
 ]

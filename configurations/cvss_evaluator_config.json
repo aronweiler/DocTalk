@@ -1,20 +1,64 @@
 {
     "ai": {
         "type": "llm_chain",
-        "arguments": {            
+        "arguments": {
             "run_locally": false,
             "chat_model": true,
             "ai_temp": 0,
             "verbose": true,
-            "max_tokens": 4096            
+            "max_tokens": 4096
         }
     },
-    "runner": {
-        "type": "cvss",
-        "arguments": {
-            "critique": false,
-            "input_directory": "src\\runners\\cvss\\examples\\input",
-            "output_directory": "src\\runners\\cvss\\examples\\output"
+    "runners": [
+        {
+            "runner": {
+                "type": "cvss",
+                "arguments": {
+                    "run_type": "one_shot_evaluation",
+                    "input_directory": "src\\runners\\cvss\\examples\\input",
+                    "output_directory": "src\\runners\\cvss\\examples\\output"
+                }
+            }
+        },
+        {
+            "runner": {
+                "type": "cvss",
+                "arguments": {
+                    "run_type": "one_shot_single_critique_evaluation",
+                    "input_directory": "src\\runners\\cvss\\examples\\input",
+                    "output_directory": "src\\runners\\cvss\\examples\\output"
+                }
+            }
+        },
+        {
+            "runner": {
+                "type": "cvss",
+                "arguments": {
+                    "run_type": "one_shot_iterative_single_metric_critique_evaluation",
+                    "input_directory": "src\\runners\\cvss\\examples\\input",
+                    "output_directory": "src\\runners\\cvss\\examples\\output"
+                }
+            }
+        },
+        {
+            "runner": {
+                "type": "cvss",
+                "arguments": {
+                    "run_type": "iterative_single_metric_evaluation",
+                    "input_directory": "src\\runners\\cvss\\examples\\input",
+                    "output_directory": "src\\runners\\cvss\\examples\\output"
+                }
+            }
+        },
+        {
+            "runner": {
+                "type": "cvss",
+                "arguments": {
+                    "run_type": "iterative_single_metric_evaluation_single_critique",
+                    "input_directory": "src\\runners\\cvss\\examples\\input",
+                    "output_directory": "src\\runners\\cvss\\examples\\output"
+                }
+            }
         }
-    }
+    ]
 }

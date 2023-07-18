@@ -1,6 +1,6 @@
 langchain
 llama-cpp-python
-chromadb
+chromadb==0.3.29
 tiktoken
 pypdf
 openai

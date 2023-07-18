@@ -4,7 +4,7 @@ import os
 
 OFFLOAD_TO_GPU_LAYERS = 10
 AI_TEMP = float(0)
-MAX_LOCAL_CONTEXT_SIZE = 2048
+MAX_LOCAL_CONTEXT_SIZE = 4096
 MAX_OPEN_AI_CONTEXT_SIZE = 4096
 
 ## If we split documents in the loader, need to know by how much
@@ -24,7 +24,8 @@ LLAMA_TIMINGS_FILE = f"{ROOT_DIRECTORY}/timings/llama_print_timings.txt"
 # Best model so far
 #LOCAL_MODEL_PATH = "/Repos/LLM/WizardLM-13B-1.0.ggmlv3.q5_1.bin"
 
-LOCAL_MODEL_PATH = "/Repos/LLM/orca-mini-13b.ggmlv3.q5_1.bin"
+LOCAL_MODEL_PATH = "/Repos/LLM/orca_mini_v2_13b.ggmlv3.q5_1.bin"
+#LOCAL_MODEL_PATH = "/Repos/LLM/orca-mini-13b.ggmlv3.q5_1.bin"
 #LOCAL_MODEL_PATH = "/Repos/LLM/open-llama-13b-open-instruct.ggmlv3.q5_1.bin"
 #LOCAL_MODEL_PATH = "/Repos/LLM/open-llama-7B-open-instruct.ggmlv3.q4_1.bin"
 

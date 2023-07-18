@@ -8,6 +8,8 @@ from runners.api.rest_api_runner import RestAPIRunner
 from runners.console.console_runner import ConsoleRunner
 from runners.question_file.question_file_runner import QuestionFileRunner
 from runners.cvss.cvss_runner import CvssRunner
+from runners.coder.code_runner import CodeRunner
+from runners.unit_tests.unit_test_runner import UnitTestRunner
 
 AI_TYPES = {
     "qa_chain": QAChainAI,
@@ -19,7 +21,9 @@ RUNNER_TYPES = {
     "api": RestAPIRunner,
     "console" : ConsoleRunner,
     "question_file": QuestionFileRunner,
-    "cvss": CvssRunner
+    "cvss": CvssRunner,
+    "code": CodeRunner,
+    "unit_test": UnitTestRunner
     # TODO: this     
     # "web_ui" : xxx,
 }

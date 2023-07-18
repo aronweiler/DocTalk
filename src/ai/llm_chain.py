@@ -18,7 +18,7 @@ class LLMChain(AbstractAI):
         if self.configuration.chat_model:
             llm = get_chat_model(self.configuration.run_locally, float(self.configuration.ai_temp))
         else:
-            llm = get_llm(self.configuration.run_locally, float(self.configuration.ai_temp), -1)#self.configuration.max_tokens)
+            llm = get_llm(self.configuration.run_locally, local_model_path=self.configuration.model, ai_temp=float(self.configuration.ai_temp), max_tokens=-1)
 
         memory = self._get_memory(llm, self.configuration.max_tokens) if self.configuration.use_memory else None                
         

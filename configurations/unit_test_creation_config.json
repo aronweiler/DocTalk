@@ -2,8 +2,9 @@
     "ai": {
         "type": "llm_chain",
         "arguments": {
-            "run_locally": false,
-            "chat_model": true,
+            "run_locally": true,
+            "model": "/Repos/LLM/orca_mini_v2_13b.ggmlv3.q5_1.bin",
+            "chat_model": false,
             "ai_temp": 0,
             "verbose": true,
             "max_tokens": 4096

@@ -2,6 +2,7 @@ class LLMChainConfiguration:
     
     def __init__(self, json_args):
         self.run_locally = json_args["run_locally"]
+        self.model = json_args.get("model", None)
         self.use_memory = json_args.get("use_memory", False)
         self.prompt = json_args.get("prompt", None)
         self.chat_model = json_args.get("chat_model", False)

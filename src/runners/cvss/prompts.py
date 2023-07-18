@@ -15,7 +15,7 @@ There are 2 different ways this attack may manifest. First a local privileged us
 CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_1 = """
 Vulnerable Component: 
 - Apache Tomcat 4.1.0 through 4.1.39, 5.5.0 through 5.5.27, and 6.0.0 through 6.0.18
-Evaluation:
+Evaluation (thinking it through, step-by-step):
 - Local user access is required to 'remove all existing web-apps including those in server/webapps, then install a web-app with an XML parser is stored in WEB-INF/lib', so the Attack Vector (AV) is L (Local)
 - The data provided does not contain any attack prerequisites, so Attack Complexity (AC) is L (Low)
 - The data mentions requiring a user to perform the attack, 'a local privileged user could simply replace the non-Apache XML parser with a malicious variant', so Privileges Required (PR) is H (High)
@@ -41,7 +41,7 @@ The drug library also contains proprietary information which an attacker can obt
 CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_2 = """
 Vulnerable Component:
 - Medication management medical device
-Evaluation:
+Evaluation (thinking it through, step-by-step):
 - The attacker can access the medical device over the Internet, so the Attack Vector (AV) is N (Network)
 - The data provided does not say the attacker needs any special knowledge to exploit the vulnerability, so Attack Complexity (AC) is L (Low)
 - The attacker 'can use the lowest-level user account on the device to exploit the vulnerability', so Privileges Required (PR) is L (Low)
@@ -65,8 +65,7 @@ This vulnerability poses a significant risk to user data integrity and can lead 
 
 CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_3 = """
 Vulnerable Component: Social media platform for sharing photos and videos
-
-Evaluation:
+Evaluation (thinking it through, step-by-step):
 The vulnerability can be exploited remotely, so the Attack Vector (AV) is N (Network)
 The data does not mention any complexity required to exploit the vulnerability, so Attack Complexity (AC) is L (Low)
 The vulnerability does not require any special privileges, so Privileges Required (PR) is N (None)
@@ -91,8 +90,7 @@ The impact of this vulnerability can lead to significant financial loss, comprom
 
 CHAIN_OF_THOUGHT_EXAMPLE_EVALUATION_4 = """
 Vulnerable Component: E-commerce website's checkout page
-
-Evaluation:
+Evaluation (thinking it through, step-by-step):
 The vulnerability can be exploited remotely, so the Attack Vector (AV) is N (Network)
 The vulnerability occurs due to improper input sanitization, indicating a low complexity to exploit, so Attack Complexity (AC) is L (Low)
 The vulnerability does not require any special privileges, so Privileges Required (PR) is N (None)

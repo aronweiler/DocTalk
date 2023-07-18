@@ -1,0 +1,30 @@
+{
+    "ai": {
+        "type": "llm_chain",
+        "arguments": {
+            "run_locally": false,
+            "chat_model": true,
+            "ai_temp": 0,
+            "verbose": true,
+            "max_tokens": 4096
+        }
+    },
+    "runner": {
+        "type": "code",
+        "arguments": {
+            "instruction_file": "c:\\repos\\doctalk\\src\\runners\\coder\\examples\\webcam.txt",
+            "code_file": "C:\\Repos\\DocTalk\\src\\runners\\coder\\examples\\app\\run.py",
+            "tools": [
+                {
+                    "friendly_name": "Python REPL Tool",
+                    "description": "A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)`.",
+                    "tool_module_name": "langchain.utilities",
+                    "tool_class_name": "PythonREPL",
+                    "arguments": {
+                        
+                    }
+                }                
+            ]
+        }
+    }
+}

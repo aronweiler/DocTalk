@@ -2,12 +2,11 @@
     "ai": {
         "type": "qa_chain",
         "arguments": {
-            "database_name": "fda",
-            "chat_model": true,
-            "use_memory": true,
-            "run_locally": false,
+            "database_name": "remote_control",
+            "use_memory": false,
+            "run_locally": true,
             "ai_temp": "0",
-            "top_k": 5,
+            "top_k": 8,
             "chain_type": "stuff",
             "search_type": "mmr",
             "search_distance": 0.6,

@@ -1,0 +1,19 @@
+{
+    "ai": {
+        "type": "llm_chain",
+        "arguments": {
+            "run_locally": false,
+            "chat_model": true,
+            "ai_temp": 0,
+            "verbose": true,
+            "max_tokens": 4096
+        }
+    },
+    "runner": {
+        "type": "unit_test",
+        "arguments": {
+            "code_file": "C:\\Repos\\DocTalk\\src\\runners\\unit_tests\\examples\\c_sharp_code.cs",
+            "language": "C#"
+        }
+    }
+}

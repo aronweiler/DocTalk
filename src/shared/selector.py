@@ -10,7 +10,7 @@ def get_chat_model(local, ai_temp = constants.AI_TEMP, max_tokens = None):
         raise Exception("Chat model not supported locally")
     else:
         openai_api_key = get_openai_api_key()
-        return ChatOpenAI(temperature=ai_temp, openai_api_key=openai_api_key, max_tokens=max_tokens)
+        return ChatOpenAI(temperature=ai_temp, openai_api_key=openai_api_key)#, max_tokens=max_tokens) ## Don't use max_tokens for now
 
 def get_llm(local, ai_temp = constants.AI_TEMP, max_tokens = -1):    
     if local:          
@@ -20,7 +20,7 @@ def get_llm(local, ai_temp = constants.AI_TEMP, max_tokens = -1):
         else:
             offload_layers = os.environ.get("OFFLOAD_TO_GPU_LAYERS")
 
-        return LlamaCpp(model_path=constants.LOCAL_MODEL_PATH, n_ctx=constants.MAX_LOCAL_CONTEXT_SIZE, temperature=ai_temp, n_gpu_layers=offload_layers) 
+        return LlamaCpp(model_path=constants.LOCAL_MODEL_PATH, n_ctx=constants.MAX_LOCAL_CONTEXT_SIZE, max_tokens=max_tokens, temperature=ai_temp, n_gpu_layers=offload_layers) 
     else:
         openai_api_key = get_openai_api_key()
         return OpenAI(temperature=ai_temp, openai_api_key=openai_api_key, max_tokens=max_tokens)

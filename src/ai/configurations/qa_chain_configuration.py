@@ -2,6 +2,7 @@ class QAChainConfiguration:
     
     def __init__(self, json_args):
         self.run_locally = json_args["run_locally"]
+        self.chat_model = json_args.get("chat_model", False)
         self.use_memory = json_args["use_memory"]
         self.ai_temp = json_args["ai_temp"]
         self.database_name = json_args.get("database_name", None)

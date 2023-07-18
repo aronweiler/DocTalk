@@ -4,10 +4,10 @@ from utilities.callback_handlers import DebugCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationTokenBufferMemory
 
-from shared.selector import get_embedding, get_chat_model
+from shared.selector import get_embedding, get_chat_model, get_llm
 from documents.vector_database import get_database
 
-from ai.qa_chain_configuration import QAChainConfiguration
+from ai.configurations.qa_chain_configuration import QAChainConfiguration
 from ai.abstract_ai import AbstractAI
 from ai.ai_result import AIResult
 
@@ -17,7 +17,11 @@ class QAChainAI(AbstractAI):
         self.configuration = QAChainConfiguration(json_args)
         embeddings = get_embedding(self.configuration.run_locally)    
         db = get_database(embeddings, self.configuration.database_name) 
-        llm = get_chat_model(self.configuration.run_locally, float(self.configuration.ai_temp))
+
+        if self.configuration.chat_model:
+            llm = get_chat_model(self.configuration.run_locally, float(self.configuration.ai_temp), int(self.configuration.max_tokens))
+        else:
+            llm = get_llm(self.configuration.run_locally, float(self.configuration.ai_temp), int(self.configuration.max_tokens))
         
         memory = self._get_memory(llm, self.configuration.max_tokens) if self.configuration.use_memory else None    
         
@@ -25,9 +29,9 @@ class QAChainAI(AbstractAI):
 
 
     def _get_chain(self, llm, memory, db, top_k, chain_type, search_type, search_distance, verbose):
-        vectordbkwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
+        search_kwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
         
-        qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever(search_kwargs=vectordbkwargs), chain_type=chain_type, memory=memory, verbose=verbose, return_source_documents=True, callbacks=[DebugCallbackHandler()])
+        qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever(search_kwargs=search_kwargs), chain_type=chain_type, memory=memory, verbose=verbose, return_source_documents=True, callbacks=[DebugCallbackHandler()])
 
         return qa
 
@@ -39,7 +43,7 @@ class QAChainAI(AbstractAI):
     def query(self, input):
 
         # If there is no memory, we have to fake it for the prompt.  
-        # Langchain should be better about this and automatically hand it
+        # Langchain should be better about this and automatically handle it
         if self.configuration.use_memory:
             result = self.qa_chain({"question": input})
         else:
@@ -50,4 +54,5 @@ class QAChainAI(AbstractAI):
         ai_results = AIResult(result, result['answer'], source_docs) 
 
         return ai_results
+    
     

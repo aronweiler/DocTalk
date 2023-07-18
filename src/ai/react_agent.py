@@ -6,7 +6,7 @@ from langchain.agents import AgentType
 from ai.abstract_ai import AbstractAI
 from ai.ai_result import AIResult
 
-from ai.react_agent_configuration import ReActAgentConfiguration
+from ai.configurations.react_agent_configuration import ReActAgentConfiguration
 
 from ai.agent_tools.utilities.tool_loader import load_tools
 

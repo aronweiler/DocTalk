@@ -21,7 +21,7 @@ class QAChainAI(AbstractAI):
         if self.configuration.chat_model:
             llm = get_chat_model(local=self.configuration.run_locally, ai_temp=float(self.configuration.ai_temp), max_tokens=int(self.configuration.max_tokens))
         else:
-            llm = get_llm(local=self.configuration.run_locally, ai_temp=float(self.configuration.ai_temp), max_tokens=int(self.configuration.max_tokens))
+            llm = get_llm(local=self.configuration.run_locally, local_model_path=self.configuration.model, ai_temp=float(self.configuration.ai_temp), max_tokens=int(self.configuration.max_tokens))
         
         memory = self._get_memory(llm, self.configuration.max_tokens) if self.configuration.use_memory else None    
         

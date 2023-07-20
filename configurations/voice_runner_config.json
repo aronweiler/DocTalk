@@ -8,6 +8,7 @@
             "ai_temp": ".7",
             "verbose": true,
             "max_tokens": 4096,
+            "system_message": "You are a friendly voice assistant. Please be as brief as possible, while still being complete sentences and containing enough detail to answer the user's query. This means that you should not include things like code, bulleted lists, numbered lists, or other things that would not be appropriate for a voice assistant to say. All of your answers should be in plain English, knowing that it will be spoken out loud to the user. All of your answers should be phonetically correct (do not worry about spelling), so that they are pronounced correctly by the text-to-speech engine. All of your answers should be in JSON format, nothing else.",
             "tools": [
                 {
                     "friendly_name": "Python REPL Tool",
@@ -21,6 +22,7 @@
     "runner": {
         "type": "voice",
         "arguments": {
+            "activation_cooldown": 2,
             "save_audio": false,
             "wake_word_models": [
                 "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_jarvis_v0.1.onnx",

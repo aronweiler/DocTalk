@@ -62,9 +62,7 @@ class VoiceRunner(Runner):
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
-        model_activation_threshold = 0.5
-        # Set cooldown period before another activation
-        cooldown = 4  # seconds
+        model_activation_threshold = 0.5        
 
         # Predict continuously on audio stream
         last_activation = time.time()
@@ -88,7 +86,7 @@ class VoiceRunner(Runner):
             # Check for model activations (score above threshold), and save clips
             for mdl in prediction.keys():                
                 # Does the activation meet our threshold, and has enough time passed since the last activation?
-                if prediction[mdl] > model_activation_threshold and (time.time() - last_activation) >= cooldown:
+                if prediction[mdl] > model_activation_threshold and (time.time() - last_activation) >= self.args.activation_cooldown:
                     
                     detect_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")                    
                     print(f'Detected activation from \"{mdl}\" model at time {detect_time}!')

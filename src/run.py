@@ -3,7 +3,7 @@ import json
 
 from ai.qa_chain import QAChainAI
 from ai.llm_chain import LLMChain
-from ai.react_agent import ReActAgent
+from ai.agent_with_tools import AgentWithTools
 from runners.api.rest_api_runner import RestAPIRunner
 from runners.console.console_runner import ConsoleRunner
 from runners.question_file.question_file_runner import QuestionFileRunner
@@ -14,7 +14,7 @@ from runners.voice.voice_runner import VoiceRunner
 
 AI_TYPES = {
     "qa_chain": QAChainAI,
-    "agent_with_tools" : ReActAgent,
+    "agent_with_tools" : AgentWithTools,
     "llm_chain": LLMChain
 }
 

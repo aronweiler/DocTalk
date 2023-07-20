@@ -9,14 +9,14 @@ import json
 from ai.abstract_ai import AbstractAI
 from ai.ai_result import AIResult
 
-from ai.configurations.react_agent_configuration import ReActAgentConfiguration
+from ai.configurations.react_agent_configuration import AgentWithToolsConfiguration
 
 from ai.agent_tools.utilities.tool_loader import load_tools
 
-class ReActAgent(AbstractAI):
+class AgentWithTools(AbstractAI):
 
     def configure(self, json_args) -> None:        
-        self.configuration = ReActAgentConfiguration(json_args)
+        self.configuration = AgentWithToolsConfiguration(json_args)
 
         if self.configuration.chat_model:
             router_llm = get_chat_model(self.configuration.run_locally, ai_temp=float(self.configuration.ai_temp))    
@@ -29,7 +29,7 @@ class ReActAgent(AbstractAI):
 
         tools = load_tools(json_args, memory, None)
 
-        self.agent_chain = initialize_agent(tools, router_llm, agent=agent_type, verbose=True, memory=memory, handle_parsing_errors=self._handle_error)     
+        self.agent_chain = initialize_agent(tools, router_llm, agent=agent_type, verbose=True, memory=memory, handle_parsing_errors=self._handle_error, agent_kwargs={"system_message": self.configuration.system_message})     
 
 
     def _get_memory(self, llm):

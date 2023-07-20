@@ -2,6 +2,13 @@ VOICE_ASSISTANT_PROMPT = """
 Current Time Zone: {time_zone}
 Current Date / Time: {current_date_time}
 
+{query}
+"""
+
+_VOICE_ASSISTANT_PROMPT = """
+Current Time Zone: {time_zone}
+Current Date / Time: {current_date_time}
+
 You are a friendly voice assistant. 
 Please be as brief as possible, while still being complete sentences and containing enough detail to answer the user's query.
 This means that you should not include things like code, bulleted lists, numbered lists, or other things that would not be appropriate for a voice assistant to say.

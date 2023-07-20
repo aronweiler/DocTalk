@@ -2,19 +2,21 @@
     "ai": {
         "type": "llm_chain",
         "arguments": {
-            "run_locally": false,
-            "chat_model": true,
+            "run_locally": true,
+            "model": "/Repos/LLM/llama-2-13b.ggmlv3.q5_1.bin",
+            "use_memory": false,
+            "chat_model": false,
             "ai_temp": 0,
             "verbose": true,
-            "max_tokens": 4096
+            "max_tokens": 2048
         }
     },
     "runner": {
         "type": "cvss",
         "arguments": {
-            "run_type": "one_shot_iterative_single_metric_critique_evaluation",
+            "run_type": "iterative_single_metric_evaluation",
             "input_directory": "src\\runners\\cvss\\examples\\input",
-            "output_directory": "src\\runners\\cvss\\examples\\output"
+            "output_directory": "src\\runners\\cvss\\examples\\output\\local_llm"
         }
     }
 }

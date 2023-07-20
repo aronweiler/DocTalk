@@ -1,5 +1,3 @@
-import collections
-from collections import deque
 import datetime
 import os
 import platform
@@ -8,18 +6,11 @@ import time
 from ai.abstract_ai import AbstractAI
 
 from openwakeword.model import Model
-from queue import Queue
 from runners.runner import Runner
 from runners.voice.configuration.voice_runner_configuration import VoiceRunnerConfiguration
 from runners.voice.player import play_wav_file, play_audio_stream
 from runners.voice.sound import Sound
 from runners.voice.prompts import VOICE_ASSISTANT_PROMPT
-
-from transformers import SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan
-from datasets import load_dataset
-import torch
-import soundfile as sf
-from datasets import load_dataset
 
 import numpy as np
 import torch
@@ -143,11 +134,6 @@ class VoiceRunner(Runner):
                                                current_date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         return prompt
-
-    def enqueue_with_overflow(self, fifo_queue, element):
-        if fifo_queue.full():
-            fifo_queue.get()  # Discard the first element
-        fifo_queue.put(element)
     
     def record_and_wait_for_silence(self):        
         # Initialize WebRTC VAD
@@ -175,7 +161,7 @@ class VoiceRunner(Runner):
                 is_speech = vad.is_speech(frame, sample_rate=RATE)  
 
                 if is_speech:
-                    print("SPEECH")
+                    #print("SPEECH")
                     # Reset the silence threshold
                     silence_threshold = 0
                 elif not is_speech:
@@ -186,7 +172,7 @@ class VoiceRunner(Runner):
                     # so we can proceed to process the buffer in waveform and reset
                     if silence_threshold < SILENCE_LIMIT_IN_SECONDS * (RATE / silence_chunk):
                         silence_threshold += 1
-                        print("silence_threshold=", silence_threshold)
+                        #print("silence_threshold=", silence_threshold)
                         continue
                     else:
                         print("Silence Detected, silence_threshold=", silence_threshold)                        
@@ -215,7 +201,7 @@ class VoiceRunner(Runner):
 
     def text_to_speech(self, text):
         # Might eventually stop saving things to file and just play them directly        
-        file_path = os.path.join(os.path.dirname(__file__), 'output', 'hello_world.wav')
+        file_path = os.path.join(os.path.dirname(__file__), 'output', 'tts_output.wav')
 
         # Some other voices
         #227 - 0
@@ -235,25 +221,4 @@ class VoiceRunner(Runner):
 
         # If file_path exists, delete it
         if os.path.exists(file_path):
-            os.remove(file_path)            
-
-    # def init_voice(self):  
-    #     self.processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
-    #     self.model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
-    #     self.vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
-
-    #     # load xvector containing speaker's voice characteristics from a dataset
-    #     embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
-    #     self.speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
-
-
-    # def text_to_speech(self, text):
-    #     inputs = self.processor(text=text, return_tensors="pt")
-
-    #     speech = self.model.generate_speech(inputs["input_ids"], self.speaker_embeddings, vocoder=self.vocoder)
-
-    #     file_path = os.path.join(os.path.dirname(__file__), 'output', 'hello_world.wav')
-
-    #     sf.write(file_path, speech.numpy(), samplerate=RATE)
-
-    #     play_wav_file(file_path, gain=6)
+            os.remove(file_path)

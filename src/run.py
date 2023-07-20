@@ -71,7 +71,13 @@ if not runners:
 
 # TODO: Make this multi-threaded
 for runner in runners:
-    runner_type = runner['runner']['type']
+    runner_enabled = runner['runner'].get('enabled', True)
+
+    if not runner_enabled:
+        print("Skipping disabled runner, ", runner['runner']['type'])
+        continue
+
+    runner_type = runner['runner']['type']    
     runner_args = runner['runner']['arguments']
     print("runner_type: ", runner_type)
 

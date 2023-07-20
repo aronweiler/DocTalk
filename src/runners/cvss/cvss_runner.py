@@ -154,8 +154,13 @@ class CvssRunner(Runner):
         results = []
         for metric in SINGLE_METRIC_INSTRUCTIONS:
             # Create the input message
-            message = SINGLE_METRIC_EVALUATION_PROMPT.format(metric=metric[0], instructions=metric[1], example_data=SINGLE_METRIC_SAMPLE_DATA, example_evaluation=metric[2], data=input_file_data, vulnerable_component=vulnerable_component)
-
+            message = SINGLE_METRIC_EVALUATION_PROMPT.format(metric=metric[0], 
+                                                             instructions=metric[1], 
+                                                             example_data=SINGLE_METRIC_SAMPLE_DATA, 
+                                                             example_evaluation=metric[2], 
+                                                             data=input_file_data, 
+                                                             vulnerable_component=vulnerable_component)            
+            
             # Query the AI
             results.append(abstract_ai.query(message).result_string) 
 

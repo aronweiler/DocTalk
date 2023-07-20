@@ -1,7 +1,7 @@
 import io
 from ai.abstract_ai import AbstractAI
 from runners.runner import Runner
-from runners.unit_tests.unit_test_runner_configuration import UnitTestRunnerConfiguration
+from runners.unit_tests.configuration.unit_test_runner_configuration import UnitTestRunnerConfiguration
 from runners.unit_tests.prompts import CREATE_UNIT_TESTS_PROMPT
 
 class UnitTestRunner(Runner):

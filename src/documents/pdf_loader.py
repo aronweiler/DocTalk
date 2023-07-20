@@ -72,8 +72,15 @@ class PDFLoader:
         # Assumption: headings have higher font size than their respective content
         for s in snippets:
             # if current snippet's font size > previous section's heading => it is a new heading
-            # or it could be the begining of the first page, or a header of some sort.
-            if not semantic_snippets or (s[1] is not None and s[1] > semantic_snippets[cur_idx].metadata.get('heading_font', 0)):
+            # or it could be the beginning of the first page, or a header of some sort.
+            heading_font = 0
+
+            if semantic_snippets:
+                heading_font = semantic_snippets[cur_idx].metadata.get('heading_font', 0) 
+                if heading_font is None:
+                    heading_font = 0
+                
+            if not semantic_snippets or (s[1] is not None and s[1] > heading_font):
                 # throw the 'heading', or whatever it is, into the heading metadata, but also into content
                 # TODO: look at deduping the various headings (in the case of headers/footers)
                 metadata={'heading':s[0], 'content_font': 0, 'heading_font': s[1], 'page': s[2]}

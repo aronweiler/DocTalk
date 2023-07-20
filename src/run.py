@@ -10,6 +10,7 @@ from runners.question_file.question_file_runner import QuestionFileRunner
 from runners.cvss.cvss_runner import CvssRunner
 from runners.coder.code_runner import CodeRunner
 from runners.unit_tests.unit_test_runner import UnitTestRunner
+from runners.voice.voice_runner import VoiceRunner
 
 AI_TYPES = {
     "qa_chain": QAChainAI,
@@ -23,7 +24,8 @@ RUNNER_TYPES = {
     "question_file": QuestionFileRunner,
     "cvss": CvssRunner,
     "code": CodeRunner,
-    "unit_test": UnitTestRunner
+    "unit_test": UnitTestRunner,
+    "voice": VoiceRunner
     # TODO: this     
     # "web_ui" : xxx,
 }

@@ -1,14 +1,44 @@
+# AI
 langchain
 llama-cpp-python
-chromadb==0.3.29
-tiktoken
-pypdf
 openai
+
+# Token counting
+tiktoken
+
+# Embeddings
 sentence_transformers
 InstructorEmbedding
-docx2txt
-openai
-pdfminer.six
+chromadb==0.3.29
+
+# API
 fastapi
+
+# Document parsing
+pypdf
+docx2txt
+pdfminer.six
 bs4
+
+# Security
 cvss
+
+# Audio related
+openwakeword
+pyaudiowpatch
+pyaudio
+webrtcvad
+whisper
+sound
+TTS
+
+# Maffs
+# torch
+# pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+# NOTE: The pip install of ffmpeg-python is broken, so you need to install ffmpeg manually
+# After you install ffmpeg (download from the website), you need to add the bin folder to your path
+ffmpeg 
+ffmpeg-python
+
+# Search
+google-api-python-client

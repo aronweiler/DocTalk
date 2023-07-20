@@ -1,0 +1,31 @@
+{
+    "ai": {
+        "type": "agent_with_tools",
+        "arguments": {
+            "use_memory": true,
+            "run_locally": false,
+            "chat_model": true,
+            "ai_temp": ".7",
+            "verbose": true,
+            "max_tokens": 4096,
+            "tools": [
+                {
+                    "friendly_name": "Python REPL Tool",
+                    "description": "A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)`.",
+                    "tool_module_name": "ai.agent_tools.python_repl",
+                    "tool_class_name": "PythonREPLTool"                    
+                }
+            ]
+        }
+    },
+    "runner": {
+        "type": "voice",
+        "arguments": {
+            "save_audio": false,
+            "wake_word_models": [
+                "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_jarvis_v0.1.onnx",
+                "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_rhasspy_v0.1.onnx"
+            ]
+        }
+    }
+}

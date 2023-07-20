@@ -8,7 +8,7 @@ def load_tools(config, memory, override_llm):
     for tool_json in config["tools"]:
         # Load the JSON into the specified type, getting the tool back
         header = ToolHeader(tool_json)
-        tool = tool_creator.TOOL_TYPES[header.tool_class_name](tool_json, memory, override_llm)
+        tool = tool_creator.create_tool(tool_json, memory, override_llm)
         tools.append(tool)
     
     return tools

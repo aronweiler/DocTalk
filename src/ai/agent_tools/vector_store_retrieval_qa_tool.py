@@ -5,10 +5,11 @@ from documents.vector_database import get_database
 from shared.selector import get_llm, get_embedding
 from langchain.chains import RetrievalQA
 import utilities.calculate_timing as calculate_timing
+from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
-class VectorStoreRetrievalQATool:
+class VectorStoreRetrievalQATool(AbstractTool):
 
-    def __init__(self, memory, database_name, run_locally, override_llm = None, top_k = 4, search_type = "mmr", chain_type = "stuff", search_distance = .5, verbose = False, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
+    def configure(self, database_name, run_locally, override_llm = None, top_k = 4, search_type = "mmr", chain_type = "stuff", search_distance = .5, verbose = False, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
             self.database_name = database_name
             self.top_k = top_k
             self.search_type = search_type

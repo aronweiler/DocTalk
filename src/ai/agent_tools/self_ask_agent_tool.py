@@ -5,10 +5,11 @@ from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from langchain.agents import  Tool
 import utilities.calculate_timing as calculate_timing
+from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
-class SelfAskAgentTool:
+class SelfAskAgentTool(AbstractTool):
 
-    def __init__(self, memory, local, search_tool:Tool, verbose = False, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE, override_llm = None):            
+    def configure(self, memory, local, search_tool:Tool, verbose = False, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE, override_llm = None):            
             self.verbose = verbose
             self.max_tokens = max_tokens
             self.search_tool = search_tool
@@ -17,8 +18,7 @@ class SelfAskAgentTool:
                 llm = get_llm(local=local)
             else:
                 llm = override_llm
-
-            #memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True) #, input_key="input", output_key="answer"
+            
             self.agent_chain = initialize_agent([search_tool], llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=verbose, memory=memory)
 
             print(f"SelfAskAgentTool initialized with local={local}, search_tool={search_tool}, verbose={verbose}, max_tokens={max_tokens}")

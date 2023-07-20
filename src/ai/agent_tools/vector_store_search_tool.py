@@ -12,10 +12,11 @@ from langchain.vectorstores import Chroma
 import shared.selector as selector
 from langchain.docstore.document import Document
 from langchain.retrievers import KNNRetriever
+from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
-class VectorStoreSearchTool:
+class VectorStoreSearchTool(AbstractTool):
 
-    def __init__(self, database_names, run_locally, return_source_documents):
+    def configure(self, database_names, run_locally, return_source_documents):
             self.databases: List[Chroma] = []
             self.return_source_documents = return_source_documents
             self.embedding = get_embedding(run_locally)

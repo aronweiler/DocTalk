@@ -33,7 +33,7 @@ class LLMChain(AbstractAI):
         self.chain = llm_chain(llm=llm, memory=memory, verbose=self.configuration.verbose, prompt=prompt)
 
     def _get_memory(self, llm, max_tokens):
-        memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True, input_key="question", output_key="answer")    
+        memory = ConversationTokenBufferMemory(llm=llm, memory_key="chat_history", return_messages=True, input_key="inputs", output_key="text")    
         
         return memory
      

@@ -13,7 +13,7 @@ from ai.ai_result import AIResult
 
 class QAChainAI(AbstractAI):
 
-    def configure(self, json_args) -> None:        
+    def configure(self, json_args) -> None:
         self.configuration = QAChainConfiguration(json_args)
         embeddings = get_embedding(self.configuration.run_locally)    
         db = get_database(embeddings, self.configuration.database_name) 
@@ -36,7 +36,7 @@ class QAChainAI(AbstractAI):
         return qa
 
     def _get_memory(self, llm, max_tokens):
-        memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=max_tokens, memory_key="chat_history", return_messages=True, input_key="question", output_key="answer")    
+        memory = ConversationTokenBufferMemory(llm=llm, memory_key="chat_history", return_messages=True, input_key="question", output_key="answer")    
         
         return memory
      

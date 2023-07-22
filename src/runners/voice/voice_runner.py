@@ -22,7 +22,7 @@ if platform.system() == "Windows":
 else:
     import pyaudio
 
-import whisper  
+
 from TTS.api import TTS
 
 FORMAT = pyaudio.paInt16
@@ -37,6 +37,11 @@ class VoiceRunner(Runner):
         self.args = VoiceRunnerConfiguration(args)
 
     def run(self, abstract_ai: AbstractAI):    
+        import whisper  
+        model_name = "base"
+        device = ("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = whisper.load_model(model_name).to(device)
+
         self.audio = pyaudio.PyAudio()
         mic_stream = self.audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)        
 
@@ -86,7 +91,8 @@ class VoiceRunner(Runner):
                     play_wav_file(os.path.join(os.path.dirname(__file__), 'audio', 'activation.wav'))
 
                     # Mute any audio playing
-                    Sound.mute()
+                    if self.args.mute_while_listening:
+                        Sound.mute()
 
                     # Stop the stream
                     mic_stream.stop_stream()
@@ -94,7 +100,8 @@ class VoiceRunner(Runner):
                     frames = self.record_and_wait_for_silence()
 
                     # Unmute the audio
-                    Sound.volume_up()                                     
+                    if self.args.mute_while_listening:
+                        Sound.volume_up()                                     
 
                     temp_file_name = detect_time + f"_{mdl}.wav"
                     
@@ -181,11 +188,9 @@ class VoiceRunner(Runner):
             stream.stop_stream()
             stream.close()     
 
-    def transcribe_audio(self, audio_file, model_name = "base", device = ("cuda" if torch.cuda.is_available() else "cpu")):
-        model = whisper.load_model(model_name).to(device)
-
+    def transcribe_audio(self, audio_file):
         # This call requires ffmpeg!!
-        result = model.transcribe(audio=audio_file)
+        result = self.model.transcribe(audio=audio_file)
         print("Transcribed: ", result["text"])
         return result["text"]
     

@@ -11,11 +11,12 @@ from runners.voice.configuration.voice_runner_configuration import VoiceRunnerCo
 from runners.voice.player import play_wav_file, play_audio_stream
 from runners.voice.sound import Sound
 from runners.voice.prompts import VOICE_ASSISTANT_PROMPT
+from runners.voice.audio_transcriber import AudioTranscriber
 
 import numpy as np
-import torch
+
 import wave
-import webrtcvad
+
 
 if platform.system() == "Windows":
     import pyaudiowpatch as pyaudio
@@ -35,12 +36,9 @@ class VoiceRunner(Runner):
     def __init__(self, args):
         super().__init__()
         self.args = VoiceRunnerConfiguration(args)
+        self.audio_transcriber = AudioTranscriber()
 
-    def run(self, abstract_ai: AbstractAI):    
-        import whisper  
-        model_name = "base"
-        device = ("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = whisper.load_model(model_name).to(device)
+    def run(self, abstract_ai: AbstractAI):           
 
         self.audio = pyaudio.PyAudio()
         mic_stream = self.audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)        
@@ -94,105 +92,43 @@ class VoiceRunner(Runner):
                     if self.args.mute_while_listening:
                         Sound.mute()
 
-                    # Stop the stream
+                    # Stop the mic stream
                     mic_stream.stop_stream()
 
-                    frames = self.record_and_wait_for_silence()
-
-                    # Unmute the audio
-                    if self.args.mute_while_listening:
-                        Sound.volume_up()                                     
-
-                    temp_file_name = detect_time + f"_{mdl}.wav"
-                    
-                    print(f"Saving audio to {temp_file_name}")
-
-                    output_file = os.path.join(os.path.abspath(output_dir), temp_file_name)
-                    wf = wave.open(output_file, 'wb')
-                    wf.setnchannels(CHANNELS)
-                    wf.setsampwidth(self.audio.get_sample_size(FORMAT))
-                    wf.setframerate(RATE)
-                    wf.writeframes(b''.join(frames))
-                    wf.close()
+                    transcribed_audio = self.audio_transcriber.record_and_wait_for_silence(self.audio, FORMAT, CHANNELS, RATE, SILENCE_LIMIT_IN_SECONDS)
 
                     # Alert the user we've stopped recording
                     play_wav_file(os.path.join(os.path.dirname(__file__), 'audio', 'deactivate.wav'))
 
-                    transcribed_audio = self.transcribe_audio(audio_file=output_file)
-                    
-                    ai_response = abstract_ai.query(self.get_prompt(transcribed_audio))
+                    # Unmute the audio
+                    if self.args.mute_while_listening:
+                        Sound.volume_up()
 
-                    print("AI Response: ", ai_response.result_string)
+                    try:
+                        if transcribed_audio is None or len(transcribed_audio) == 0:
+                            print("No audio detected")
+                            continue                    
 
-                    self.text_to_speech(ai_response.result_string)
+                        ai_response = abstract_ai.query(self.get_prompt(transcribed_audio))
 
-                    if self.args.save_audio != True:
-                        # Remove the file
-                        os.remove(output_file)
+                        print("AI Response: ", ai_response.result_string)
 
-                    model.reset()                    
-                    mic_stream.start_stream()
+                        self.text_to_speech(ai_response.result_string)
 
-                    last_activation = time.time()                                      
+                    finally: 
+                        model.reset()                    
+                        mic_stream.start_stream()
+                        last_activation = time.time()                                      
                     
     def get_prompt(self, transcribed_audio):
         prompt = VOICE_ASSISTANT_PROMPT.format(query=transcribed_audio, 
                                                time_zone=datetime.datetime.now().astimezone().tzname(), 
-                                               current_date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                                               current_date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                               user_information=self.args.user_information)
 
         return prompt
     
-    def record_and_wait_for_silence(self):        
-        # Initialize WebRTC VAD
-        vad = webrtcvad.Vad()
-        # Aggressive VAD mode
-        vad.set_mode(3)
-        silence_threshold = 0
-        silence_chunk = 160
-        frames = []
-
-        # Create another mic input
-        stream = self.audio.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=silence_chunk)
-        try:
-        
-            while True:
-                # Tells me if there is speech in this frame            
-                #frame = mic_stream.read(CHUNK)
-                frame = stream.read(silence_chunk)
-                frames.append(frame)
-
-                is_speech = vad.is_speech(frame, sample_rate=RATE)  
-
-                if is_speech:
-                    #print("SPEECH")
-                    # Reset the silence threshold
-                    silence_threshold = 0
-                elif not is_speech:
-                    # if no speech is detected but script was expecting speech
-                    # check if the silence_threshold is less than 4 seconds
-                    # if it is, increase the silence_threshold of 10ms
-                    # otherwise 4 seconds have passed and the user stopped speaking
-                    # so we can proceed to process the buffer in waveform and reset
-                    if silence_threshold < SILENCE_LIMIT_IN_SECONDS * (RATE / silence_chunk):
-                        silence_threshold += 1
-                        #print("silence_threshold=", silence_threshold)
-                        continue
-                    else:
-                        print("Silence Detected, silence_threshold=", silence_threshold)                        
-                        return frames
-        finally:
-            stream.stop_stream()
-            stream.close()     
-
-    def transcribe_audio(self, audio_file):
-        # This call requires ffmpeg!!
-        result = self.model.transcribe(audio=audio_file)
-        print("Transcribed: ", result["text"])
-        return result["text"]
+    
     
     def init_voice(self):
         # Multi-speaker
@@ -218,7 +154,7 @@ class VoiceRunner(Runner):
         #278 - 51        
 
         if self.tts.speakers:
-            self.tts.tts_to_file(text, speaker=self.tts.speakers[23], file_path=file_path)        
+            self.tts.tts_to_file(text, speaker=self.tts.speakers[43], file_path=file_path)        
         else:
             self.tts.tts_to_file(text, file_path=file_path)        
 

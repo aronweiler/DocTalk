@@ -2,6 +2,9 @@ VOICE_ASSISTANT_PROMPT = """
 Current Time Zone: {time_zone}
 Current Date / Time: {current_date_time}
 
+Remember to make your responses phonetically correct, as well as spelling out any dates and times.
+
+Query from {user_information}:
 {query}
 """
 

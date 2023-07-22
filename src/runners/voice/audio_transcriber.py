@@ -6,8 +6,8 @@ import numpy as np
 
 class AudioTranscriber:
 
-    def __init__(self):
-        import whisper  
+    def __init__(self):       
+        import whisper   
         model_name = "base"
         device = ("cuda" if torch.cuda.is_available() else "cpu")
         self.model = whisper.load_model(model_name).to(device)

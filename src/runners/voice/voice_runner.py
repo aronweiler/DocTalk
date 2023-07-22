@@ -8,21 +8,17 @@ from ai.abstract_ai import AbstractAI
 from openwakeword.model import Model
 from runners.runner import Runner
 from runners.voice.configuration.voice_runner_configuration import VoiceRunnerConfiguration
-from runners.voice.player import play_wav_file, play_audio_stream
+from runners.voice.player import play_wav_file
 from runners.voice.sound import Sound
 from runners.voice.prompts import VOICE_ASSISTANT_PROMPT
 from runners.voice.audio_transcriber import AudioTranscriber
 
 import numpy as np
 
-import wave
-
-
 if platform.system() == "Windows":
     import pyaudiowpatch as pyaudio
 else:
     import pyaudio
-
 
 from TTS.api import TTS
 
@@ -138,8 +134,9 @@ class VoiceRunner(Runner):
         model_name = "tts_models/en/ljspeech/tacotron2-DCA"
 
         # Init TTS - should move this up so that it doesn't happen over and over
-        self.tts = TTS(model_name=model_name, gpu=True)        
+        self.tts = TTS(model_name=model_name, gpu=True)          
 
+    # Not the best TTS, but closer to real-time than anything else I've found right now
     def text_to_speech(self, text):
         # Might eventually stop saving things to file and just play them directly        
         file_path = os.path.join(os.path.dirname(__file__), 'output', 'tts_output.wav')
@@ -163,3 +160,30 @@ class VoiceRunner(Runner):
         # If file_path exists, delete it
         if os.path.exists(file_path):
             os.remove(file_path)
+
+
+    # https://github.com/suno-ai/bark/tree/main#-usage-in-python
+    ## REALLY excellent TTS, but takes waaaayyyyy too long
+    # from transformers import AutoProcessor, BarkModel
+    # from IPython.display import Audio
+    # from bark import SAMPLE_RATE, generate_audio, preload_models
+    # from scipy.io.wavfile import write as write_wav
+    # def text_to_speech(self, text):
+    #     processor = AutoProcessor.from_pretrained("suno/bark")
+    #     model = BarkModel.from_pretrained("suno/bark").to("cuda")
+
+    #     voice_preset = "v2/en_speaker_6"
+
+    #     inputs = processor(text, voice_preset=voice_preset)
+
+    #     audio_array = model.generate(**inputs.to("cuda"))
+    #     audio_array = audio_array.cpu().numpy().squeeze()
+
+    #     file_path = os.path.join(os.path.dirname(__file__), 'output', 'tts_output.wav')
+    #     write_wav(file_path, SAMPLE_RATE, audio_array)
+
+    #     play_wav_file(file_path)
+
+    #     # If file_path exists, delete it
+    #     if os.path.exists(file_path):
+    #         os.remove(file_path)            

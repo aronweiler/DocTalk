@@ -6,6 +6,8 @@ doctalk_venv/
 .chroma
 docker.env
 src/runners/cvss/examples/output
+*_credentials.json
+*.pickle
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

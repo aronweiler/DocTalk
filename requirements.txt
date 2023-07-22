@@ -42,3 +42,19 @@ ffmpeg-python
 
 # Search
 google-api-python-client
+duckduckgo-search
+
+# Date/Time & Calendars
+pytz
+google-api-python-client 
+google-auth-httplib2 
+google-auth-oauthlib
+
+# Wikipedia
+wikipedia
+
+# Weather
+python-weather
+
+# Keyboard
+keyboard

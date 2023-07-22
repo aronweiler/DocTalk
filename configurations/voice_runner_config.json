@@ -8,13 +8,53 @@
             "ai_temp": ".7",
             "verbose": true,
             "max_tokens": 4096,
-            "system_message": "You are a friendly voice assistant. Please be as brief as possible, while still being complete sentences and containing enough detail to answer the user's query. This means that you should not include things like code, bulleted lists, numbered lists, or other things that would not be appropriate for a voice assistant to say. All of your answers should be in plain English, knowing that it will be spoken out loud to the user. All of your answers should be phonetically correct (do not worry about spelling), so that they are pronounced correctly by the text-to-speech engine. All of your answers should be in JSON format, nothing else.",
+            "system_message": "You are a friendly voice assistant. Please be as brief as possible, while still being complete sentences and containing enough detail to answer the user's query. This means that you should not include things like code, bulleted lists, numbered lists, or other things that would not be appropriate for a voice assistant to say. All of your answers should be in plain English, knowing that it will be spoken out loud to the user. All of your answers should spelled phonetically, so that they are pronounced correctly by the text-to-speech engine. For example, if you see a date or time, write it out in your response in full-English. e.g. 1-1-2023 would become January first, twenty tewnty three. All of your answers should be in JSON format, nothing else.",
             "tools": [
                 {
                     "friendly_name": "Python REPL Tool",
                     "description": "A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)`.",
                     "tool_module_name": "ai.agent_tools.python_repl",
                     "tool_class_name": "PythonREPLTool"                    
+                },
+                {
+                    "friendly_name": "Date / Time Tool",
+                    "description": "A tool used to get the current date and time.  Input is a time zone, in the format expected by the python pytz.timezone() call. Use the Python REPL Tool to get a list of valid time zones before calling this tool.",
+                    "tool_module_name": "ai.agent_tools.time_tool",
+                    "tool_class_name": "TimeTool"                    
+                },
+                {
+                    "friendly_name": "Wikipedia Tool",
+                    "description": "A tool that is useful for looking things up on wikipedia.",
+                    "tool_module_name": "ai.agent_tools.wikipedia_tool",
+                    "tool_class_name": "WikipediaTool",
+                    "arguments": {
+                        "top_k_results": 1,
+                        "doc_content_chars_max": 2000
+                    }
+                },
+                {
+                    "friendly_name": "DuckDuckGo Search Tool",
+                    "description": "A tool that is useful for searching for things on the internet, this tool should be used when the answer to a user's query cannot be found with other tools or by your own knowledge.",
+                    "tool_module_name": "ai.agent_tools.duck_duck_go_tool",
+                    "tool_class_name": "DuckDuckGoTool"                    
+                },
+                {
+                    "friendly_name": "Weather Tool",
+                    "description": "A tool that is useful for getting the weather for a specific location.",
+                    "tool_module_name": "ai.agent_tools.weather_tool",
+                    "tool_class_name": "WeatherTool"                    
+                },
+                {
+                    "friendly_name": "List Calendars Tool",
+                    "description": "A tool that is useful for listing all of the calendars a user has access to.",
+                    "tool_module_name": "ai.agent_tools.list_calendars_tool",
+                    "tool_class_name": "ListCalendarsTool"
+                },
+                {
+                    "friendly_name": "Calendars Events Tool",
+                    "description": "A tool that is useful for getting events in a specific calendar.  The input should be a calendar id, which can be found by using the List Calendars Tool.  If no calendar is specified by the user, the input should be 'primary'.",
+                    "tool_module_name": "ai.agent_tools.calendar_events_tool",
+                    "tool_class_name": "CalendarEventsTool"
                 }
             ]
         }
@@ -23,7 +63,9 @@
         "type": "voice",
         "arguments": {
             "activation_cooldown": 2,
+            "mute_while_listening": false,
             "save_audio": false,
+            "user_information": "Aron Weiler, in San Diego",
             "wake_word_models": [
                 "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_jarvis_v0.1.onnx",
                 "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_rhasspy_v0.1.onnx"

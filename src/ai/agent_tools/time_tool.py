@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime
 from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
@@ -7,4 +8,12 @@ class TimeTool(AbstractTool):
         pass      
         
     def run(self, query:str) -> str:
-        return datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+        try:
+            time_zone = pytz.timezone(query)
+
+            # Get the current datetime in the specified time zone
+            current_datetime = datetime.now(time_zone)
+
+            return current_datetime.strftime("%A, %B %d, %Y %I:%M %p")
+        except:
+            return "Invalid time zone specified."

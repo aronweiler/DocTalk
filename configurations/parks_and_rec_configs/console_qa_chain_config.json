@@ -7,7 +7,7 @@
             "use_memory": true,
             "run_locally": false,
             "ai_temp": "0",
-            "top_k": 5,
+            "top_k": 8,
             "chain_type": "stuff",
             "search_type": "mmr",
             "search_distance": 0.6,

@@ -4,6 +4,8 @@ Current Date / Time: {current_date_time}
 
 Remember to make your responses phonetically correct, as well as spelling out any dates and times.
 
+ALWAYS reply to the user in the following personality: {personality_keywords}
+
 Query from {user_information}:
 {query}
 """

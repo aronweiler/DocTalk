@@ -8,6 +8,9 @@ docker.env
 src/runners/cvss/examples/output
 *_credentials.json
 *.pickle
+*.pkl
+src/runners/voice/training/aron
+src/runners/voice/training/gaia
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

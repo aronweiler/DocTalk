@@ -7,7 +7,7 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 class WeatherTool(AbstractTool):
 
-    async def configure(self, memory = None, override_llm = None, json_args = None) -> None:           
+    async def configure(self, registered_settings, memory = None, override_llm = None, json_args = None) -> None:           
         if os.name == 'nt':
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())        
         

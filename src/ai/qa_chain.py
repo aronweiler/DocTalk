@@ -10,10 +10,11 @@ from documents.vector_database import get_database
 from ai.configurations.qa_chain_configuration import QAChainConfiguration
 from ai.abstract_ai import AbstractAI
 from ai.ai_result import AIResult
+from ai.agent_tools.utilities.registered_settings import RegisteredSettings
 
 class QAChainAI(AbstractAI):
 
-    def configure(self, json_args) -> None:
+    def configure(self, registered_settings:RegisteredSettings, json_args) -> None:        
         self.configuration = QAChainConfiguration(json_args)
         embeddings = get_embedding(self.configuration.run_locally)    
         db = get_database(embeddings, self.configuration.database_name) 
@@ -55,4 +56,5 @@ class QAChainAI(AbstractAI):
 
         return ai_results
     
-    
+    def get_settings(self) -> RegisteredSettings:
+        return self.registered_settings    

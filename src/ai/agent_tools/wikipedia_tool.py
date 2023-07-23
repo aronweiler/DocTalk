@@ -6,7 +6,7 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 class WikipediaTool(AbstractTool):
 
-    def configure(self, memory = None, override_llm = None, json_args: Optional[Union[Dict, None]] = None) -> None:
+    def configure(self, registered_settings, memory = None, override_llm = None, json_args: Optional[Union[Dict, None]] = None) -> None:
         top_k_results = 1
         doc_content_chars_max = 4000
 

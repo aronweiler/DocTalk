@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from ai.agent_tools.utilities.registered_settings import RegisteredSettings
 
 class AbstractTool(ABC):
 
@@ -7,5 +8,5 @@ class AbstractTool(ABC):
         pass
 
     @abstractmethod
-    def configure(self, memory = None, override_llm = None, json_args = None) -> None:
+    def configure(self, registered_settings:RegisteredSettings, memory = None, override_llm = None, json_args = None) -> None:
         pass

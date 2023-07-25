@@ -46,7 +46,7 @@ class VectorStoreRetrievalQATool(AbstractTool):
         end_time = time.time()
       
         elapsed_time = end_time - start_time
-        logging.debug("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+        logging.debug("Operation took: " + calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
         result_string = result['result']
 

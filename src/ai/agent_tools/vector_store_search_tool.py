@@ -127,7 +127,7 @@ class VectorStoreSearchTool(AbstractTool):
         logging.debug(f"\nVectorStoreSearchTool got: {search_terms}\n")
 
         for db in self.databases:            
-            logging.debug("For database: ", db._persist_directory)
+            logging.debug(f"For database: {db._persist_directory}")
             relevant_documents = db.similarity_search_with_relevance_scores(search_terms, 9999999)
             logging.debug(f"Found {len(relevant_documents)} chunks of related documents")
             # Print out the max relevance score from the relevant documents

@@ -169,7 +169,7 @@ class VoiceRunner(Runner):
                         )
                     )
 
-                    logging.debug("AI Response: ", ai_response.result_string)
+                    logging.debug("AI Response: " + ai_response.result_string)
 
                     # self.text_to_speech(ai_response.result_string)
                     last_activation = time.time()

@@ -39,7 +39,7 @@ def play_wav_file(file_path, stop_event):
         audio_player.terminate()
 
     except Exception as e:
-        logging.debug("Error playing the .wav file:", str(e))
+        logging.debug("Error playing the .wav file:" + str(e))
 
 
 def play_wav_data(wav_data, stop_event, sample_rate=16000, sample_width=2, channels=1):
@@ -74,4 +74,4 @@ def play_wav_data(wav_data, stop_event, sample_rate=16000, sample_width=2, chann
         audio_player.terminate()
 
     except Exception as e:
-        logging.debug("Error playing the wav data:", str(e))
+        logging.debug("Error playing the wav data:" + str(e))

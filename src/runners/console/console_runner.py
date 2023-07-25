@@ -36,7 +36,7 @@ class ConsoleRunner(Runner):
             
             elapsed_time = end_time - start_time
 
-            logging.debug("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+            logging.debug("Operation took: " + calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
     def get_multi_line_console_input(self):
         # Get the query, which can be multiple lines, until the user presses enter twice

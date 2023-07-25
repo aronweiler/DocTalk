@@ -1,162 +1,115 @@
-import threading
 import webrtcvad
-import torch
 import queue
-import numpy as np
+from runners.voice.speech_to_text import SpeechToText
+import logging
+from collections import deque
 
 
 class AudioTranscriber:
     def __init__(self):
-        import whisper
-
-        model_name = "base"
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = whisper.load_model(model_name).to(device)
-
-    def record_and_wait_for_silence(
-        self, audio, current_mic_audio_frames, format, channels, rate, silence_limit
-    ):
         # Initialize WebRTC VAD
-        vad = webrtcvad.Vad()
+        self.vad = webrtcvad.Vad()
         # Aggressive VAD mode
-        vad.set_mode(3)
-        accumulated_silence = 0
-        word_silence_limit = 0.5
-        # Use a small chunk size to reduce latency and improve accuracy by looking for small chunks of silence, which would indicate a pause in speech
-        chunk_size = 160
+        self.vad.set_mode(3)
 
-        # Set up the vars and queue for the audio frames
-        frames = []
         self.audio_queue = queue.Queue()
+        self.buffer_size = 100  # This should never be reached while transcribing
+        self.queue_timeout = 1
+        self.pre_capture_audio_buffer_size = 20
 
-        # Set the starting frame as the initial frame from the wake word activation
-        # Split the current mic audio frame into chunks of 160 samples (10ms)
-        for current_mic_audio_frame in current_mic_audio_frames:
-            for i in range(0, len(current_mic_audio_frame), chunk_size):
-                chunk = current_mic_audio_frame[i : i + chunk_size]
-                frame_array = torch.from_numpy(
-                    np.frombuffer(chunk, np.int16).flatten().astype(np.float32)
-                    / 32768.0
-                )
-                frames.append(frame_array)
+        self.vad_chunk_size = 320  # Needs to be multiples of 80
 
-        # Set up a flag to indicate if the frames have been queued so that we don't start immediately queueing frames for transcription if the first frame is silence
-        unqueued_frames = False
+        self.speech_to_text = SpeechToText()
 
-        # Start a thread to actively transcribe the incoming audio
-        # This will significantly speed up the reaction times for the user
-        thread = threading.Thread(target=self.transcribe_audio)
+    def add_frame_to_buffer(self, frame):
+        if self.audio_queue.full():
+            logging.debug("Audio queue full, dropping first frame")
+            self.audio_queue.get()
 
-        # Start the transcription thread
-        thread.start()
+        self.audio_queue.put(frame, block=True, timeout=self.queue_timeout)
 
-        # Create another mic input
-        stream = audio.open(
-            format=format,
-            channels=channels,
-            rate=rate,
-            input=True,
-            frames_per_buffer=chunk_size,
+    def transcribe_until_silence(self, audio_rate, silence_limit):
+        logging.debug(
+            f"transcribe_until_silence called with rate={audio_rate},and silence_limit={silence_limit}"
         )
 
-        try:
-            while True:
-                # Read the next frame
-                frame = stream.read(chunk_size, exception_on_overflow=False)
+        # Get the pre-capture audio
+        self.enqueue_pre_capture_audio()
 
-                # Convert the frame to an array and append it to the frames list
-                frame_array = torch.from_numpy(
-                    np.frombuffer(frame, np.int16).flatten().astype(np.float32)
-                    / 32768.0
-                )
-                frames.append(frame_array)
+        # Start transcribing
+        self.speech_to_text.start_transcribing()
 
-                # Check if the frame is speech or not
-                is_speech = vad.is_speech(frame, sample_rate=rate)
+        # Start listening for silence
+        self.listen_for_silence(audio_rate, silence_limit)
 
-                # TODO: Look at speeding this up by removing silences from the transcription queue
+    def enqueue_pre_capture_audio(self):
+        # Since sometimes the wake word capture is late, or the wake word is at the end of the buffer, we need to capture some audio around the wake word
+        # Get the last X frames in the transcription queue.
+        # This has the effect of getting the surrounding audio, and also dropping any audio that was captured long before (like silence)
 
-                if is_speech:
-                    # Reset the silence threshold
-                    accumulated_silence = 0
+        # Loop to retrieve all of the entries from the audio_queue
+        all_entries = []
+        while not self.audio_queue.empty():
+            frame = self.audio_queue.get()
+            all_entries.append(frame)
 
-                    # We got some speech, so the next silence we should flag ourselves so that we queue the frames
-                    unqueued_frames = True
+        # Get the last 10 entries from the list using slicing
+        pre_wake_word_frames_list = all_entries[-10:]
 
-                elif not is_speech:
-                    # If this is a silent frame, we should add the previous frames to the transcription queue
-                    # Also check to see if the silence limit has been hit for the word silence limit
-                    # Only do this if we haven't already queued the frames
+        # Append the last 10 entries to the pre_wake_word_frames deque
+        for frame in pre_wake_word_frames_list:
+            self.speech_to_text.enqueue_audio(frame)
 
-                    if (
-                        unqueued_frames
-                        and accumulated_silence
-                        >= word_silence_limit * (rate / chunk_size)
-                    ):
-                        # Concatenate the frames
-                        joined_frames = np.concatenate(frames)
-                        # torch_audio = torch.from_numpy(np.frombuffer(audio.get_raw_data(), np.int16).flatten().astype(np.float32) / 32768.0)
-                        self.audio_queue.put(joined_frames)
-                        unqueued_frames = False
+    def listen_for_silence(self, audio_rate, silence_limit):
+        accumulated_silence = 0
 
-                        print(f"Queuing {len(frames)} frames")
-
-                        # Clear the frames, because now they are queued
-                        frames = []
-
-                    # Also, if there is no speech in the frame, increment the silence threshold and continue listening
-                    if accumulated_silence < silence_limit * (rate / chunk_size):
-                        accumulated_silence += 1
-                        continue
-                    else:
-                        # Or, if the silence threshold is met, stop listening
-                        print(
-                            "Silence threshold met, accumulated_silence=",
-                            accumulated_silence,
-                        )
-
-                        # Stop the transcription thread
-                        self.audio_queue.put(None)
-                        break
-        finally:
-            stream.stop_stream()
-            stream.close()
-
-        # Join on the transcription thread
-        thread.join()
-
-        # Return the transcribed audio
-        return self.transcribed_audio
-
-    # This call requires ffmpeg!!
-    def transcribe_audio(self):
-        transcription = ""
-
-        running_frames = []
-
-        # Continuously transcribe the audio from the queue, when None is received, stop
+        # Start listening for silence, enqueueing the audio as it comes in
+        # When we see silence that exceeds the silence limit, stop listening
         while True:
-            dequeued_item = self.audio_queue.get()
+            # Get the current frames out of the buffer and send them to the speech to text system
+            while not self.audio_queue.empty():
+                current_frame = self.audio_queue.get(
+                    block=True, timeout=self.queue_timeout
+                )
+                self.speech_to_text.enqueue_audio(current_frame)
 
-            # The calling thread is cancelling this
-            if dequeued_item is None:
+                # Also listen for silence in these frames
+                # Get the length of the silence in the current frames
+                # Any time speech is detected, the silence length should be reset
+                # The returned silence length is a concatenation of the accumulated silence and the silence in the current frames
+                accumulated_silence = self.get_silence_length(
+                    current_frame, accumulated_silence, audio_rate
+                )
+
+            # If the silence threshold is met, stop listening
+            if silence_limit < (self.vad_chunk_size / audio_rate) * accumulated_silence:
+                logging.debug(
+                    f"Silence threshold met, accumulated_silence={accumulated_silence}"
+                )
+
+                # When we hit the silence threshold, stop transcribing
+                self.speech_to_text.stop_transcribing()
+
                 break
 
-            # Append the dequeued frame to the running frames
-            running_frames.append(dequeued_item)
+    def get_silence_length(self, frame, accumulated_silence, audio_rate):
+        evaluation_frames = []
+        # Split the frame into chunks of vad_chunk_size for the VAD
+        for i in range(0, len(frame), self.vad_chunk_size):
+            chunk = frame[i : i + self.vad_chunk_size]
+            evaluation_frames.append(chunk)
 
-            print(f"Transcribing {len(running_frames[0]) / 16000} seconds of audio")
+        # Loop over all of the frames and evaluate them
+        for vad_frame in evaluation_frames:
+            # If the frame is speech, reset the accumulated silence, otherwise increment it
+            if self.vad.is_speech(vad_frame, sample_rate=audio_rate):
+                # logging.debug("Speech detected")
+                accumulated_silence = 0
+            else:
+                # logging.debug("Silence detected")
+                accumulated_silence += 1
 
-            # Attempt to transcribe the chunk of audio
-            # Note, this includes the previously unsuccessfully transcribed frames (if any)
-            result = self.model.transcribe(audio=np.concatenate(running_frames))
+        return accumulated_silence
 
-            result_text = result["text"]
-            print("Transcribed: ", result_text)
-
-            # If result text is not empty, add it to the transcription and reset the running frames
-            if result_text != "":
-                transcription += result_text
-                running_frames = []
-
-        self.transcribed_audio = transcription
+    def get_transcription(self):
+        return self.speech_to_text.get_transcription()

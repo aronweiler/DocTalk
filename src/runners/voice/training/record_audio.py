@@ -1,21 +1,21 @@
 import os
 import pyaudio
 import wave
+import logging
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 CHUNK = 1280
 
-def record_audio(save_dir, clip_num, record_seconds):    
+
+def record_audio(save_dir, clip_num, record_seconds):
     p = pyaudio.PyAudio()
-    
-    print(f"Recording clip {clip_num}...")
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
+
+    logging.debug(f"Recording clip {clip_num}...")
+    stream = p.open(
+        format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK
+    )
 
     frames = []
     for i in range(0, int(RATE / CHUNK * record_seconds)):
@@ -35,4 +35,4 @@ def record_audio(save_dir, clip_num, record_seconds):
     wf.close()
 
     p.terminate()
-    print("Recording completed.")
+    logging.debug("Recording completed.")

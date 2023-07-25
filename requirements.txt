@@ -1,3 +1,7 @@
+# Basic stuff
+keyboard
+python-dotenv
+
 # AI
 langchain
 llama-cpp-python
@@ -59,6 +63,3 @@ wikipedia
 
 # Weather
 python-weather
-
-# Keyboard
-keyboard

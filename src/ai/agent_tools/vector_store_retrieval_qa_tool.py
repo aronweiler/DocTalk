@@ -1,4 +1,5 @@
 import time
+import logging
 import os
 import shared.constants as constants
 from documents.vector_database import get_database
@@ -31,21 +32,21 @@ class VectorStoreRetrievalQATool(AbstractTool):
             
             self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type=chain_type, retriever=self.db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
 
-            print(f"VectorStoreRetrievalQATool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
+            logging.debug(f"VectorStoreRetrievalQATool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
 
     @property
     def database(self):
         return self.db
 
     def run(self, query:str) -> str:
-        print(f"\nVectorStoreRetrievalQATool got: {query}")
+        logging.debug(f"\nVectorStoreRetrievalQATool got: {query}")
 
         start_time = time.time()
         result = self.retrieval_qa({"query": query})
         end_time = time.time()
       
         elapsed_time = end_time - start_time
-        print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+        logging.debug("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
         result_string = result['result']
 

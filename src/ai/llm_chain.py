@@ -1,4 +1,4 @@
-import os
+import logging
 
 from langchain import PromptTemplate
 from langchain.chains import LLMChain as llm_chain
@@ -65,7 +65,7 @@ class LLMChain(AbstractAI):
             for string in input:
                 num_tokens += num_tokens_from_string(string)
 
-        print(f"LLMChain query has {num_tokens} tokens")
+        logging.debug(f"LLMChain query has {num_tokens} tokens")
 
         result = self.chain(inputs=input)
 

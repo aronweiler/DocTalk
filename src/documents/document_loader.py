@@ -1,5 +1,6 @@
 import os
 import multiprocessing
+import logging
 
 from subprocess import  Popen
 
@@ -60,7 +61,7 @@ def convert_word_doc_to_pdf(input_doc, out_folder):
     """
     p = Popen([LIBRE_OFFICE, '--headless', '--convert-to', 'pdf', '--outdir',
             out_folder, input_doc])
-    print([LIBRE_OFFICE, '--convert-to', 'pdf', input_doc])
+    logging.debug([LIBRE_OFFICE, '--convert-to', 'pdf', input_doc])
     p.communicate()            
 
 def load_single_document(file_path: str) -> List[Document]:
@@ -79,12 +80,12 @@ def load_single_document(file_path: str) -> List[Document]:
         return documents
     except Exception as e:
         err = f"Could not load {file_path}, {e}"
-        print(err)
+        logging.debug(err)
         raise(ValueError(err))   
     
 
 def load_document_batch(filepaths):
-    print("Loading document batch")
+    logging.debug("Loading document batch")
     # create a thread pool
     with ThreadPoolExecutor(len(filepaths)) as exe:
         # load files
@@ -152,7 +153,7 @@ def main(document_directory:str, database_name:str, run_local:bool, split_docume
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=split_chunks, chunk_overlap=split_overlap, separators=SPLIT_SEPARATORS)
         texts = text_splitter.split_documents(documents)
         
-        print(f"Split into {len(texts)} chunks of text (chunk_size: {split_chunks}, chunk_overlap: {split_overlap})")
+        logging.debug(f"Split into {len(texts)} chunks of text (chunk_size: {split_chunks}, chunk_overlap: {split_overlap})")
     else:
         texts = documents
 
@@ -163,7 +164,7 @@ def main(document_directory:str, database_name:str, run_local:bool, split_docume
         if 'TLP:WHITE' in text.page_content:
             text.page_content = text.page_content.replace('TLP:WHITE', '')
 
-    print(f"Loaded {len(documents)} pages of documents from {document_directory}")
+    logging.debug(f"Loaded {len(documents)} pages of documents from {document_directory}")
 
     # Get the correct embeddings
     embeddings = get_embedding(run_local)

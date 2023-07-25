@@ -1,6 +1,5 @@
 import re
-import os
-import io
+import logging
 from langchain.document_loaders import PDFMinerPDFasHTMLLoader
 from langchain.docstore.document import Document
 from bs4 import BeautifulSoup
@@ -42,7 +41,7 @@ class PDFLoader:
                         cur_page = temp_page
                         continue
 
-            print("Page: ", cur_page)
+            logging.debug("Page: ", cur_page)
             sp = c.find('span')
             if not sp:
                 continue
@@ -116,4 +115,4 @@ class PDFLoader:
     
 # loader = PDFLoader("C:\\Repos\\DocTalk\\src\\runners\\cvss\\documents\\spec\\cvss-v31-specification_r1.pdf")
 # docs = loader.load()
-# print(docs[0].page_content)
+# logging.debug(docs[0].page_content)

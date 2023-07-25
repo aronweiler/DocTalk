@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from ai.abstract_ai import AbstractAI
 from runners.runner import Runner
+import logging
 
 class RestAPIRunner(Runner):
     def __init__(self):
@@ -9,7 +10,7 @@ class RestAPIRunner(Runner):
         self.app = FastAPI()
 
     def query_ai(self, query: str):
-        print(f"Querying abstract AI, '{query}'")
+        logging.debug(f"Querying abstract AI, '{query}'")
         return {"result": self.abstract_ai.query(query)}
 
     def run(self, abstract_ai: AbstractAI):

@@ -1,4 +1,5 @@
 import time
+import logging
 import shared.constants as constants
 from shared.selector import get_llm
 from langchain.agents import initialize_agent
@@ -21,17 +22,17 @@ class SelfAskAgentTool(AbstractTool):
             
             self.agent_chain = initialize_agent([search_tool], llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=verbose, memory=memory)
 
-            print(f"SelfAskAgentTool initialized with local={local}, search_tool={search_tool}, verbose={verbose}, max_tokens={max_tokens}")
+            logging.debug(f"SelfAskAgentTool initialized with local={local}, search_tool={search_tool}, verbose={verbose}, max_tokens={max_tokens}")
 
     def run(self, query:str) -> str:        
-        print(f"\nSelfAskAgentTool got: {query}")
+        logging.debug(f"\nSelfAskAgentTool got: {query}")
 
         start_time = time.time()
         result = self.agent_chain.run(input=query)
         end_time = time.time()
       
         elapsed_time = end_time - start_time
-        print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+        logging.debug("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
         ## If only I could return document sources with self-ask, that would be great... 
         # result_string = result['result']

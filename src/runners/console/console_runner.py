@@ -1,4 +1,4 @@
-import os
+import logging
 import time
 import utilities.console_text as console_text
 import utilities.calculate_timing as calculate_timing
@@ -13,7 +13,7 @@ class ConsoleRunner(Runner):
     def run(self, abstract_ai: AbstractAI):
         while True:    
             # Get the query, which can be multiple lines            
-            print("Query (Enter twice to run, X to exit):")
+            logging.debug("Query (Enter twice to run, X to exit):")
             
             query = self.get_multi_line_console_input()
 
@@ -31,12 +31,12 @@ class ConsoleRunner(Runner):
 
             # print the answer
             console_text.print_green(result.result_string)            
-            source_docs = self.get_source_docs_to_print(result.source_documents)
+            source_docs = self.get_source_docs_to_logging.debug(result.source_documents)
             console_text.print_blue("Source documents:\n" + source_docs)
             
             elapsed_time = end_time - start_time
 
-            print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+            logging.debug("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
     def get_multi_line_console_input(self):
         # Get the query, which can be multiple lines, until the user presses enter twice

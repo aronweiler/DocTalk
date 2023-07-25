@@ -1,3 +1,4 @@
+import logging
 import os
 import io
 import re
@@ -69,7 +70,7 @@ class CvssRunner(Runner):
             # Call the appropriate run type
             output_text = self.run_types[run_type](abstract_ai, input_file_data, vulnerable_component)            
 
-            print(output_text)
+            logging.debug(output_text)
 
             # Create the output directory if it doesn't exist
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)

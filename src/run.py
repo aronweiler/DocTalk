@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 
 from ai.qa_chain import QAChainAI
 from ai.llm_chain import LLMChain
@@ -33,12 +34,15 @@ RUNNER_TYPES = {
 parser = argparse.ArgumentParser()
 
 # Add arguments
-parser.add_argument(
-    "--config", type=str, required=True, help="Path to the configuration file"
-)
+parser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
+parser.add_argument("--logging_level", type=str, required=False, default="INFO", help="Logging level")
 
 # Parse the command-line arguments
 args = parser.parse_args()
+
+numeric_level = getattr(logging, args.logging_level.upper(), None)
+logging.basicConfig(level=numeric_level)
+logging.info('Started logging')
 
 # load the config
 with open(args.config) as config_file:
@@ -47,12 +51,12 @@ with open(args.config) as config_file:
 ai_type = config["ai"]["type"]
 ai_args = config["ai"]["arguments"]
 
-print("ai_type: ", ai_type)
+logging.debug("ai_type: " + ai_type)
 
 # Print out the list of arguments in a nice human readable format:
-print("ai_args:")
+logging.debug("ai_args:")
 for key, value in ai_args.items():
-    print(f"\t{key}: {value}")
+    logging.debug(f"{key}: {value}")
 
 # Create the registered settings
 registered_settings = RegisteredSettings()
@@ -64,7 +68,7 @@ if ai_class:
     try:
         ai.configure(registered_settings, ai_args)
     except Exception as e:
-        print("Error configuring AI: " + str(e))
+        logging.debug("Error configuring AI: " + str(e))
         raise e
 else:
     raise ValueError(f"ai_type is undefined, {ai_type}")
@@ -83,17 +87,17 @@ for runner in runners:
     runner_enabled = runner["runner"].get("enabled", True)
 
     if not runner_enabled:
-        print("Skipping disabled runner, ", runner["runner"]["type"])
+        logging.debug("Skipping disabled runner, " + runner["runner"]["type"])
         continue
 
     runner_type = runner["runner"]["type"]
     runner_args = runner["runner"]["arguments"]
-    print("runner_type: ", runner_type)
+    logging.debug("runner_type: " + runner_type)
 
     # Print out the list of arguments in a nice human readable format:
-    print("runner_args:")
+    logging.debug("runner_args:")
     for key, value in runner_args.items():
-        print(f"\t{key}: {value}")
+        logging.debug(f"{key}: {value}")
 
     runner_class = RUNNER_TYPES.get(runner_type)
     if runner_class:

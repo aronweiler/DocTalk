@@ -1,6 +1,4 @@
-import os
-import time
-import json
+import logging
 from typing import List
 from documents.vector_database import get_database
 from shared.selector import get_llm, get_embedding
@@ -27,7 +25,7 @@ class VectorStoreSearchTool(AbstractTool):
 
             
     # def run(self, search_terms) -> str:
-    #     print(f"\nVectorStoreSearchTool got: {search_terms}\n")
+    #     logging.debug(f"\nVectorStoreSearchTool got: {search_terms}\n")
 
     #     # search_json = json.loads(search_terms)
 
@@ -91,7 +89,7 @@ class VectorStoreSearchTool(AbstractTool):
     #          for doc in db_harvest:
     #             total_relevance_scores[doc[0].metadata['source']] = doc[1]
 
-    #         #print(len(doc_details))
+    #         #logging.debug(len(doc_details))
 
     #         # relevant_documents = db.similarity_search_with_relevance_scores(search_terms, len(db.get()["documents"]))  
 
@@ -119,26 +117,26 @@ class VectorStoreSearchTool(AbstractTool):
     #     end_time = time.time()
       
     #     elapsed_time = end_time - start_time
-    #     print("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
+    #     logging.debug("Operation took: ", calculate_timing.convert_milliseconds_to_english(elapsed_time * 1000))
 
     #     # TODO: Return JSON
     #     return json.dumps(result)
     
 
     def run(self, search_terms):
-        print(f"\nVectorStoreSearchTool got: {search_terms}\n")
+        logging.debug(f"\nVectorStoreSearchTool got: {search_terms}\n")
 
         for db in self.databases:            
-            print("For database: ", db._persist_directory)
+            logging.debug("For database: ", db._persist_directory)
             relevant_documents = db.similarity_search_with_relevance_scores(search_terms, 9999999)
-            print(f"Found {len(relevant_documents)} chunks of related documents")
+            logging.debug(f"Found {len(relevant_documents)} chunks of related documents")
             # Print out the max relevance score from the relevant documents
-            print(f"Max relevance score: {max(relevant_documents, key=lambda x: x[1])[1]}")
+            logging.debug(f"Max relevance score: {max(relevant_documents, key=lambda x: x[1])[1]}")
             # Print out the min relevance score from the relevant documents
-            print(f"Min relevance score: {min(relevant_documents, key=lambda x: x[1])[1]}")
+            logging.debug(f"Min relevance score: {min(relevant_documents, key=lambda x: x[1])[1]}")
 
             # Sum the [0].page_content of each item in relevant_documents
-            print(f"Sum of page content: {sum([len(x[0].page_content) for x in relevant_documents])}")
+            logging.debug(f"Sum of page content: {sum([len(x[0].page_content) for x in relevant_documents])}")
             
 
 # import sys
@@ -152,4 +150,4 @@ class VectorStoreSearchTool(AbstractTool):
 
 searcher = VectorStoreSearchTool(["pr_meeting_minutes"], False, False)    
 result = searcher.run("Comments or motions by Rene Smith")
-print(result)
+logging.debug(result)

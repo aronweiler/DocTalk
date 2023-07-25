@@ -1,3 +1,4 @@
+import logging
 import io
 from utilities.token_helper import num_tokens_from_string
 from shared.constants import LLAMA_TIMINGS_FILE
@@ -54,7 +55,7 @@ def calculate_total_processing_time_from_docs(docs) -> float:
 
 def calculate_total_processing_time_from_tokens(num_tokens:int) -> float:
     average_time_per_token = calculate_average_timings(LLAMA_TIMINGS_FILE)
-    # print(f"Reading {LLAMA_TIMINGS_FILE} looks like the average time per token on this system is: {average_time_per_token}")
+    # logging.debug(f"Reading {LLAMA_TIMINGS_FILE} looks like the average time per token on this system is: {average_time_per_token}")
     total_processing_time = num_tokens * average_time_per_token
     return total_processing_time
 

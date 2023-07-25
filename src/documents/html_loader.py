@@ -1,6 +1,4 @@
-import re
-import os
-import io
+import logging
 from langchain.document_loaders import PDFMinerPDFasHTMLLoader
 from langchain.docstore.document import Document
 from bs4 import BeautifulSoup
@@ -15,7 +13,7 @@ class HTMLLoader:
     
     def load(self):
         if self.file_path is None:
-            print("File path is None")
+            logging.debug("File path is None")
             return None        
 
         loader = BSHTMLLoader(self.file_path, open_encoding='utf-8')

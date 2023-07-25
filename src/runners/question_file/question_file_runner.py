@@ -1,3 +1,4 @@
+import logging
 import io
 from ai.abstract_ai import AbstractAI
 from runners.runner import Runner

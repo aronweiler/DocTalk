@@ -1,3 +1,5 @@
+import logging
+
 class RegisteredSettings:
     # Allow the user to register settings with this class
     # Create a dictionary of settings (name, setting) that we can use later to dynamically set the settings
@@ -12,7 +14,7 @@ class RegisteredSettings:
         if name in self.registered_settings:
             return self.registered_settings[name]
         else:
-            print("Setting not found: " + name)
+            logging.warn("Setting not found: " + name)
             return None
 
     def get_settings(self):

@@ -1,3 +1,4 @@
+import logging
 from chromadb.config import Settings
 import shared.constants as constants
 from langchain.vectorstores import Chroma
@@ -17,7 +18,7 @@ def get_database(embeddings, database_name, collection_name = Chroma._LANGCHAIN_
         client_settings=get_chroma_settings(database_name),
     )
 
-    print(f"There are {len(db.get()['documents'])} chunks in the datastore")
+    logging.debug(f"There are {len(db.get()['documents'])} chunks in the datastore")
 
     return db 
 
@@ -30,6 +31,6 @@ def store_embeddings(embeddings, documents, database_name):
         client_settings=get_chroma_settings(database_name),
     )
 
-    print("Persisting DB")
+    logging.debug("Persisting DB")
     db.persist()
     db = None

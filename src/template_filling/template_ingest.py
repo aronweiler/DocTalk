@@ -1,3 +1,4 @@
+import logging
 import time
 import os
 import io
@@ -32,7 +33,7 @@ def ingest_template(template_file_name):
     markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
     md_header_splits = markdown_splitter.split_text(markdown_document)
 
-    print(md_header_splits)
+    logging.debug(md_header_splits)
 
     # For the FDA analysis, use OpenAI
     llm = get_llm(False)
@@ -115,6 +116,6 @@ def ingest_template(template_file_name):
 
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print("Total Operation Time: ", convert_milliseconds_to_english(elapsed_time * 1000))
+    logging.debug("Total Operation Time: ", convert_milliseconds_to_english(elapsed_time * 1000))
 
     return analyzed_template_path

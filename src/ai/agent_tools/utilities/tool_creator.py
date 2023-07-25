@@ -1,3 +1,5 @@
+import logging
+
 from langchain.agents import Tool
 from langchain.tools import BaseTool, StructuredTool
 import importlib
@@ -45,6 +47,6 @@ def create_tool(
 
         return tool
     except Exception as e:
-        print("Error creating tool: " + str(e))
+        logging.debug("Error creating tool: " + str(e))
 
     return None

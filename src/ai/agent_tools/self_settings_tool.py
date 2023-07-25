@@ -1,4 +1,4 @@
-import json
+import logging
 from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 
@@ -13,7 +13,7 @@ class SelfSettingsTool(AbstractTool):
         self.registered_settings = registered_settings
 
     def run(self, query: str) -> str:
-        print("SelfSettingsTool got query: " + query)
+        logging.debug("SelfSettingsTool got query: " + query)
         # Parse the query
         things_to_set = query.split(",")
 

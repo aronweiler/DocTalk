@@ -1,3 +1,4 @@
+import logging
 import time
 from template_ingest import ingest_template
 from template_completion import complete_template
@@ -14,6 +15,6 @@ final_path = complete_template(analyzed_template_file_path)
 
 end_time = time.time()
 elapsed_time = end_time - start_time
-print("Total Operation Time: ", convert_milliseconds_to_english(elapsed_time * 1000))
+logging.debug("Total Operation Time: ", convert_milliseconds_to_english(elapsed_time * 1000))
 
-print("Template complete: ", final_path)
+logging.debug("Template complete: ", final_path)

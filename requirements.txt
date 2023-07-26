@@ -37,6 +37,9 @@ webrtcvad
 # whisper
 sound
 TTS
+# Required for AWS Polly
+boto3
+pydub
 
 # Maffs
 # torch

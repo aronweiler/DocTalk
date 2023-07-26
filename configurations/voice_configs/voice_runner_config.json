@@ -4,11 +4,12 @@
         "arguments": {
             "use_memory": true,
             "run_locally": false,
+            "model": "H:\\LLM\\wizardLM-7B.ggmlv3.q4_1.bin",
             "chat_model": true,
-            "ai_temp": ".7",
+            "ai_temp": "1",
             "verbose": true,
             "max_tokens": 4096,
-            "system_message": "Your name is Jarvis. You are a voice assistant. Your responses should be as brief as possible, while still being complete sentences and conveying enough detail to answer the user's query. This means that you should not include things like code, bulleted lists, numbered lists, or other things that would not be appropriate for a voice assistant to say. All of your answers should be in plain English, knowing that it will be spoken out loud to the user. All of your answers should spelled phonetically, so that they are pronounced correctly by the text-to-speech engine. For example, if you see a date or time, write it out in your response in full-English. e.g. 1-1-2023 would become January first, twenty tewnty three. All of your answers should be in JSON format, nothing else.",
+            "system_message": "Your name is Jarvis. You are a friendly and capable voice assistant, with a host of tools available to help you to assist the user in accomplishing their goals.  If you cannot answer to the user's query with your own knowledge, use one of the tools available to you. Keep your responses brief as possible, while still conveying enough detail to answer the user's query. All of your answers should be in plain English, knowing that it will be spoken out loud to the user. All of your answers should be in JSON format, nothing else.",
             "tools": [
                 {
                     "friendly_name": "Python REPL Tool",
@@ -39,16 +40,22 @@
                     "tool_class_name": "DuckDuckGoTool"
                 },                
                 {
-                    "friendly_name": "List Calendars Tool",
-                    "description": "A tool that is useful for listing all of the calendars a user has access to.",
+                    "friendly_name": "Available Calendars Tool",
+                    "description": "A tool that is useful for listing all of the available calendars a user has access to.  Use this tool to find the correct 'calendar_id'.  Always use this tool before the Calendar Events Tool.",
                     "tool_module_name": "ai.agent_tools.list_calendars_tool",
                     "tool_class_name": "ListCalendarsTool"
                 },
                 {
-                    "friendly_name": "Calendars Events Tool",
-                    "description": "A tool that is useful for getting events in a specific calendar.  The input should be a calendar id, which can be found by using the List Calendars Tool.  If no calendar is specified by the user, the input should be 'primary'.",
+                    "friendly_name": "Calendar Events Tool",
+                    "description": "USE THE AVAILABLE CALENDARS TOOL FIRST!! A tool for getting events from a calendar. Always use the output from the Available Calendars Tool to find the 'calendar_id' for this tool.  The input must contain a 'calendar_id' key found by using the Available Calendars Tool, a 'start_date' key, and an 'end_date' key.  Think about the context of the user's request, and pick the right 'calendar_id' from the available calendars.  If no date range is specified, 'start_date' and 'end_date' should be the same.  The dates should be a string in the format YYYY-MM-DD.  The input must be a single JSON string",
                     "tool_module_name": "ai.agent_tools.calendar_events_tool",
                     "tool_class_name": "CalendarEventsTool"
+                },
+                {
+                    "friendly_name": "Weather Tool",
+                    "description": "A tool that is useful for getting the weather for a specific location.  Input should be a single JSON string, containing a 'location' key, and a 'date' key.  The location should be a string, and the date should be a string in the format YYYY-MM-DD.  If no date is specified, the current date will be used.",
+                    "tool_module_name": "ai.agent_tools.weather_tool",
+                    "tool_class_name": "WeatherTool"
                 },
                 {
                     "friendly_name": "Self-Settings Lookup Tool",
@@ -58,7 +65,7 @@
                 },
                 {
                     "friendly_name": "Self-Settings Tool",
-                    "description": "This tool allows you to modify your settings.  You must use the output of the 'Self-Settings Lookup Tool' for the input to this tool. Call it when the user asks to modify any setting. Single setting example: 'setting_name_from_lookup_tool=setting_value'. Multiple settings example: 'setting_name_from_lookup_tool=setting_value, volume=7,my_name='its me''. The setting name should be one of the settings from the Self-Settings Lookup Tool.",
+                    "description": "Useful if you are asked to change anything about yourself, or when the user asks to change settings.  You must use the output of the 'Self-Settings Lookup Tool' for the input to this tool. Single setting example: 'setting_name_from_lookup_tool=setting_value'. Multiple settings example: 'setting_name_from_lookup_tool=setting_value, volume=7,my_name='its me''. The setting name should be one of the settings from the Self-Settings Lookup Tool.",
                     "tool_module_name": "ai.agent_tools.self_settings_tool",
                     "tool_class_name": "SelfSettingsTool"
                 }
@@ -71,20 +78,24 @@
             "activation_cooldown": 2,
             "mute_while_listening": false,
             "save_audio": false,
+            "sts_model": "tiny.en",
+            "default_tts_voice": "Matthew",
             "wake_word_models": [
                 {
                     "model_name": "hey_jarvis_v0.1",
                     "model_path": "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_jarvis_v0.1.onnx",
                     "training_data": "src/runners/voice/training/aron/model.pkl",
                     "user_information": "Aron Weiler, in San Diego",
-                    "personality_keywords": "serious, professional, friendly"
+                    "personality_keywords": "serious, professional, friendly",
+                    "tts_voice": "Brian"
                 },
                 {
                     "model_name": "hey_jarvis_v0.1",
                     "model_path": "C:\\Repos\\DocTalk\\src\\runners\\voice\\models\\hey_jarvis_v0.1.onnx",
                     "training_data": "src/runners/voice/training/gaia/model.pkl",
                     "user_information": "Gaia Weiler, in San Diego",
-                    "personality_keywords": "sassy, opinionated, fun, silly"
+                    "personality_keywords": "sassy, opinionated, fun, silly",
+                    "tts_voice": "Amy"
                 }
             ]
         }

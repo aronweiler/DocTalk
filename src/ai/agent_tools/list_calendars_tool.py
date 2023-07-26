@@ -1,4 +1,5 @@
 import datetime
+import json
 from ai.agent_tools.calendar.calendar_setup import get_calendar_service
 from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
@@ -19,13 +20,12 @@ class ListCalendarsTool(AbstractTool):
         if not calendars:
             return "No calendars found."
 
-        calendars_descriptions = []
+        calendars_descriptions = [{}]
         for calendar in calendars:
-            summary = calendar["summary"]
-            id = calendar["id"]
-            primary = "True" if calendar.get("primary") else "False"
-            calendars_descriptions.append(
-                f"Calendar: {summary}\tID: {id}\tPrimary Calendar: {primary}"
-            )
+            calendars_descriptions.append({
+                "summary": calendar["summary"],
+                "calendar_id": calendar["id"],
+                "is_primary": "True" if calendar.get("primary") else "False"
+            })            
 
-        return "\n".join(calendars_descriptions)
+        return json.dumps(calendars_descriptions)

@@ -2,28 +2,56 @@ import python_weather
 import json
 import asyncio
 import os
+from datetime import datetime
+import logging
 
 from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 
 class WeatherTool(AbstractTool):
-    async def configure(
+
+    def configure(
         self, registered_settings, memory=None, override_llm=None, json_args=None
     ) -> None:
-        if os.name == "nt":
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        pass
 
-    def run(self, query: str) -> str:
-        # Call the async get method synchronously
-        # loop = asyncio.new_event_loop()
-
+    async def run(self, query: str) -> str:
+        # Convert the query to a dictionary
+        logging.debug(f"Weather Query: {query}")
         try:
-            result = asyncio.run(self.get(query))
+            json_query = json.loads(query)
+            location = json_query["location"]            
+        except:
+            return "Could not parse the query, make sure your input is valid JSON in the format: {\"location\": \"city, state\", \"date\": \"YYYY-MM-DD\"}"
+
+        # Parse the date string from the query
+        date_format = "%Y-%m-%d"
+        try:
+            if 'date' in json_query:
+                date_string = json_query["date"]
+                parsed_date = datetime.strptime(date_string, date_format) 
+            else:
+                parsed_date = datetime.now().date()
+        except:
+            parsed_date = None
+
+        try:            
+            result = await self.get(location)
         except asyncio.TimeoutError:
             return "Timeout: The operation took too long to complete."
 
-        # f"In {query} it is {result.current.description}, and the temperature is {result.current.temperature} degrees."
-        return f"Feels like: {result.current.feels_like} degrees. Temperature: {result.current.temperature} degrees. Description: {result.current.description}. Humidity: {result.current.humidity}. Wind speed: {result.current.wind_speed}. Wind direction: {result.current.wind_direction}. Visibility: {result.current.visibility}."
+        if parsed_date is None or parsed_date == datetime.now().date():
+            logging.debug("Looking for the current weather")
+            return f"Temperature: {result.current.temperature} degrees. Feels like: {result.current.feels_like} degrees. Description: {result.current.description}. Humidity: {result.current.humidity}."
+        else:
+            logging.debug("Looking for a forecast for the date: " + str(parsed_date))
+            # Look for the date in the forecast
+            for forecast in result.forecasts:
+                logging.debug("Forecast date: " + str(forecast.date))
+                if forecast.date == parsed_date:
+                    return f"Low temp: {forecast.lowest_temperature} degrees. High temp: {forecast.highest_temperature} degrees."
+            
+            return f"Could not find a forecast for {parsed_date}."
 
     async def get(self, query):
         weather_client = python_weather.Client(unit=python_weather.IMPERIAL)

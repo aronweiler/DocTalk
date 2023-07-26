@@ -20,6 +20,10 @@ class AgentWithTools(AbstractAI):
         self.configuration = AgentWithToolsConfiguration(json_args)
 
         if self.configuration.chat_model:
+            if self.configuration.run_locally:
+                raise Exception(
+                    "The chat model can only be used with remote APIs right now."
+                )
             router_llm = get_chat_model(
                 self.configuration.run_locally,
                 ai_temp=float(self.configuration.ai_temp),
@@ -29,6 +33,7 @@ class AgentWithTools(AbstractAI):
             router_llm = get_llm(
                 self.configuration.run_locally,
                 ai_temp=float(self.configuration.ai_temp),
+                local_model_path=self.configuration.model,
             )
             agent_type = AgentType.CONVERSATIONAL_REACT_DESCRIPTION
 

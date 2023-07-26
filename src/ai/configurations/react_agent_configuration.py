@@ -3,6 +3,7 @@ class AgentWithToolsConfiguration:
     def __init__(self, json_args):
         # TODO: Implement this
         self.run_locally = json_args["run_locally"]
+        self.model = json_args.get("model", None)
         self.use_memory = json_args["use_memory"]
         self.system_message = json_args.get("system_message", "")
         self.chat_model = json_args.get("chat_model", False)

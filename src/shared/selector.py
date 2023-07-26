@@ -29,7 +29,7 @@ def get_llm(local, local_model_path = None, ai_temp = constants.AI_TEMP, max_tok
             offload_layers = os.environ.get("OFFLOAD_TO_GPU_LAYERS")
 
         if local_model_path == None:
-            local_model_path = constants.LOCAL_MODEL_PATH
+            local_model_path = constants.DEFAULT_LOCAL_MODEL_PATH
 
         return LlamaCpp(model_path=local_model_path, n_ctx=constants.MAX_LOCAL_CONTEXT_SIZE, max_tokens=max_tokens, temperature=ai_temp, n_gpu_layers=offload_layers) 
     else:

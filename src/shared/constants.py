@@ -21,4 +21,6 @@ CHROMA_DIRECTORY = f"{ROOT_DIRECTORY}/data/ChromaDB_{{database_name}}"
 # Keeping the output from some runs here, which I use to estimate times for the local llm runs
 LLAMA_TIMINGS_FILE = f"{ROOT_DIRECTORY}/timings/llama_print_timings.txt"
 
+DEFAULT_LOCAL_MODEL_PATH = "H:\\LLM\\wizardLM-7B.ggmlv3.q4_1.bin"
+
 

@@ -7,7 +7,7 @@ import queue
 
 
 class SpeechToText:
-    def __init__(self, audio_queue_size=1024):
+    def __init__(self, audio_queue_size=1024, model_name="base"):
         self.audio_queue = queue.Queue(audio_queue_size)
         self.transcription = ""
         self.thread = None

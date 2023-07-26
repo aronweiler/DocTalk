@@ -2,11 +2,10 @@ import webrtcvad
 import queue
 from runners.voice.speech_to_text import SpeechToText
 import logging
-from collections import deque
 
 
 class AudioTranscriber:
-    def __init__(self):
+    def __init__(self, transcription_model_name = "base"):
         # Initialize WebRTC VAD
         self.vad = webrtcvad.Vad()
         # Aggressive VAD mode
@@ -19,7 +18,7 @@ class AudioTranscriber:
 
         self.vad_chunk_size = 320  # Needs to be multiples of 80
 
-        self.speech_to_text = SpeechToText()
+        self.speech_to_text = SpeechToText(model_name=transcription_model_name)
 
     def add_frame_to_buffer(self, frame):
         if self.audio_queue.full():

@@ -21,6 +21,7 @@ from runners.voice.sound import Sound
 from runners.voice.prompts import VOICE_ASSISTANT_PROMPT
 from runners.voice.audio_transcriber import AudioTranscriber
 from runners.voice.wake_word import WakeWord
+from runners.voice.text_to_speech import TextToSpeech
 
 from TTS.api import TTS
 
@@ -43,13 +44,13 @@ class VoiceRunner(Runner):
         self.wake_word = WakeWord()
 
         self.stop_event = threading.Event()
-        self.audio_transcriber = AudioTranscriber()
+        self.audio_transcriber = AudioTranscriber(transcription_model_name=self.args.sts_model)
 
         # Create a queue to store audio frames
         self.audio_queue = queue.Queue(self.args.max_audio_queue_size)
 
         # initialize the text to speech engine
-        self.init_tts()
+        self.text_to_speech = TextToSpeech()
 
     def configure(self, registered_settings: RegisteredSettings):
         # TODO: Add settings to control voice here
@@ -81,7 +82,7 @@ class VoiceRunner(Runner):
         last_activation = time.time() - self.args.activation_cooldown
 
         # Start listening for wake words
-        logging.debug("\n\n--- Listening for wake words...\n")
+        logging.info("\n\n--- Listening for wake words...\n")
 
         while True:
             # Pull a frame from the queue fed by the mic thread
@@ -116,7 +117,7 @@ class VoiceRunner(Runner):
 
                     detect_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-                    logging.debug(
+                    logging.info(
                         f"Detected activation from '{mdl}' model at time {detect_time}!  I think you are: {prediction['wake_word_model'].user_information}"
                     )
 
@@ -124,11 +125,19 @@ class VoiceRunner(Runner):
                     if self.args.mute_while_listening:
                         Sound.mute()
 
+                    transcription_start_time = time.time()
+
                     self.audio_transcriber.transcribe_until_silence(
                         RATE, SILENCE_LIMIT_IN_SECONDS
                     )
 
                     transcribed_audio = self.audio_transcriber.get_transcription()
+
+                    transcription_end_time = time.time()
+
+                    logging.info(
+                        f"Transcription took {transcription_end_time - transcription_start_time} seconds"
+                    )
 
                     # Alert the user we've stopped recording
                     play_wav_file(
@@ -142,7 +151,7 @@ class VoiceRunner(Runner):
                     if self.args.mute_while_listening:
                         Sound.volume_up()
 
-                    logging.debug("Transcribed audio: " + transcribed_audio)
+                    logging.info("Transcribed audio: " + transcribed_audio)
 
                     if transcribed_audio is None or len(transcribed_audio) == 0:
                         logging.debug("No audio detected")
@@ -161,6 +170,8 @@ class VoiceRunner(Runner):
                         logging.debug("Stop event is set, cancelling interaction")
                         return
 
+                    ai_query_start_time = time.time()
+
                     ai_response = self.abstract_ai.query(
                         self.get_prompt(
                             transcribed_audio,
@@ -169,11 +180,18 @@ class VoiceRunner(Runner):
                         )
                     )
 
+                    ai_query_end_time = time.time()
+                    logging.info(f"AI query took {str(ai_query_end_time - ai_query_start_time)} seconds")
+                    
                     logging.debug("AI Response: " + ai_response.result_string)
 
-                    # self.text_to_speech(ai_response.result_string)
+                    text_to_speech_start_time = time.time()
+                    self.text_to_speech.speak(ai_response.result_string, prediction["wake_word_model"].tts_voice, self.stop_event)
+                    text_to_speech_end_time = time.time()
+                    logging.info(f"Text to speech took {str(text_to_speech_end_time - text_to_speech_start_time)} seconds")
+                    
+                    
                     last_activation = time.time()
-
                     logging.debug("--- Continuing to listen for wake words...")
 
     def run(self, abstract_ai: AbstractAI):
@@ -210,44 +228,3 @@ class VoiceRunner(Runner):
         )
 
         return prompt
-
-    def init_tts(self):
-        # Multi-speaker
-        # model_name = "tts_models/en/vctk/fast_pitch"
-
-        # Single speaker
-        model_name = "tts_models/en/ljspeech/tacotron2-DCA"
-
-        # Init TTS - should move this up so that it doesn't happen over and over
-        self.tts = TTS(model_name=model_name, gpu=True)
-
-    # Not the best TTS, but closer to real-time than anything else I've found right now
-    def text_to_speech(self, text):
-        # Might eventually stop saving things to file and just play them directly
-        file_path = os.path.join(os.path.dirname(__file__), "output", "tts_output.wav")
-
-        # Some other voices
-        # 227 - 0
-        # 240 - 13
-        # 241 - 14
-        # 250 - 23
-        # 260 - 33
-        # 270 - 43
-        # 278 - 51
-
-        # Check to see if we've stopped before doing TTS
-        if self.stop_event.is_set():
-            logging.debug("Stop event is set, cancelling TTS")
-            return
-
-        if self.tts.speakers:
-            speech_audio = self.tts.tts(text, speaker=self.tts.speakers[43])
-        else:
-            speech_audio = self.tts.tts(text)
-            # self.tts.tts_to_file(text, file_path=file_path)
-
-        play_wav_data(speech_audio, self.stop_event)
-
-        # If file_path exists, delete it
-        if os.path.exists(file_path):
-            os.remove(file_path)

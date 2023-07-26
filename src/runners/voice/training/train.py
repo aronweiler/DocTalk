@@ -1,4 +1,3 @@
-import logging
 import sys
 import os
 import platform
@@ -54,21 +53,22 @@ def record_samples(training_data_dir):
         os.makedirs(f"{training_data_dir}/positive")
 
     input("Press enter to record positive samples...")
-    for i in range(10):
+    for i in range(20):
         # Record a 3 second clip, 1 channel, 16Khz sample rate, 16 bit depth, and save it to the positive directory
         record_seconds = 3
-        logging.debug("Say, 'Hey Jarvis!'")
+        print("Say, 'Hey Jarvis!'")
         record_audio(f"{training_data_dir}/positive", i, record_seconds)
 
     input("Press enter to record negative samples...")
-    for i in range(10):
+    for i in range(20):
         # Record a 3 second clip, 1 channel, 16Khz sample rate, 16 bit depth, and save it to the negative directory
         record_seconds = 3
-        logging.debug("Anything but 'Hey Jarvis!'")
+        print("Anything but 'Hey Jarvis!'")
         record_audio(f"{training_data_dir}/negative", i, record_seconds)
 
 
 if __name__ == "__main__":
-    # record_samples("src/runners/voice/training/gaia")
+    #record_samples("src/runners/voice/training/aron")
     run_training("src/runners/voice/training/aron")
-    run_training("src/runners/voice/training/gaia")
+    # run_training("src/runners/voice/training/gaia")
+

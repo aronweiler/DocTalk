@@ -1,0 +1,17 @@
+{
+    "ai": {
+        "type": "llm_chain",
+        "arguments": {
+            "run_locally": true,
+            "model": "H:\\LLM\\Gorilla-7B.ggmlv3.q8_0.bin",
+            "ai_temp": 0,
+            "verbose": true,
+            "max_tokens": 2048,
+            "prompt": "###USER: {inputs}\n###ASSISTANT:\n"
+        }
+    },
+    "runner": {
+        "type": "console",
+        "arguments": {}
+    }
+}

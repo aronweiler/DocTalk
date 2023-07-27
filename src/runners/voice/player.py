@@ -86,8 +86,21 @@ def play_audio_bytes(audio_bytes, chunk_size, sample_rate = 16000, stop_event = 
 
     p.terminate()
 
-def play_mp3_stream(mp3_data):
-    # Convert MP3 data to raw audio data
+def play_mp3_stream(mp3_data, stop_event):
     audio_data = pydub.AudioSegment.from_mp3(io.BytesIO(mp3_data))
+    chunk_size = 1024
+    p = pyaudio.PyAudio()
+    stream = p.open(format=p.get_format_from_width(audio_data.sample_width),
+                    channels=audio_data.channels,
+                    rate=audio_data.frame_rate,
+                    output=True)
 
-    play(audio_data)
+    for i in range(0, len(audio_data.raw_data), chunk_size):
+        if stop_event.is_set():
+            break
+        chunk = audio_data.raw_data[i:i + chunk_size]
+        stream.write(chunk)
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()

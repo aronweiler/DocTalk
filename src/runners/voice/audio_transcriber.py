@@ -2,6 +2,7 @@ import webrtcvad
 import queue
 from runners.voice.speech_to_text import SpeechToText
 import logging
+import threading
 
 
 class AudioTranscriber:
@@ -20,6 +21,8 @@ class AudioTranscriber:
 
         self.speech_to_text = SpeechToText(model_name=transcription_model_name)
 
+        self.stop_event = threading.Event()
+
     def add_frame_to_buffer(self, frame):
         if self.audio_queue.full():
             logging.debug("Audio queue full, dropping first frame")
@@ -32,6 +35,8 @@ class AudioTranscriber:
             f"transcribe_until_silence called with rate={audio_rate},and silence_limit={silence_limit}"
         )
 
+        self.stop_event.clear()
+
         # Get the pre-capture audio
         self.enqueue_pre_capture_audio()
 
@@ -39,7 +44,12 @@ class AudioTranscriber:
         self.speech_to_text.start_transcribing()
 
         # Start listening for silence
-        self.listen_for_silence(audio_rate, silence_limit)
+        self.listen_for_silence(audio_rate, silence_limit, self.stop_event)
+
+    def stop_transcribing(self):
+        # Start transcribing
+        self.speech_to_text.stop_transcribing()
+        self.stop_event.set()
 
     def enqueue_pre_capture_audio(self):
         # Since sometimes the wake word capture is late, or the wake word is at the end of the buffer, we need to capture some audio around the wake word
@@ -59,12 +69,12 @@ class AudioTranscriber:
         for frame in pre_wake_word_frames_list:
             self.speech_to_text.enqueue_audio(frame)
 
-    def listen_for_silence(self, audio_rate, silence_limit):
+    def listen_for_silence(self, audio_rate, silence_limit, stop_event):
         accumulated_silence = 0
 
         # Start listening for silence, enqueueing the audio as it comes in
         # When we see silence that exceeds the silence limit, stop listening
-        while True:
+        while True and not stop_event.is_set():
             # Get the current frames out of the buffer and send them to the speech to text system
             while not self.audio_queue.empty():
                 current_frame = self.audio_queue.get(

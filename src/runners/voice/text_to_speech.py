@@ -43,7 +43,7 @@ class TextToSpeech():
                     mp3_data = stream.read()
                     # Play the data by reading the stream until it is complete
                     while mp3_data != b"" and (stop_event is None or not stop_event.is_set()):                        
-                        play_mp3_stream(mp3_data)
+                        play_mp3_stream(mp3_data, stop_event)
                         # Read more data
                         mp3_data = stream.read()
                         

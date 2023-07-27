@@ -5,6 +5,7 @@ doctalk_venv/
 .vscode/
 .chroma
 docker.env
+db.env
 src/runners/cvss/examples/output
 *_credentials.json
 *.pickle

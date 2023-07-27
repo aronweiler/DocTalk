@@ -1,0 +1,2 @@
+The application searches for a webcam on my system, and if one is found it connects to the webcam to display the video feed.  
+If the video feed is working, the application then looks for faces within the video (while still streaming video), and if a face is found, draws a box around the face.

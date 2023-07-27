@@ -1,10 +1,8 @@
 import io
 import os
-import logging
 from ai.abstract_ai import AbstractAI
 from runners.runner import Runner
 from runners.coder.prompts import SPLIT_INSTRUCTIONS_PROMPT, STEP_INSTRUCTION_PROMPT, SUB_STEP_INSTRUCTION_PROMPT
-from langchain.utilities import PythonREPL
 
 class CodeRunner(Runner):
     def __init__(self, args):
@@ -41,9 +39,6 @@ class CodeRunner(Runner):
             # Get sub-steps from the instruction
             detailed_step_instructions = abstract_ai.query(prompt)
             
-            # Create an agent to use the python REPL
-            
-
             prompt = SUB_STEP_INSTRUCTION_PROMPT.format(initial_description=instruction_file_data, coding_sub_step=detailed_step_instructions.result_string, code=current_code)
 
             python_code = abstract_ai.query(prompt)

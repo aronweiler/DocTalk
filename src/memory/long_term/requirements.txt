@@ -2,3 +2,5 @@ psycopg2-binary
 alembic
 python-dotenv
 pgvector
+plotly
+openai

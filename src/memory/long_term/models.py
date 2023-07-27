@@ -6,6 +6,7 @@ from sqlalchemy import (
     ForeignKey,
     ForeignKeyConstraint,
     CheckConstraint,
+    Boolean,
 )
 from pgvector.sqlalchemy import Vector
 from sqlalchemy.ext.declarative import declarative_base
@@ -36,6 +37,7 @@ class Conversation(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     additional_metadata = Column(String, nullable=True)
     embedding = Column(Vector(1536), nullable=True)
+    is_memory = Column(Boolean, nullable=False, default=0)
 
     # Define the ForeignKeyConstraint to ensure the user_id exists in the users table
     user_constraint = ForeignKeyConstraint([user_id], [User.id])

@@ -1,5 +1,27 @@
 "tools": [
     {
+        "friendly_name": "Memory Tool",
+        "description": "A tool to call when you need to look up a conversation memory, or create one. You should create a conversation memory when you think some data is worth storing. Input to this tool should be a SINGLE JSON string.  For example: '{{'action': \"add_conversation\", \"user_info\": {{\"user_name\": \"John\", \"user_age\": 30, \"user_location\": \"New York\"}}, \"message\": \"Hello, how are you?\"}}', or '{{\"action\": \"search_conversation_memory\", \"user\": \"John\", \"query\": \"Asking how I am\"}}'. Remember, the input must be a SINGLE JSON string.",
+        "tool_module_name": "ai.agent_tools.memory_tool",
+        "tool_class_name": "MemoryTool",
+        "arguments": {
+            "db_env_location": "src/memory/long_term/db.env",
+            "top_k": 10
+        }
+    },
+    {
+        "friendly_name": "API Tool",
+        "description": "A tool to call when trying to determine what API to use, or how to call an API.  Input to this tool should be a request to create or find an API.  e.g. 'find me an API to generate cute cat images'",
+        "tool_module_name": "ai.agent_tools.api_tool",
+        "tool_class_name": "APITool",
+        "arguments": {
+            "run_locally": false,
+            "model": "H:\\LLM\\Gorilla-7B.ggmlv3.q8_0.bin",
+            "ai_temp": "0",
+            "prompt": "###USER: {{query}}\n###ASSISTANT:\n"
+        }
+    },
+    {
         "friendly_name": "Python REPL Tool",
         "description": "A Python shell. Use this to execute python commands. Input should be a valid python command. If you want to see the output of a value, you should print it out with `print(...)`.",
         "tool_module_name": "ai.agent_tools.python_repl",
@@ -26,7 +48,7 @@
         "description": "A tool that is useful for searching for things on the internet, this tool should be used when the answer to a user's query cannot be found with other tools or by your own knowledge.",
         "tool_module_name": "ai.agent_tools.duck_duck_go_tool",
         "tool_class_name": "DuckDuckGoTool"
-    },                
+    },
     {
         "friendly_name": "Available Calendars Tool",
         "description": "A tool that is useful for listing all of the available calendars a user has access to.  Use this tool to find the correct 'calendar_id'.  Always use this tool before the Calendar Events Tool.",

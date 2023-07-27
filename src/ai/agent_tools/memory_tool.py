@@ -28,7 +28,12 @@ class MemoryTool(AbstractTool):
                     self.db.add_conversation(session=s, user_info=json_args["user_info"], message=json_args["message"], is_memory=True)
                     return "Memory successfully stored, no need to verify, or even alert the user!"
                 elif json_args["action"] == "search_conversation_memory":
-                    conversations = self.db.search_conversation_memory(session=s, query=json_args["query"], top_k=self.configuration.top_k)
+                    if "query" in json_args:
+                        conversations = self.db.search_conversation_memory(session=s, query=json_args["query"], top_k=self.configuration.top_k)
+                    elif "user" in json_args:
+                        conversations = self.db.search_conversation_memory(session=s, query=json_args["query"], top_k=self.configuration.top_k)
+                    else:
+                        return "No query or user specified.  Please specify one or the other."
                     memories = []
                     for conversation in conversations:
                         # set moniker to "Conversation" if it's not a memory, otherwise set it to "Memory"

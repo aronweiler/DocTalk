@@ -9,6 +9,7 @@ import queue
 from collections import deque
 import logging
 import json
+import uuid
 
 from ai.abstract_ai import AbstractAI
 from ai.agent_tools.utilities.registered_settings import RegisteredSettings
@@ -26,7 +27,16 @@ from runners.voice.audio_transcriber import AudioTranscriber
 from runners.voice.wake_word import WakeWord
 from runners.voice.text_to_speech import TextToSpeech
 
-from memory.long_term.vector_database import VectorDatabase
+from memory.long_term.models import Children
+from memory.long_term.database.vector_database import SearchType
+from memory.long_term.database.conversations import Conversations
+from memory.long_term.database.users import Users
+from memory.long_term.database.memories import Memories
+
+
+# from memory.long_term.database.user_settings import UserSettings
+
+from memory.long_term.models import User, Memory, Conversation, UserSetting
 
 
 from TTS.api import TTS
@@ -44,6 +54,7 @@ SILENCE_LIMIT_IN_SECONDS = 2
 
 AI_USER_INFO = {"user_name": "Jarvis", "user_age": 0, "user_location": "The Void"}
 
+
 class VoiceRunner(Runner):
     def __init__(self, args):
         super().__init__()
@@ -54,7 +65,9 @@ class VoiceRunner(Runner):
 
         self.activation_thread = None
         self.stop_event = threading.Event()
-        self.audio_transcriber = AudioTranscriber(transcription_model_name=self.args.sts_model)
+        self.audio_transcriber = AudioTranscriber(
+            transcription_model_name=self.args.sts_model
+        )
 
         # Create a queue to store audio frames
         self.audio_queue = queue.Queue(self.args.max_audio_queue_size)
@@ -62,7 +75,69 @@ class VoiceRunner(Runner):
         # initialize the text to speech engine
         self.text_to_speech = TextToSpeech()
 
-        self.memory_db = VectorDatabase(self.args.db_env_location)        
+        self.users = Users(self.args.db_env_location)
+        self.memories = Memories(self.args.db_env_location)
+        self.conversations = Conversations(self.args.db_env_location)
+        # self.user_settings = UserSettings(self.args.db_env_location)
+
+        self.initialize_users()
+
+    def initialize_users(self):
+        # TODO: Refactor users to be better
+        # Probably should be storing them in the database initially- not in this config file
+        # Need to find a way to separate the wake word activation models from the user information
+        for wake_word_model in self.args.wake_word_models:
+            # See if the user exists in the database
+            with self.users.session_context(self.users.Session()) as session:
+                user = self.users.find_user_by_email(
+                    session,
+                    wake_word_model.user_information.user_email,
+                    eager_load=[User.children[Children.USER_SETTINGS]],
+                )
+
+                if user is None:
+                    # If the user doesn't exist, create a new user
+                    user = User(
+                        name=wake_word_model.user_information.user_name,
+                        age=wake_word_model.user_information.user_age,
+                        location=wake_word_model.user_information.user_location,
+                        email=wake_word_model.user_information.user_email,
+                    )
+                    session.commit()
+
+                user = self.users.add_update_user(
+                    session, user, eager_load=[User.children[Children.USER_SETTINGS]]
+                )
+
+                logging.info(f"Added / updated user: {user.name}, email: {user.email}")
+
+                # Look at all of the settings int he wake word model user information and add it to the user settings if it doesn't exist
+                for setting in wake_word_model.user_information.settings:
+                    existing_setting = next(
+                        (
+                            item
+                            for item in user.user_settings
+                            if item.setting_name == setting
+                        ),
+                        None,
+                    )
+                    if existing_setting:
+                        existing_setting.setting_value = (
+                            wake_word_model.user_information.settings[setting]
+                        )
+                    else:
+                        user.user_settings.append(
+                            UserSetting(
+                                setting_name=setting,
+                                setting_value=wake_word_model.user_information.settings[
+                                    setting
+                                ],
+                            )
+                        )
+
+                    # if len(user.user_settings) == 0 or not setting not in user.user_settings:
+                    #     user.update_add_setting_for_user(user.email, UserSetting(user_id=user.id, setting_name=setting, setting_value=wake_word_model.user_information.settings[setting]))
+                    #     logging.info(f"Added setting {setting} with value {wake_word_model.user_information.settings[setting]} for user {user.name}")
 
     def configure(self, registered_settings: RegisteredSettings):
         # TODO: Add settings to control voice here
@@ -111,7 +186,10 @@ class VoiceRunner(Runner):
             # Does this prediction meet our threshold, and has enough time passed since the last activation?
             if (
                 prediction is not None
-                and prediction["prediction"][prediction["wake_word_model"]["model_name"]] > self.args.model_activation_threshold
+                and prediction["prediction"][
+                    prediction["wake_word_model"]["model_name"]
+                ]
+                > self.args.model_activation_threshold
                 and (time.time() - last_activation) >= self.args.activation_cooldown
             ):
                 detect_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -119,12 +197,10 @@ class VoiceRunner(Runner):
                 logging.info(
                     f"Detected activation from '{prediction['wake_word_model']['model_name']}' model at time {detect_time}!  I think you are: {prediction['wake_word_model'].user_information.user_name}"
                 )
-                
+
                 # Alert the user we've detected an activation
                 play_wav_file(
-                    os.path.join(
-                        os.path.dirname(__file__), "audio", "activation.wav"
-                    ),
+                    os.path.join(os.path.dirname(__file__), "audio", "activation.wav"),
                     self.stop_event,
                 )
 
@@ -134,7 +210,7 @@ class VoiceRunner(Runner):
                     self.audio_transcriber.stop_transcribing()
                     self.activation_thread.join()
                     self.activation_thread = None
-                    self.stop_event.clear()                        
+                    self.stop_event.clear()
 
                 self.activation_thread = threading.Thread(
                     target=self.process_activation, args=(prediction,)
@@ -144,101 +220,135 @@ class VoiceRunner(Runner):
                 last_activation = time.time()
                 logging.debug("--- Continuing to listen for wake words...")
 
-
     def process_activation(self, prediction):
-        # Mute any audio playing
-        if self.args.mute_while_listening:
-            Sound.mute()
+        # Create an interaction ID for this activation
+        interaction_id = uuid.uuid4()
 
-        transcription_start_time = time.time()
+        wake_model = prediction["wake_word_model"]
 
-        self.audio_transcriber.transcribe_until_silence(
-            RATE, SILENCE_LIMIT_IN_SECONDS
-        )
+        # Get the user that activated us
+        with self.users.session_context(self.users.Session()) as session:
+            conversation_user = self.users.find_user_by_email(
+                session,
+                wake_model.user_information.user_email,
+                eager_load=[
+                    User.children[Children.USER_SETTINGS],
+                    User.children[Children.CONVERSATIONS],
+                ],
+            )
+            if conversation_user is None:
+                logging.error(
+                    f"Could not find user {wake_model.user_information.user_email} in the database"
+                )
+                return
+            else:
+                logging.debug(f"Found user {conversation_user.name}")
 
-        transcribed_audio = self.audio_transcriber.get_transcription()
+            # Mute any audio playing
+            if self.args.mute_while_listening:
+                Sound.mute()
 
-        if transcribed_audio is None or len(transcribed_audio) == 0:
-            logging.info("No audio detected")
-            # sad face
-            self.text_to_speech.speak("I'm sorry, I didn't get that.  Can you please repeat your query?", prediction["wake_word_model"].tts_voice, self.stop_event)
-            return
+            transcription_start_time = time.time()
 
-        # Create a memory
-        # Might want to look at making this threaded to avoid blocking
-        with self.memory_db.session_context(self.memory_db.Session()) as s:
-            self.memory_db.add_conversation(
-                s,
-                prediction["wake_word_model"].user_information,
-                transcribed_audio
+            self.audio_transcriber.transcribe_until_silence(
+                RATE, SILENCE_LIMIT_IN_SECONDS
             )
 
-        transcription_end_time = time.time()
+            transcribed_audio = self.audio_transcriber.get_transcription()
 
-        logging.info(
-            f"Transcription took {transcription_end_time - transcription_start_time} seconds"
-        )
+            if transcribed_audio is None or len(transcribed_audio) == 0:
+                logging.info("No audio detected")
+                # sad face
+                self.text_to_speech.speak(
+                    "I'm sorry, I didn't get that.  Can you please repeat your query?",
+                    prediction["wake_word_model"].tts_voice,
+                    self.stop_event,
+                )
+                return
 
-        # Alert the user we've stopped recording
-        play_wav_file(
-            os.path.join(
-                os.path.dirname(__file__), "audio", "deactivate.wav"
-            ),
-            self.stop_event,
-        )
-
-        # Unmute the audio
-        if self.args.mute_while_listening:
-            Sound.volume_up()
-
-        logging.info("Transcribed audio: " + transcribed_audio)
-
-        if transcribed_audio is None or len(transcribed_audio) == 0:
-            logging.debug("No audio detected")
-            return
-
-        if (
-            transcribed_audio.strip().lower() == "stop"
-            or transcribed_audio.strip().lower() == "stop."
-            or transcribed_audio.strip().lower() == "cancel"
-            or transcribed_audio.strip().lower() == "cancel."
-        ):
-            logging.debug("Stop keyword detected")
-            return
-
-        if self.stop_event.is_set():
-            logging.debug("Stop event is set, cancelling interaction")
-            return
-
-        ai_query_start_time = time.time()
-
-        ai_response = self.abstract_ai.query(
-            self.get_prompt(
-                transcribed_audio,
-                prediction["wake_word_model"].user_information,
-                prediction["wake_word_model"].personality_keywords,
-            )
-        )
-
-        ai_query_end_time = time.time()
-        logging.info(f"AI query took {str(ai_query_end_time - ai_query_start_time)} seconds")
-
-        logging.debug("AI Response: " + ai_response.result_string)
-
-        # Create a memory from the response
-        # Might want to look at making this threaded to avoid blocking
-        with self.memory_db.session_context(self.memory_db.Session()) as s:
-            self.memory_db.add_conversation(
-                s,
-                AI_USER_INFO,
-                ai_response.result_string
+            # Store the first part of the conversation
+            self.conversations.store_conversation(
+                session, transcribed_audio, interaction_id, conversation_user
             )
 
-        text_to_speech_start_time = time.time()
-        self.text_to_speech.speak(ai_response.result_string, prediction["wake_word_model"].tts_voice, self.stop_event)
-        text_to_speech_end_time = time.time()
-        logging.info(f"Text to speech took {str(text_to_speech_end_time - text_to_speech_start_time)} seconds")        
-        
+            transcription_end_time = time.time()
+
+            logging.info(
+                f"Transcription took {transcription_end_time - transcription_start_time} seconds"
+            )
+
+            # Alert the user we've stopped recording
+            play_wav_file(
+                os.path.join(os.path.dirname(__file__), "audio", "deactivate.wav"),
+                self.stop_event,
+            )
+
+            # Unmute the audio
+            if self.args.mute_while_listening:
+                Sound.volume_up()
+
+            logging.info("Transcribed audio: " + transcribed_audio)
+
+            if transcribed_audio is None or len(transcribed_audio) == 0:
+                logging.debug("No audio detected")
+                return
+
+            if (
+                transcribed_audio.strip().lower() == "stop"
+                or transcribed_audio.strip().lower() == "stop."
+                or transcribed_audio.strip().lower() == "cancel"
+                or transcribed_audio.strip().lower() == "cancel."
+            ):
+                logging.debug("Stop keyword detected")
+                return
+
+            if self.stop_event.is_set():
+                logging.debug("Stop event is set, cancelling interaction")
+                return
+
+            ai_query_start_time = time.time()
+
+            ai_response = self.abstract_ai.query(
+                self.get_prompt(
+                    session,
+                    transcribed_audio,
+                    user=conversation_user,
+                    interaction_id=interaction_id,
+                )
+            )
+
+            ai_query_end_time = time.time()
+            logging.info(
+                f"AI query took {str(ai_query_end_time - ai_query_start_time)} seconds"
+            )
+
+            logging.debug("AI Response: " + ai_response.result_string)
+
+            # Store the first part of the conversation
+            # TODO: Do I want to store this as the AI response or something?
+            self.conversations.store_conversation(
+                session,
+                ai_response.result_string,
+                interaction_id,
+                conversation_user,
+                is_ai_response=True,
+            )
+
+            text_to_speech_start_time = time.time()
+            self.text_to_speech.speak(
+                ai_response.result_string,
+                # there HAS to be a better way than this... fucking eh, python
+                [
+                    s
+                    for s in conversation_user.user_settings
+                    if s.setting_name == "tts_voice"
+                ][0].setting_value,
+                self.stop_event,
+            )
+            text_to_speech_end_time = time.time()
+            logging.info(
+                f"Text to speech took {str(text_to_speech_end_time - text_to_speech_start_time)} seconds"
+            )
 
     def run(self, abstract_ai: AbstractAI):
         self.abstract_ai = abstract_ai
@@ -255,13 +365,30 @@ class VoiceRunner(Runner):
         wake_word_thread.start()
 
     def get_prompt(
-        self, transcribed_audio, user_information:UserInformation, personality_keywords=None
+        self,
+        session,
+        transcribed_audio,
+        user: User,
+        interaction_id: uuid.UUID,
     ):
-        if personality_keywords is None:
-            personality_keywords = ""
+        user_info_string = f"associated_user: {user.email}, user_name: {user.name}, user_age: {user.age}, user_location: {user.location}"
 
-        user_info_string = f"Name: {user_information.user_name}, Age: {user_information.user_age}, Location: {user_information.user_location}, Email: {user_information.user_email}"
-        
+        # Another dumbass way to get something out of a list- I swear there has to be something better
+        personality_setting = next(
+            (
+                item
+                for item in user.user_settings
+                if item.setting_name == "personality_keywords"
+            ),
+            None,
+        )
+
+        # Pull some context out of previous conversations- but not too much
+        related_conversations = self.conversations.find_conversations(
+            session, transcribed_audio, SearchType.SIMILARITY, user, top_k=5
+        )
+        # context = "\n".join([f"{c.record_created}: {c.conversation_text}" for c in related_conversations])
+
         prompt = VOICE_ASSISTANT_PROMPT.format(
             query=transcribed_audio,
             time_zone=datetime.datetime.now().astimezone().tzname(),
@@ -269,7 +396,16 @@ class VoiceRunner(Runner):
                 "%I:%M %p %A, %B %d, %Y"
             ),
             user_information=user_info_string,
-            personality_keywords=personality_keywords,
+            personality_keywords=personality_setting.setting_value
+            if personality_setting is not None
+            else "",
+            interaction_id=interaction_id,
+            context="\n".join(
+                [
+                    f"{c.record_created}: {c.conversation_text}"
+                    for c in related_conversations
+                ]
+            ),
         )
 
         return prompt

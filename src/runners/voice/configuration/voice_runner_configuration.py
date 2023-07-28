@@ -4,6 +4,7 @@ class UserInformation:
         self.user_age = json_args.get("user_age", None)
         self.user_location = json_args.get("user_location", None)
         self.user_email = json_args.get("user_email", None)
+        self.settings = json_args.get("settings", {})
 
     def __getitem__(self, key):
         # Allow accessing the attributes using square brackets like a dictionary
@@ -14,7 +15,7 @@ class WakeWordModel:
         self.model_name = json_args["model_name"]
         self.model_path = json_args["model_path"]
         self.training_data = json_args.get("training_data", None)
-        self.user_information = UserInformation(json_args.get("user_information", {"user_name": "Unknown", "user_age": None, "user_location": None, "user_email": None}))
+        self.user_information = UserInformation(json_args.get("user_information", {"user_name": "Unknown", "user_age": None, "user_location": None, "user_email": None, "settings": {}}))
         self.tts_voice = json_args.get("tts_voice", default_tts_voice)        
         self.personality_keywords = json_args.get(
             "personality_keywords", "helpful, friendly"

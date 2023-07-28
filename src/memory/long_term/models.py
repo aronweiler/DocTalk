@@ -111,6 +111,9 @@ class Conversation(ModelBase):
     is_ai_response = Column(Boolean, nullable=False)
     additional_metadata = Column(String, nullable=True)
     embedding = Column(Vector(EMBEDDING_DIMENSIONS), nullable=True)
+    exception = Column(String, nullable=True)
+
+    # flag for deletion
     is_deleted = Column(Boolean, nullable=False, default=False)
 
     # Define the ForeignKeyConstraint to ensure the user_id exists in the users table

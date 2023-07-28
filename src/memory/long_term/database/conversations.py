@@ -27,6 +27,7 @@ class Conversations(VectorDatabase):
         associated_user: Union[User, None] = None,
         is_ai_response: bool = False,
         additional_metadata: Union[str, None] = None,
+        exception = None
     ):
         if associated_user is not None:
             user_id = associated_user.id
@@ -46,6 +47,7 @@ class Conversations(VectorDatabase):
             is_ai_response=is_ai_response,
             additional_metadata=additional_metadata,
             embedding=embedding,
+            exception=exception
         )
 
         session.add(conversation)
@@ -75,12 +77,12 @@ class Conversations(VectorDatabase):
             else True,
         )
 
-        if search_type == SearchType.KEY_WORD:
+        if search_type == SearchType.key_word:
             # TODO: Do better key word search
             query = query.filter(                
                 Conversation.conversation_text.contains(conversation_text_search_query)
             )
-        elif search_type == SearchType.SIMILARITY:
+        elif search_type == SearchType.similarity:
             embedding = self._get_embedding(conversation_text_search_query)
             query = self._get_nearest_neighbors(session, query, embedding, top_k=top_k)
         else:
@@ -124,14 +126,14 @@ if __name__ == "__main__":
 
     with conversations.session_context(conversations.Session()) as session:
         aron = users.find_user_by_email(session, "aronweiler@gmail.com")
-        results = conversations.find_conversations(session, conversation_text_search_query="favorite food is", search_type=SearchType.SIMILARITY, top_k=100, associated_user=aron)
+        results = conversations.find_conversations(session, conversation_text_search_query="favorite food is", search_type=SearchType.similarity, top_k=100, associated_user=aron)
 
         for result in results:
             print(result.conversation_text)
 
         print("---------------------------")
 
-        results = conversations.find_conversations(session, conversation_text_search_query="food", search_type=SearchType.KEY_WORD, top_k=90, associated_user=aron)
+        results = conversations.find_conversations(session, conversation_text_search_query="food", search_type=SearchType.key_word, top_k=90, associated_user=aron)
 
         for result in results:
             print(result.conversation_text)

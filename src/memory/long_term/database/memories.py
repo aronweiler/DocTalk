@@ -69,12 +69,12 @@ class Memories(VectorDatabase):
             else True,
         )
 
-        if search_type == SearchType.KEY_WORD:
+        if search_type == SearchType.key_word:
             # TODO: Do better key word search
             query = query.filter(                
                 Memory.memory_text.contains(memory_text_search_query)
             )
-        elif search_type == SearchType.SIMILARITY or search_type == SearchType.KEY_WORD:
+        elif search_type == SearchType.similarity or search_type == SearchType.key_word:
             embedding = self._get_embedding(memory_text_search_query)
             query = self._get_nearest_neighbors(session, query, embedding, top_k=top_k)
         else:
@@ -114,14 +114,14 @@ if __name__ == "__main__":
 
     with memories.session_context(memories.Session()) as session:
         aron = users.find_user_by_email(session, "aronweiler@gmail.com")
-        results = memories.find_memories(session, memory_text_search_query="favorite food is", search_type=SearchType.SIMILARITY, top_k=100, associated_user=aron)
+        results = memories.find_memories(session, memory_text_search_query="favorite food is", search_type=SearchType.similarity, top_k=100, associated_user=aron)
 
         for result in results:
-            print(result.conversation_text)
+            print(f"User: {result.user.name} - {result.memory_text}")
 
         print("---------------------------")
 
-        results = memories.find_memories(session, memory_text_search_query="food", search_type=SearchType.KEY_WORD, top_k=90, associated_user=aron)
+        results = memories.find_memories(session, memory_text_search_query="food", search_type=SearchType.key_word, top_k=90, eager_load=[Memory.user])        
 
         for result in results:
-            print(result.conversation_text)
+            print(f"User: {result.user.name} - {result.memory_text}")

@@ -13,8 +13,8 @@ from enum import Enum
 
 
 class SearchType(Enum):
-    KEY_WORD = 1
-    SIMILARITY = 2
+    key_word = "key_word"
+    similarity = "similarity"
 
 
 class VectorDatabase:

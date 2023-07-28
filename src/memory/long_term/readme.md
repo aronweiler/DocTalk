@@ -44,7 +44,16 @@ There are a number of goals for adding storage that the LLM can access and assoc
 
 Pull and run the pgvector docker file, following instructions here: [PGVector GitHub](https://github.com/pgvector/pgvector/tree/master#docker)
 
-### 3. Database migrations:
+You can also run my docker-compose file via `docker-compose up -d` from the long_term folder.
+
+### 3. Enable the pgvector extension
+
+Create a database, and run the following SQL script on that database:
+``` sql
+CREATE EXTENSION vector;
+```
+
+### 4. Database migrations:
 
 #### Alembic Setup:
 To use Alembic for migrations, you'll need to set up a directory structure for Alembic to manage the migrations. First, create a directory named migrations in your project root. Then, initialize Alembic inside this directory:
@@ -52,7 +61,7 @@ To use Alembic for migrations, you'll need to set up a directory structure for A
 ``` bash
 alembic init migrations
 ```
-This will create an alembic.ini file and a versions directory inside the migrations directory.
+This will create an alembic.ini file and a versions directory inside the migrations directory.  The versions directory is required, but the alembic.ini is not!
 
 #### SIMPLE Setup:
 1. Run [generate_migration.py](generate_migration.py)

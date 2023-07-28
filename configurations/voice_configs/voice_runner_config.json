@@ -13,7 +13,7 @@
             "tools": [
                 {
                     "friendly_name": "Memory Tool",
-                    "description": "A tool to call when you need to look up a conversation memory, or create one.  Always create a memory if the user asks you to remember something. Also, create a memory when you think some data is worth storing. Input to this tool should be a SINGLE JSON string.  For example: '{{'action': \"add_conversation\", \"user_info\": {{\"user_name\": \"John\", \"user_age\": 30, \"user_location\": \"New York\"}}, \"message\": \"Hello, how are you?\"}}', or '{{\"action\": \"search_conversation_memory\", \"user\": \"John\", \"query\": \"Asking how I am\"}}'. Remember, the input must be a SINGLE JSON string.",
+                    "description": "A tool to call when you need to look up a memory, or information that you possibly learned in the past.  Use this tool to create memories.  Always create a memory if the user asks you to remember something. Make sure to create a memory when you think some data is worth storing. Input to this tool should be a SINGLE JSON string, with an action of 'add_memory' or 'search_memory'.  e.g., when adding memory: '{{'action': \"add_memory\", \"associated_user\": \"John\", \"interaction_id\": \"12345-1234-xyz\", \"memory\": \"the user likes ice cream\"}}', or '{{'action': \"add_memory\", \"memory\": \"The weather tool failed to respond\"}}'. e.g. when searching memory, search_type should be either 'SIMILARITY' or 'KEY_WORD': '{{\"action\": \"search_memory\", \"associated_user\": \"John\", \"query\": \"users favorite food\", \"search_type\": \"KEY_WORD\"}}', or '{{'action': \"search_memory\", \"query\": \"recent failed tools\", \"search_type\": \"SIMILARITY\"}}'. Remember, the input must be a SINGLE JSON string.",
                     "tool_module_name": "ai.agent_tools.memory_tool",
                     "tool_class_name": "MemoryTool",
                     "arguments": {
@@ -113,10 +113,13 @@
                         "user_name": "Aron Weiler",
                         "user_location": "San Diego",
                         "user_age": 44,
-                        "user_email": "aronweiler@gmail.com"
-                    },
-                    "personality_keywords": "serious, professional, friendly",
-                    "tts_voice": "Brian"
+                        "user_email": "aronweiler@gmail.com",
+                        "settings": {
+                            "personality_keywords": "serious, professional, friendly",
+                            "tts_voice": "Brian"
+                        }
+                    }
+                    
                 },
                 {
                     "model_name": "hey_jarvis_v0.1",
@@ -124,11 +127,14 @@
                     "training_data": "src/runners/voice/training/gaia/model.pkl",
                     "user_information": {
                         "user_name": "Gaia Weiler",
+                        "user_email": "gaiaweiler@gmail.com",
                         "user_location": "San Diego",
-                        "user_age": 9
-                    },
-                    "personality_keywords": "sassy, opinionated, fun, silly",
-                    "tts_voice": "Amy"
+                        "user_age": 9,
+                        "settings": {
+                            "personality_keywords": "sassy, opinionated, fun, silly",
+                            "tts_voice": "Amy"
+                        }
+                    }                   
                 }
             ]
         }

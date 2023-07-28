@@ -20,7 +20,7 @@ from runners.voice.configuration.voice_runner_configuration import (
     UserInformation,
     WakeWordModel,
 )
-from runners.voice.player import play_wav_file, play_wav_data
+from runners.voice.player import play_wav_file
 from runners.voice.sound import Sound
 from runners.voice.prompts import VOICE_ASSISTANT_PROMPT
 from runners.voice.audio_transcriber import AudioTranscriber
@@ -81,6 +81,19 @@ class VoiceRunner(Runner):
         # self.user_settings = UserSettings(self.args.db_env_location)
 
         self.initialize_users()
+
+    def run(self, abstract_ai: AbstractAI):
+        self.abstract_ai = abstract_ai
+
+        # Create the verifier models
+        self.wake_word.create_verifier_models(self.args.wake_word_models)
+
+        # Start the thread that listens to the microphone, putting data into the audio_queue
+        mic_thread = threading.Thread(target=self.listen_to_microphone)
+        mic_thread.start()
+
+        # Start the thread that looks for wake words in the audio_queue
+        self.look_for_wake_words()
 
     def initialize_users(self):
         # TODO: Refactor users to be better
@@ -233,10 +246,16 @@ class VoiceRunner(Runner):
                 wake_model.user_information.user_email,
                 eager_load=[
                     User.children[Children.USER_SETTINGS],
-                    User.children[Children.CONVERSATIONS],
+                    User.children[Children.MEMORIES]
                 ],
             )
+            
             if conversation_user is None:
+                self.text_to_speech.speak(
+                    "I'm sorry, you are not authorized to use this system.",
+                    prediction["wake_word_model"].tts_voice,
+                    self.stop_event,
+                )
                 logging.error(
                     f"Could not find user {wake_model.user_information.user_email} in the database"
                 )
@@ -256,6 +275,12 @@ class VoiceRunner(Runner):
 
             transcribed_audio = self.audio_transcriber.get_transcription()
 
+            transcription_end_time = time.time()
+
+            logging.info(
+                f"Transcription took {transcription_end_time - transcription_start_time} seconds"
+            )
+
             if transcribed_audio is None or len(transcribed_audio) == 0:
                 logging.info("No audio detected")
                 # sad face
@@ -266,107 +291,99 @@ class VoiceRunner(Runner):
                 )
                 return
 
+            # Pull some context out of previous conversations- but not too much
+            related_conversations = self.conversations.find_conversations(
+                session, transcribed_audio, SearchType.similarity, conversation_user, top_k=5
+            )
+
             # Store the first part of the conversation
             self.conversations.store_conversation(
                 session, transcribed_audio, interaction_id, conversation_user
             )
 
-            transcription_end_time = time.time()
+            try:
+                # Unmute the audio
+                if self.args.mute_while_listening:
+                    Sound.volume_up()
 
-            logging.info(
-                f"Transcription took {transcription_end_time - transcription_start_time} seconds"
-            )
+                logging.info("Transcribed audio: " + transcribed_audio)
 
-            # Alert the user we've stopped recording
-            play_wav_file(
-                os.path.join(os.path.dirname(__file__), "audio", "deactivate.wav"),
-                self.stop_event,
-            )
+                if transcribed_audio is None or len(transcribed_audio) == 0:
+                    logging.debug("No audio detected")
+                    return
 
-            # Unmute the audio
-            if self.args.mute_while_listening:
-                Sound.volume_up()
+                if (
+                    transcribed_audio.strip().lower() == "stop"
+                    or transcribed_audio.strip().lower() == "stop."
+                    or transcribed_audio.strip().lower() == "cancel"
+                    or transcribed_audio.strip().lower() == "cancel."
+                ):
+                    logging.debug("Stop keyword detected")
+                    return
 
-            logging.info("Transcribed audio: " + transcribed_audio)
+                if self.stop_event.is_set():
+                    logging.debug("Stop event is set, cancelling interaction")
+                    return
 
-            if transcribed_audio is None or len(transcribed_audio) == 0:
-                logging.debug("No audio detected")
-                return
+                ai_query_start_time = time.time()
 
-            if (
-                transcribed_audio.strip().lower() == "stop"
-                or transcribed_audio.strip().lower() == "stop."
-                or transcribed_audio.strip().lower() == "cancel"
-                or transcribed_audio.strip().lower() == "cancel."
-            ):
-                logging.debug("Stop keyword detected")
-                return
-
-            if self.stop_event.is_set():
-                logging.debug("Stop event is set, cancelling interaction")
-                return
-
-            ai_query_start_time = time.time()
-
-            ai_response = self.abstract_ai.query(
-                self.get_prompt(
-                    session,
-                    transcribed_audio,
-                    user=conversation_user,
-                    interaction_id=interaction_id,
+                ai_response = self.abstract_ai.query(
+                    self.get_prompt(
+                        related_conversations,
+                        transcribed_audio,
+                        user=conversation_user,
+                        interaction_id=interaction_id,
+                    )
                 )
-            )
+                
+                ai_query_end_time = time.time()
 
-            ai_query_end_time = time.time()
-            logging.info(
-                f"AI query took {str(ai_query_end_time - ai_query_start_time)} seconds"
-            )
+                # Alert the response from the AI is back
+                play_wav_file(
+                    os.path.join(os.path.dirname(__file__), "audio", "deactivate.wav"),
+                    self.stop_event,
+                )
+            
+                logging.info(
+                    f"AI query took {str(ai_query_end_time - ai_query_start_time)} seconds"
+                )
 
-            logging.debug("AI Response: " + ai_response.result_string)
+                logging.debug("AI Response: " + ai_response.result_string)
 
-            # Store the first part of the conversation
-            # TODO: Do I want to store this as the AI response or something?
-            self.conversations.store_conversation(
-                session,
-                ai_response.result_string,
-                interaction_id,
-                conversation_user,
-                is_ai_response=True,
-            )
+                # Store the first part of the conversation
+                # TODO: Do I want to store this as the AI response or something?
+                self.conversations.store_conversation(
+                    session,
+                    ai_response.result_string,
+                    interaction_id,
+                    conversation_user,
+                    is_ai_response=True,
+                )
 
-            text_to_speech_start_time = time.time()
-            self.text_to_speech.speak(
-                ai_response.result_string,
-                # there HAS to be a better way than this... fucking eh, python
-                [
-                    s
-                    for s in conversation_user.user_settings
-                    if s.setting_name == "tts_voice"
-                ][0].setting_value,
-                self.stop_event,
-            )
-            text_to_speech_end_time = time.time()
-            logging.info(
-                f"Text to speech took {str(text_to_speech_end_time - text_to_speech_start_time)} seconds"
-            )
-
-    def run(self, abstract_ai: AbstractAI):
-        self.abstract_ai = abstract_ai
-
-        # Create the verifier models
-        self.wake_word.create_verifier_models(self.args.wake_word_models)
-
-        # Start the thread that listens to the microphone, putting data into the audio_queue
-        mic_thread = threading.Thread(target=self.listen_to_microphone)
-        mic_thread.start()
-
-        # Start the thread that looks for wake words in the audio_queue
-        wake_word_thread = threading.Thread(target=self.look_for_wake_words)
-        wake_word_thread.start()
+                text_to_speech_start_time = time.time()
+                self.text_to_speech.speak(
+                    ai_response.result_string,
+                    # there HAS to be a better way than this... fucking eh, python
+                    [
+                        s
+                        for s in conversation_user.user_settings
+                        if s.setting_name == "tts_voice"
+                    ][0].setting_value,
+                    self.stop_event,
+                )
+                text_to_speech_end_time = time.time()
+                logging.info(
+                    f"Text to speech took {str(text_to_speech_end_time - text_to_speech_start_time)} seconds"
+                )
+            except Exception as e:
+                # Store the exception
+                self.conversations.store_conversation(
+                    session, "Interaction failed.  See exception for details.", interaction_id, conversation_user, exception=e
+                )    
 
     def get_prompt(
         self,
-        session,
+        related_conversations,
         transcribed_audio,
         user: User,
         interaction_id: uuid.UUID,
@@ -383,12 +400,6 @@ class VoiceRunner(Runner):
             None,
         )
 
-        # Pull some context out of previous conversations- but not too much
-        related_conversations = self.conversations.find_conversations(
-            session, transcribed_audio, SearchType.SIMILARITY, user, top_k=5
-        )
-        # context = "\n".join([f"{c.record_created}: {c.conversation_text}" for c in related_conversations])
-
         prompt = VOICE_ASSISTANT_PROMPT.format(
             query=transcribed_audio,
             time_zone=datetime.datetime.now().astimezone().tzname(),
@@ -400,10 +411,16 @@ class VoiceRunner(Runner):
             if personality_setting is not None
             else "",
             interaction_id=interaction_id,
-            context="\n".join(
+            related_conversations="\n".join(
                 [
                     f"{c.record_created}: {c.conversation_text}"
                     for c in related_conversations
+                ]
+            ),
+            user_memories="\n".join(
+                [
+                    f"{m.record_created}: {m.memory_text}"
+                    for m in user.memories
                 ]
             ),
         )

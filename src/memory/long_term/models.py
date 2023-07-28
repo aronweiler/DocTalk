@@ -45,7 +45,7 @@ class User(ModelBase):
     location = Column(String, nullable=True)
     email = Column(String, nullable=False, unique=True)
 
-    # Define a one-to-many relationship with Conversation
+    # Define a one-to-many relationship with other tables
     conversations = relationship("Conversation", back_populates="user")
     memories = relationship("Memory", back_populates="user")
     documents = relationship("Document", back_populates="user")
@@ -75,7 +75,7 @@ class UserSetting(ModelBase):
         "user_id IN (SELECT id FROM users)", name="ck_user_id_in_users"
     )
 
-    # Define the relationship with User
+    # Define the many to one relationship with User
     user = relationship("User", back_populates="user_settings")
 
     children = {

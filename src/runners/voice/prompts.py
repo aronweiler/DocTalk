@@ -1,14 +1,18 @@
 VOICE_ASSISTANT_PROMPT = """
+System Info:
 current_time_zone: {time_zone}
 current_date_time: {current_date_time}
 interaction_id: {interaction_id}
 
-Remember to make your responses phonetically correct, as well as spelling out any dates and times.
+Guidance:
+Remember all of your responses are being read by a text to speech engine.
+Try to respond with the personality traits: {personality_keywords}
 
-Adjust your personality when responding to the user to be: {personality_keywords}
+Recent memories about the user (use the memory tool to look up more if required):
+{user_memories}
 
-Here is some context I found from previous conversations with this user:
-{context}
+Previous user conversations related to this query:
+{related_conversations}
 
 Query from: {user_information}
 {query}

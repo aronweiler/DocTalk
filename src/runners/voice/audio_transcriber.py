@@ -1,9 +1,11 @@
+import os
 import webrtcvad
 import queue
-from runners.voice.speech_to_text import SpeechToText
 import logging
 import threading
 
+from runners.voice.speech_to_text import SpeechToText
+from runners.voice.player import play_wav_file
 
 class AudioTranscriber:
     def __init__(self, transcription_model_name = "base"):
@@ -100,6 +102,11 @@ class AudioTranscriber:
                 self.speech_to_text.stop_transcribing()
 
                 break
+
+        play_wav_file(
+            os.path.join(os.path.dirname(__file__), "audio", "boop-beep.wav"),
+            self.stop_event,
+        )
 
     def get_silence_length(self, frame, accumulated_silence, audio_rate):
         evaluation_frames = []

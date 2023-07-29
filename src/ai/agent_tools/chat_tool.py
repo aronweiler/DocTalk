@@ -9,7 +9,7 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 
 class LLMChainTool(AbstractTool):
-    def __init__(self, registered_settings, json_args):
+    def __init__(self, json_args):
         self.configuration = LLMChainConfiguration(json_args)
 
         if self.configuration.chat_model:

@@ -10,12 +10,10 @@ from utilities.token_helper import num_tokens_from_string
 from ai.configurations.llm_chain_configuration import LLMChainConfiguration
 from ai.abstract_ai import AbstractAI
 from ai.ai_result import AIResult
-from ai.agent_tools.utilities.registered_settings import RegisteredSettings
 
 
 class LLMChain(AbstractAI):
-    def configure(self, registered_settings: RegisteredSettings, json_args) -> None:
-        self.registered_settings = RegisteredSettings()
+    def configure(self, json_args) -> None:
         self.configuration = LLMChainConfiguration(json_args)
         if self.configuration.chat_model:
             llm = get_chat_model(

@@ -8,7 +8,6 @@ import json
 
 from ai.abstract_ai import AbstractAI
 from ai.ai_result import AIResult
-from ai.agent_tools.utilities.registered_settings import RegisteredSettings
 
 from ai.configurations.react_agent_configuration import AgentWithToolsConfiguration
 
@@ -16,7 +15,7 @@ from ai.agent_tools.utilities.tool_loader import load_tools
 
 
 class AgentWithTools(AbstractAI):
-    def configure(self, registered_settings, json_args) -> None:
+    def configure(self, json_args) -> None:
         self.configuration = AgentWithToolsConfiguration(json_args)
 
         if self.configuration.chat_model:
@@ -43,7 +42,6 @@ class AgentWithTools(AbstractAI):
             config=json_args,
             memory=memory,
             override_llm=None,
-            registered_settings=registered_settings,
         )
 
         self.agent_chain = initialize_agent(

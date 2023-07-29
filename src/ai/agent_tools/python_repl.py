@@ -5,7 +5,7 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 class PythonREPLTool(AbstractTool):
     def configure(
-        self, registered_settings, memory=None, override_llm=None, json_args=None
+        self, memory=None, override_llm=None, json_args=None
     ) -> None:
         self.tool = python_repl_tool()
 

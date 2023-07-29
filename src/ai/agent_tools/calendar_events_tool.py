@@ -10,7 +10,7 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 class CalendarEventsTool(AbstractTool):
     def configure(
-        self, registered_settings, memory=None, override_llm=None, json_args=None
+        self, memory=None, override_llm=None, json_args=None
     ) -> None:
         pass
 

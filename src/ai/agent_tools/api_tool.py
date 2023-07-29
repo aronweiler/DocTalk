@@ -7,7 +7,7 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 class APITool(AbstractTool):
     def configure(
-        self, registered_settings, memory=None, override_llm=None, json_args=None
+        self, memory=None, override_llm=None, json_args=None
     ) -> None:
         self.configuration = APIToolConfiguration(json_args=json_args)
         # Configure the local Gorilla LLM 

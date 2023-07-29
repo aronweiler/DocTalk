@@ -6,17 +6,14 @@ import importlib
 from typing import cast
 from ai.agent_tools.utilities.tool_header import ToolHeader
 from ai.agent_tools.utilities.abstract_tool import AbstractTool
-from ai.agent_tools.self_settings_tool import SelfSettingsTool
 
 
 def create_tool(
-    tool_json=None, memory=None, override_llm=None, registered_settings=None
+    tool_json=None, memory=None, override_llm=None
 ):
     if tool_json is None:
         raise Exception("Tool JSON must be provided")
 
-    if registered_settings is None:
-        raise Exception("Registered settings must be provided")
 
     header = ToolHeader(tool_json)
 
@@ -29,14 +26,13 @@ def create_tool(
 
         if "arguments" in tool_json:
             tool_instance.configure(
-                registered_settings,
                 memory=memory,
                 override_llm=override_llm,
                 json_args=tool_json["arguments"],
             )
         else:
             tool_instance.configure(
-                registered_settings, memory=memory, override_llm=override_llm
+                memory=memory, override_llm=override_llm
             )
 
         tool = Tool(

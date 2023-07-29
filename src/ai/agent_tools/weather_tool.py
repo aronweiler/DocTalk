@@ -5,13 +5,19 @@ import os
 from datetime import datetime
 import logging
 
+# For testing
+# Add the root path to the python path so we can import the database
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
 from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 
 class WeatherTool(AbstractTool):
 
     def configure(
-        self, registered_settings, memory=None, override_llm=None, json_args=None
+        self, memory=None, override_llm=None, json_args=None
     ) -> None:
         pass
 
@@ -30,7 +36,7 @@ class WeatherTool(AbstractTool):
             try:
                 if 'date' in json_query:
                     date_string = json_query["date"]
-                    parsed_date = datetime.strptime(date_string, date_format) 
+                    parsed_date = datetime.strptime(date_string, date_format).date() 
                 else:
                     parsed_date = datetime.now().date()
             except:
@@ -52,7 +58,8 @@ class WeatherTool(AbstractTool):
                 for forecast in result.forecasts:
                     logging.debug("Forecast date: " + str(forecast.date))
                     if forecast.date == parsed_date:
-                        return f"Low temp: {forecast.lowest_temperature} degrees. High temp: {forecast.highest_temperature} degrees."
+                        return f"Summarize in one sentence the following hourly forecast for {forecast.date}:\n" + "\n".join([f"Time: {fc.time}, temp: {fc.temperature}, description: {fc.description}" for fc in forecast.hourly])
+                        #return f"Low temp: {forecast.lowest_temperature} degrees. High temp: {forecast.highest_temperature} degrees."
                 
                 return f"Could not find a forecast for {parsed_date}."
         except Exception as e:
@@ -78,3 +85,13 @@ class WeatherTool(AbstractTool):
                 return asyncio.get_event_loop()
             else:
                 raise ex
+            
+
+
+# Test code
+if __name__ == "__main__":
+    tool = WeatherTool()
+
+    result = tool.run("{\"location\": \"San Diego\", \"date\": \"2023-07-29\"}")
+
+    print(result)

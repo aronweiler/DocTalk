@@ -8,7 +8,6 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 class WikipediaTool(AbstractTool):
     def configure(
         self,
-        registered_settings,
         memory=None,
         override_llm=None,
         json_args: Optional[Union[Dict, None]] = None,

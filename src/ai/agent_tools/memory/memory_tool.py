@@ -10,7 +10,7 @@ from memory.long_term.database.users import Users, User
 
 class MemoryTool(AbstractTool):
     def configure(
-        self, registered_settings, memory=None, override_llm=None, json_args=None
+        self, memory=None, override_llm=None, json_args=None
     ) -> None:
         self.configuration = MemoryToolConfiguration(json_args)
         self.memories = Memories(self.configuration.db_env_location)
@@ -25,24 +25,17 @@ class MemoryTool(AbstractTool):
             memory_action = MemoryAction.from_json(json_args)
 
             with self.users.session_context(self.users.Session()) as session:
-                # Is there a user associated with this memory?
-                user = None
-                if memory_action.associated_user_email is not None:
-                    user = self.users.find_user_by_email(session,
-                        email=memory_action.associated_user_email, eager_load=[User.user_settings]
-                    )
-
                 if memory_action.memory_action == MemoryActionType.add_memory:
                     self.memories.store_text_memory(session,
                         memory_text=memory_action.text,
-                        associated_user=user,
+                        associated_user_email=memory_action.associated_user_email,
                         interaction_id=memory_action.interaction_id,
                     )
                     return "Memory successfully stored!"
                 elif memory_action.memory_action == MemoryActionType.search_memory:
                     memories = self.memories.find_memories(session,
                         memory_text_search_query=memory_action.text,
-                        associated_user=user,
+                        associated_user_email=memory_action.associated_user_email,
                         interaction_id=memory_action.interaction_id,
                         eager_load=[Memory.user],
                         search_type=memory_action.search_type,

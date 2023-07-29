@@ -22,10 +22,14 @@ class TextToSpeech():
         self.polly = self.session.client("polly")
         self.sample_rate = 16000
 
-    def speak(self, text, voice_id="Brian", stop_event=None):
+    def speak(self, text, voice_id="Brian", stop_event=None, speech_rate_percentage=100):
         try:
             # Request speech synthesis
-            response = self.polly.synthesize_speech(Text=text, OutputFormat="mp3", VoiceId=voice_id, SampleRate=str(self.sample_rate))
+            # Adjust the speaking rate using SSML prosody.  
+            # This opens the door to having the AI generate SSML tags for things like emphasis, pauses, etc.
+            text = f"<speak><prosody rate=\"{speech_rate_percentage}%\">" + text + "</prosody></speak>"
+     
+            response = self.polly.synthesize_speech(Text=text, OutputFormat="mp3", VoiceId=voice_id, SampleRate=str(self.sample_rate), TextType="ssml")
         except (BotoCoreError, ClientError) as error:
             logging.error(error)
             # TODO: Fallback to something else??            

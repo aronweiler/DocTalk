@@ -15,22 +15,27 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.
 
 from memory.long_term.models import User, Memory
 from memory.long_term.database.vector_database import VectorDatabase, SearchType
+from memory.long_term.database.users import Users
 
 
 class Memories(VectorDatabase):
-    def __init__(self, db_env_location):
+    def __init__(self, db_env_location):        
         super().__init__(db_env_location)
+
+        self.users = Users(db_env_location)
 
     def store_text_memory(
         self,
         session,
         memory_text: str,
-        associated_user: Union[User, None] = None,
+        associated_user_email: Union[User, None] = None,
         interaction_id: Union[UUID, None] = None,
         additional_metadata: Union[str, None] = None,
     ):
-        if associated_user is not None:
-            user_id = associated_user.id
+        # look up the user and get their ID
+        user = self.users.find_user_by_email(session, associated_user_email, eager_load=[])
+        if user is not None:
+            user_id = user.id
         else:
             user_id = None
 
@@ -50,7 +55,7 @@ class Memories(VectorDatabase):
         session,
         memory_text_search_query: str,
         search_type: SearchType,
-        associated_user: Union[User, None] = None,
+        associated_user_email = None,
         interaction_id: Union[UUID, None] = None,
         eager_load: List[str] = [],
         top_k=10,
@@ -58,16 +63,21 @@ class Memories(VectorDatabase):
     ) -> List[Memory]:
         # TODO: Handle searching metadata... e.g. metadata_search_query: Union[str,None] = None
 
+        # look up the user and get their ID
+        user = self.users.find_user_by_email(session, associated_user_email, eager_load=[])
+
         # Before searching, pre-filter the query to only include memories that match the single inputs
         query = session.query(Memory).filter(
             Memory.is_deleted == return_deleted,
-            Memory.user_id == associated_user.id
-            if associated_user is not None
+            Memory.user_id == user.id
+            if user is not None
             else True,
             Memory.interaction_id == interaction_id
             if interaction_id is not None
             else True,
         )
+
+        query = super().eager_load(query, eager_load)
 
         if search_type == SearchType.key_word:
             # TODO: Do better key word search
@@ -78,9 +88,7 @@ class Memories(VectorDatabase):
             embedding = self._get_embedding(memory_text_search_query)
             query = self._get_nearest_neighbors(session, query, embedding, top_k=top_k)
         else:
-            raise ValueError(f"Unknown search type: {search_type}")
-
-        query = super().eager_load(query, eager_load)
+            raise ValueError(f"Unknown search type: {search_type}")        
 
         return query.all()[:top_k]
 

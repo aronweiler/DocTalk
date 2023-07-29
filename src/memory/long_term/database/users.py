@@ -1,3 +1,9 @@
+# For testing
+# Add the root path to the python path so we can import the database
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+
 from typing import Union, List
 from memory.long_term.models import User
 from memory.long_term.database.vector_database import VectorDatabase
@@ -55,3 +61,23 @@ class Users(VectorDatabase):
         query = super().eager_load(query, eager_load)
 
         return query.all()
+
+
+if __name__ == "__main__":    
+
+    from memory.long_term.database.users import Users
+    db_env = "src/memory/long_term/db.env"
+    users = Users(db_env)
+
+    with users.session_context(users.Session()) as session:
+        user = users.find_user_by_email(session, "gaiaweiler@gmail.com", eager_load=[User.memories, User.conversations, User.user_settings])
+
+        if user is not None:
+            for result in user.user_settings:
+                print(f"Setting -- User: {result.user.name} - {result.setting_name}={result.setting_value}")
+
+            for result in user.memories:
+                print(f"Memory -- User: {result.user.name} - {result.memory_text}")
+
+            for result in user.conversations:
+                print(f"Conversation -- User: {result.user.name} - {result.conversation_text}")

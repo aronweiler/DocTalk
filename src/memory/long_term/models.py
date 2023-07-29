@@ -27,14 +27,6 @@ class ModelBase(Base):
 
     __tablename__ = "none" # This is just a placeholder, it will be overridden by the child class    
 
-class Children(Enum):
-    CONVERSATIONS = 1
-    MEMORIES = 2
-    DOCUMENTS = 3
-    USER_SETTINGS = 4,
-    CONVERSATION_TOOL_USES = 5,
-    USER = 6,
-
 
 class User(ModelBase):
     __tablename__ = "users"
@@ -50,13 +42,18 @@ class User(ModelBase):
     memories = relationship("Memory", back_populates="user")
     documents = relationship("Document", back_populates="user")
     user_settings = relationship("UserSetting", back_populates="user")
-
-    children = {
-        Children.CONVERSATIONS: conversations,
-        Children.MEMORIES: memories,
-        Children.DOCUMENTS: documents,
-        Children.USER_SETTINGS: user_settings,
-    }
+    
+    def get_setting(self, setting_name, default):        
+        for setting in self.user_settings:
+            if setting.setting_name == setting_name:
+                return setting.setting_value
+            
+        return default
+    
+    def set_setting(self, setting_name, value):        
+        for setting in self.user_settings:
+            if setting.setting_name == setting_name:
+                setting.setting_value = value
     
 
 class UserSetting(ModelBase):
@@ -77,10 +74,6 @@ class UserSetting(ModelBase):
 
     # Define the many to one relationship with User
     user = relationship("User", back_populates="user_settings")
-
-    children = {
-        Children.USER: user,
-    }
 
 # TBD
 # class Tool(ModelBase):
@@ -129,11 +122,6 @@ class Conversation(ModelBase):
     user = relationship("User", back_populates="conversations")
     conversation_tool_uses = relationship("ConversationToolUse", back_populates="conversation")    
 
-    children = {
-        Children.USER: user,
-        Children.CONVERSATION_TOOL_USES: conversation_tool_uses,
-    }
-
 class ConversationToolUse(ModelBase):
     __tablename__ = "conversation_tool_uses"
 
@@ -155,10 +143,6 @@ class ConversationToolUse(ModelBase):
 
     # Define the relationship with Conversation
     conversation = relationship("Conversation", back_populates="conversation_tool_uses")
-
-    children = {
-        Children.CONVERSATIONS: conversation,
-    }
 
 class Memory(ModelBase):
     __tablename__ = "memories"
@@ -192,10 +176,6 @@ class Memory(ModelBase):
     # Define the relationship with User
     user = relationship("User", back_populates="memories")
 
-    children = {
-        Children.USER: user,
-    }
-
 class Document(ModelBase):
     __tablename__ = "documents"
 
@@ -217,7 +197,3 @@ class Document(ModelBase):
 
     # Define the relationship with User
     user = relationship("User", back_populates="documents")
-
-    children = {
-        Children.USER: user,
-    }

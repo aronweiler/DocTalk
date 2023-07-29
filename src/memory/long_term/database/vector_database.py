@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 
 from enum import Enum
 
-
 class SearchType(Enum):
     key_word = "key_word"
     similarity = "similarity"

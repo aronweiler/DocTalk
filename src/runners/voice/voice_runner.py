@@ -12,7 +12,6 @@ import json
 import uuid
 
 from ai.abstract_ai import AbstractAI
-from ai.agent_tools.utilities.registered_settings import RegisteredSettings
 
 from runners.runner import Runner
 from runners.voice.configuration.voice_runner_configuration import (
@@ -27,7 +26,6 @@ from runners.voice.audio_transcriber import AudioTranscriber
 from runners.voice.wake_word import WakeWord
 from runners.voice.text_to_speech import TextToSpeech
 
-from memory.long_term.models import Children
 from memory.long_term.database.vector_database import SearchType
 from memory.long_term.database.conversations import Conversations
 from memory.long_term.database.users import Users
@@ -105,10 +103,11 @@ class VoiceRunner(Runner):
                 user = self.users.find_user_by_email(
                     session,
                     wake_word_model.user_information.user_email,
-                    eager_load=[User.children[Children.USER_SETTINGS]],
+                    eager_load=[User.user_settings],
                 )
 
                 if user is None:
+                    logging.info(f"User does not exist, creating new user. {wake_word_model.user_information.user_email}")
                     # If the user doesn't exist, create a new user
                     user = User(
                         name=wake_word_model.user_information.user_name,
@@ -116,13 +115,10 @@ class VoiceRunner(Runner):
                         location=wake_word_model.user_information.user_location,
                         email=wake_word_model.user_information.user_email,
                     )
+                    session.add(user)
                     session.commit()
-
-                user = self.users.add_update_user(
-                    session, user, eager_load=[User.children[Children.USER_SETTINGS]]
-                )
-
-                logging.info(f"Added / updated user: {user.name}, email: {user.email}")
+                else:
+                    logging.info(f"User {user.name} exists")
 
                 # Look at all of the settings int he wake word model user information and add it to the user settings if it doesn't exist
                 for setting in wake_word_model.user_information.settings:
@@ -152,7 +148,7 @@ class VoiceRunner(Runner):
                     #     user.update_add_setting_for_user(user.email, UserSetting(user_id=user.id, setting_name=setting, setting_value=wake_word_model.user_information.settings[setting]))
                     #     logging.info(f"Added setting {setting} with value {wake_word_model.user_information.settings[setting]} for user {user.name}")
 
-    def configure(self, registered_settings: RegisteredSettings):
+    def configure(self):
         # TODO: Add settings to control voice here
         pass
 
@@ -231,7 +227,7 @@ class VoiceRunner(Runner):
                 self.activation_thread.start()
 
                 last_activation = time.time()
-                logging.debug("--- Continuing to listen for wake words...")
+                logging.info("--- Continuing to listen for wake words...")
 
     def process_activation(self, prediction):
         # Create an interaction ID for this activation
@@ -245,8 +241,8 @@ class VoiceRunner(Runner):
                 session,
                 wake_model.user_information.user_email,
                 eager_load=[
-                    User.children[Children.USER_SETTINGS],
-                    User.children[Children.MEMORIES]
+                    User.user_settings,
+                    User.memories
                 ],
             )
             
@@ -255,6 +251,7 @@ class VoiceRunner(Runner):
                     "I'm sorry, you are not authorized to use this system.",
                     prediction["wake_word_model"].tts_voice,
                     self.stop_event,
+                    125
                 )
                 logging.error(
                     f"Could not find user {wake_model.user_information.user_email} in the database"
@@ -283,10 +280,9 @@ class VoiceRunner(Runner):
 
             if transcribed_audio is None or len(transcribed_audio) == 0:
                 logging.info("No audio detected")
-                # sad face
-                self.text_to_speech.speak(
-                    "I'm sorry, I didn't get that.  Can you please repeat your query?",
-                    prediction["wake_word_model"].tts_voice,
+                 # Alert the response from the AI is back
+                play_wav_file(
+                    os.path.join(os.path.dirname(__file__), "audio", "error.wav"),
                     self.stop_event,
                 )
                 return
@@ -370,16 +366,23 @@ class VoiceRunner(Runner):
                         if s.setting_name == "tts_voice"
                     ][0].setting_value,
                     self.stop_event,
+                    conversation_user.get_setting("speech_rate", 125)
                 )
                 text_to_speech_end_time = time.time()
                 logging.info(
                     f"Text to speech took {str(text_to_speech_end_time - text_to_speech_start_time)} seconds"
                 )
             except Exception as e:
+                logging.error("Failed to process.  ", e)
+                play_wav_file(
+                    os.path.join(os.path.dirname(__file__), "audio", "error.wav"),
+                    self.stop_event,
+                )
+
                 # Store the exception
                 self.conversations.store_conversation(
-                    session, "Interaction failed.  See exception for details.", interaction_id, conversation_user, exception=e
-                )    
+                    session, "Interaction failed.  See exception for details.", interaction_id, conversation_user, exception=str(e)
+                )  
 
     def get_prompt(
         self,

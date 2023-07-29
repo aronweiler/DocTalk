@@ -9,7 +9,7 @@ class ConsoleRunner(Runner):
     def __init__(self):
         pass
         
-    def configure(self, registered_settings):
+    def configure(self):
         pass
 
     def run(self, abstract_ai: AbstractAI):

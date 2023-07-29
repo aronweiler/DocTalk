@@ -13,8 +13,6 @@ from runners.coder.code_runner import CodeRunner
 from runners.unit_tests.unit_test_runner import UnitTestRunner
 from runners.voice.voice_runner import VoiceRunner
 
-from ai.agent_tools.utilities.registered_settings import RegisteredSettings
-
 AI_TYPES = {
     "qa_chain": QAChainAI,
     "agent_with_tools": AgentWithTools,
@@ -58,15 +56,13 @@ logging.debug("ai_args:")
 for key, value in ai_args.items():
     logging.debug(f"{key}: {value}")
 
-# Create the registered settings
-registered_settings = RegisteredSettings()
 
 # get the ai
 ai_class = AI_TYPES.get(ai_type)
 if ai_class:
     ai = ai_class()
     try:
-        ai.configure(registered_settings, ai_args)
+        ai.configure(ai_args)
     except Exception as e:
         logging.debug("Error configuring AI: " + str(e))
         raise e
@@ -107,8 +103,9 @@ for runner in runners:
         else:
             runner = runner_class()
 
-        # Configure the runner with the settings
-        runner.configure(registered_settings)
+        # Configure the runner
+        # Reserved for later
+        runner.configure()
 
         if callable(runner):
             runner(

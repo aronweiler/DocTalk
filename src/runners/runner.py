@@ -1,8 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
 from ai.abstract_ai import AbstractAI
-from pydantic import BaseModel
-from ai.agent_tools.utilities.registered_settings import RegisteredSettings
 
 
 class Runner(ABC):
@@ -11,7 +9,7 @@ class Runner(ABC):
         pass
 
     @abstractmethod
-    def configure(self, registered_settings: RegisteredSettings):
+    def configure(self):
         pass
 
     def get_source_docs_to_print(self, source_documents=None):

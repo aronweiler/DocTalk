@@ -1,5 +1,6 @@
-from typing import Union, List
+from typing import Union, List, Any
 from uuid import UUID
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 import openai
 
@@ -59,7 +60,7 @@ class Conversations(VectorDatabase):
         search_type: SearchType,
         associated_user: Union[User, None] = None,
         interaction_id: Union[UUID, None] = None,
-        eager_load: List[str] = [],
+        eager_load: List[InstrumentedAttribute[Any]] = [],
         top_k=10,
         return_deleted=False,
     ) -> List[Conversation]:

@@ -1,5 +1,6 @@
 import logging
-from typing import Union, List
+from typing import Union, List, Any
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 import openai
 
@@ -28,7 +29,7 @@ class Memories(VectorDatabase):
         self,
         session,
         memory_text: str,
-        associated_user_email: Union[User, None] = None,
+        associated_user_email: Union[str, None] = None,
         interaction_id: Union[UUID, None] = None,
         additional_metadata: Union[str, None] = None,
     ):
@@ -57,8 +58,9 @@ class Memories(VectorDatabase):
         search_type: SearchType,
         associated_user_email = None,
         interaction_id: Union[UUID, None] = None,
-        eager_load: List[str] = [],
+        eager_load: List[InstrumentedAttribute[Any]] = [],
         top_k=10,
+        distance=0.5,
         return_deleted=False,
     ) -> List[Memory]:
         # TODO: Handle searching metadata... e.g. metadata_search_query: Union[str,None] = None
@@ -86,7 +88,7 @@ class Memories(VectorDatabase):
             )
         elif search_type == SearchType.similarity or search_type == SearchType.key_word:
             embedding = self._get_embedding(memory_text_search_query)
-            query = self._get_nearest_neighbors(session, query, embedding, top_k=top_k)
+            query = self._get_nearest_neighbors(session, query, embedding, top_k=top_k, distance=distance)
         else:
             raise ValueError(f"Unknown search type: {search_type}")        
 
@@ -104,8 +106,9 @@ class Memories(VectorDatabase):
         memory.is_deleted = True
         session.merge(memory)
 
-    def _get_nearest_neighbors(self, session, query, embedding, top_k=5):
-        return session.scalars(query.order_by(Memory.embedding.l2_distance(embedding)).limit(top_k))
+    def _get_nearest_neighbors(self, session, query, embedding, top_k=5, distance=0.5):
+        print("DISTANCE: ", session.scalars(select(Memory.embedding.l2_distance([3, 1, 2]))))
+        return session.scalars(query.order_by(Memory.embedding.l2_distance(embedding) < distance).limit(top_k))
 
     def _get_embedding(self, text: str, embedding_model="text-embedding-ada-002"):
         return openai.Embedding.create(input=[text], model=embedding_model)["data"][0][

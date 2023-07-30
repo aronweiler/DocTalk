@@ -4,7 +4,8 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
-from typing import Union, List
+from typing import Union, List, Any
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from memory.long_term.models import User
 from memory.long_term.database.vector_database import VectorDatabase
 
@@ -55,7 +56,7 @@ class Users(VectorDatabase):
 
         return user
 
-    def get_all_users(self, session, eager_load: List[str] = []) -> List[User]:
+    def get_all_users(self, session, eager_load: List[InstrumentedAttribute[Any]] = []) -> List[User]:
         query = session.query(User)
 
         query = super().eager_load(query, eager_load)

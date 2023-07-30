@@ -1,11 +1,13 @@
 # Basic stuff
 keyboard
 python-dotenv
+termcolor
 
 # AI
 langchain
 llama-cpp-python
 openai
+tenacity
 
 # Token counting
 tiktoken

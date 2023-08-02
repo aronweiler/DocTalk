@@ -12,9 +12,10 @@ class DebugCallbackHandler(BaseCallbackHandler):
         logging.debug(f"on_text counted {token_helper.num_tokens_from_string(just_prompt)} tokens")
 
     def on_chain_start(self, serialized: Dict[str, Any], inputs: Dict[str, Any], *, run_id: UUID, parent_run_id: UUID | None = None, tags: List[str] | None = None, **kwargs: Any) -> Any:  
-        if 'context' in inputs:
-            total_message = f"{inputs['question']}\n\n{inputs['context']}"
-        else:
-            total_message = inputs['question']
+        pass
+        # if 'context' in inputs:
+        #     total_message = f"{inputs['question']}\n\n{inputs['context']}"
+        # else:
+        #     total_message = inputs['question']
 
-        logging.debug(f"on_chain_start counted {token_helper.num_tokens_from_string(total_message)} tokens")
+        # logging.debug(f"on_chain_start counted {token_helper.num_tokens_from_string(total_message)} tokens")

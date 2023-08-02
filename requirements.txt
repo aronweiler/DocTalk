@@ -6,6 +6,7 @@ termcolor
 # AI
 langchain
 llama-cpp-python
+ctransformers
 openai
 tenacity
 

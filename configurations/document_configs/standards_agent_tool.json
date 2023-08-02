@@ -1,0 +1,57 @@
+{
+    "ai": {
+        "type": "agent_with_tools",
+        "arguments": {
+            "use_memory": true,
+            "run_locally": false,
+            "ai_temp": "0",
+            "verbose": true,
+            "max_tokens": 4096,
+            "tools": [
+                {
+                    "friendly_name": "Standards and Regulations Tool",
+                    "description": "Useful for querying standards, regulations, and other bodies such as the FDA, IEC, ISO, and ANSI. Input should be a fully formed question",
+                    "tool_module_name": "ai.agent_tools.vector_store_retrieval_qa_tool",
+                    "tool_class_name": "VectorStoreRetrievalQATool",
+                    "arguments": {
+                        "database_name": "IEC",
+                        "chat_model": true,
+                        "use_memory": false,
+                        "run_locally": false,
+                        "ai_temp": "0",
+                        "top_k": 10,
+                        "chain_type": "stuff",
+                        "search_type": "mmr",
+                        "search_distance": 0.6,
+                        "verbose": true,
+                        "max_tokens": 4096,
+                        "return_source_documents": true
+                    }
+                },
+                {
+                    "friendly_name": "COSMO Tool",
+                    "description": "Useful for the COSMO documentation. Input should be a fully formed question",
+                    "tool_module_name": "ai.agent_tools.vector_store_retrieval_qa_tool",
+                    "tool_class_name": "VectorStoreRetrievalQATool",
+                    "arguments": {
+                        "database_name": "cosmo",
+                        "use_memory": false,
+                        "run_locally": true,
+                        "ai_temp": "0",
+                        "top_k": 5,
+                        "chain_type": "stuff",
+                        "search_type": "mmr",
+                        "search_distance": 0.6,
+                        "verbose": true,
+                        "max_tokens": 2048,
+                        "return_source_documents": true
+                    }
+                }
+            ]
+        }
+    },
+    "runner": {
+        "type": "console",
+        "arguments": {}
+    }
+}

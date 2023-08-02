@@ -1,0 +1,20 @@
+{
+    "ai": {
+        "type": "ctransformer_llm",
+        "arguments": {
+            "run_locally": true,
+            "model": "H:\\LLM\\WizardCoder-15B-1.0.ggmlv3.q5_1.bin",
+            "chat_model": false,
+            "ai_temp": 0,
+            "verbose": true,
+            "max_tokens": 4096
+        }
+    },
+    "runner": {
+        "type": "code_review",
+        "arguments": {
+            "code_file": "C:\\Repos\\sample_docs\\Work\\Fpga Code\\Bug\\fpga_chunk.cc",
+            "language": "C++"
+        }
+    }
+}

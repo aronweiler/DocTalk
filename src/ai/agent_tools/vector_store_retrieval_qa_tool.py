@@ -1,6 +1,7 @@
 import time
 import logging
 import os
+from typing import Any, Dict, List, Union
 import shared.constants as constants
 from documents.vector_database import get_database
 from shared.selector import get_llm, get_embedding
@@ -10,29 +11,31 @@ from ai.agent_tools.utilities.abstract_tool import AbstractTool
 
 class VectorStoreRetrievalQATool(AbstractTool):
 
-    def configure(self, database_name, run_locally, override_llm = None, top_k = 4, search_type = "mmr", chain_type = "stuff", search_distance = .5, verbose = False, max_tokens = constants.MAX_LOCAL_CONTEXT_SIZE, return_source_documents = False, return_direct = None):
-            self.database_name = database_name
-            self.top_k = top_k
-            self.search_type = search_type
-            self.search_distance = search_distance
-            self.verbose = verbose
-            self.max_tokens = max_tokens
-            self.return_source_documents = return_source_documents
+    def configure(self, memory=None, override_llm=None, json_args:dict={}):
+            self.run_locally:bool = bool(json_args["run_locally"])
+            self.database_name = json_args["database_name"]
+            self.top_k = json_args["top_k"]
+            self.search_type = json_args["search_type"]
+            self.chain_type = json_args["chain_type"]
+            self.search_distance = json_args["search_distance"]
+            self.verbose = json_args["verbose"]
+            self.max_tokens = json_args["max_tokens"]
+            self.return_source_documents = json_args["return_source_documents"]
 
             # Load the specified database 
-            self.db = get_database(get_embedding(run_locally), database_name)    
+            self.db = get_database(get_embedding(self.run_locally), self.database_name)    
 
-            vectordbkwargs = {"search_distance": search_distance, "k": top_k, "search_type": search_type}
+            vectordbkwargs = {"search_distance": self.search_distance, "k": self.top_k, "search_type": self.search_type}
 
             # Get the llm
             if override_llm != None:
                  llm = override_llm
             else:
-                llm = get_llm(run_locally)
+                llm = get_llm(self.run_locally)
             
-            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type=chain_type, retriever=self.db.as_retriever(search_kwargs=vectordbkwargs), verbose=verbose, return_source_documents=return_source_documents)
+            self.retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type=self.chain_type, retriever=self.db.as_retriever(search_kwargs=vectordbkwargs), verbose=self.verbose, return_source_documents=self.return_source_documents)
 
-            logging.debug(f"VectorStoreRetrievalQATool initialized with database_name={database_name}, top_k={top_k}, search_type={search_type}, search_distance={search_distance}, verbose={verbose}, max_tokens={max_tokens}")
+            logging.debug(f"VectorStoreRetrievalQATool initialized with database_name={self.database_name}, top_k={self.top_k}, search_type={self.search_type}, search_distance={self.search_distance}, verbose={self.verbose}, max_tokens={self.max_tokens}")
 
     @property
     def database(self):

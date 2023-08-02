@@ -5,6 +5,7 @@ import logging
 from ai.qa_chain import QAChainAI
 from ai.llm_chain import LLMChain
 from ai.agent_with_tools import AgentWithTools
+from ai.ctransformer_llm import CTransformersLLM
 from runners.api.rest_api_runner import RestAPIRunner
 from runners.console.console_runner import ConsoleRunner
 from runners.question_file.question_file_runner import QuestionFileRunner
@@ -12,11 +13,13 @@ from runners.cvss.cvss_runner import CvssRunner
 from runners.coder.code_runner import CodeRunner
 from runners.unit_tests.unit_test_runner import UnitTestRunner
 from runners.voice.voice_runner import VoiceRunner
+from runners.code_review.code_review_runner import CodeReviewRunner
 
 AI_TYPES = {
     "qa_chain": QAChainAI,
     "agent_with_tools": AgentWithTools,
     "llm_chain": LLMChain,
+    "ctransformer_llm": CTransformersLLM
 }
 
 RUNNER_TYPES = {
@@ -26,7 +29,8 @@ RUNNER_TYPES = {
     "cvss": CvssRunner,
     "code": CodeRunner,
     "unit_test": UnitTestRunner,
-    "voice": VoiceRunner
+    "voice": VoiceRunner,
+    "code_review": CodeReviewRunner
 }
 
 parser = argparse.ArgumentParser()

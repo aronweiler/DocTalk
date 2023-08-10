@@ -14,6 +14,7 @@ from runners.coder.code_runner import CodeRunner
 from runners.unit_tests.unit_test_runner import UnitTestRunner
 from runners.voice.voice_runner import VoiceRunner
 from runners.code_review.code_review_runner import CodeReviewRunner
+from runners.sts.provider_lookup_runner import ProviderLookupRunner
 
 AI_TYPES = {
     "qa_chain": QAChainAI,
@@ -30,7 +31,8 @@ RUNNER_TYPES = {
     "code": CodeRunner,
     "unit_test": UnitTestRunner,
     "voice": VoiceRunner,
-    "code_review": CodeReviewRunner
+    "code_review": CodeReviewRunner,
+    "provider_lookup_runner": ProviderLookupRunner
 }
 
 parser = argparse.ArgumentParser()
